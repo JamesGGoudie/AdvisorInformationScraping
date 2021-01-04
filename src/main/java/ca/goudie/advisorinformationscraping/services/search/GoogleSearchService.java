@@ -12,8 +12,10 @@ import java.util.List;
 public class GoogleSearchService implements SearchService {
 
 	@Override
-	public List<String> search(final WebDriver driver, final int resultsLimit) {
-		this.performQuery(driver, "test");
+	public List<String> search(
+			final WebDriver driver, final String query, final int resultsLimit
+	) {
+		this.performQuery(driver, query);
 
 		return this.getSearchResults(driver, resultsLimit);
 	}
@@ -28,8 +30,7 @@ public class GoogleSearchService implements SearchService {
 	}
 
 	private List<String> getSearchResults(
-			final WebDriver driver,
-			final int resultsLimit
+			final WebDriver driver, final int resultsLimit
 	) {
 		final List<String> links = new ArrayList<>();
 
@@ -51,9 +52,7 @@ public class GoogleSearchService implements SearchService {
 	}
 
 	private void getSearchResultsOnPage(
-			final WebDriver driver,
-			final List<String> links,
-			final int resultsLimit
+			final WebDriver driver, final List<String> links, final int resultsLimit
 	) {
 		// May contain junk like "People also search".
 		// Filter them out by searching for this class.

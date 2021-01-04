@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface SearchService {
 
-	List<String> search(final WebDriver driver, final int resultsLimit);
+	List<String> search(
+			final WebDriver driver, final String query, final int resultsLimit
+	);
 
 }

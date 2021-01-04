@@ -25,7 +25,7 @@ public class RunController {
 		SearchService searcher = this.searchServiceSelector.selectSearchService();
 		WebDriver webDriver = this.webDriverSelector.selectWebDriver();
 
-		return searcher.search(webDriver, 20);
+		return searcher.search(webDriver, "test", 20);
 	}
 
 }
