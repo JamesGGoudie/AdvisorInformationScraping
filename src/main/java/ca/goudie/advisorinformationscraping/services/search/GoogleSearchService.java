@@ -12,15 +12,10 @@ import java.util.List;
 public class GoogleSearchService implements SearchService {
 
 	@Override
-	public String search(final WebDriver driver, final int resultsLimit) {
+	public List<String> search(final WebDriver driver, final int resultsLimit) {
 		this.performQuery(driver, "test");
-		final List<String> links = this.getSearchResults(driver, resultsLimit);
 
-		for (final String link : links) {
-			System.out.println(link);
-		}
-
-		return driver.getPageSource();
+		return this.getSearchResults(driver, resultsLimit);
 	}
 
 	private void performQuery(final WebDriver driver, final String query) {

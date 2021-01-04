@@ -2,8 +2,10 @@ package ca.goudie.advisorinformationscraping.services.search;
 
 import org.openqa.selenium.WebDriver;
 
+import java.util.List;
+
 public interface SearchService {
 
-	String search(final WebDriver driver, final int resultsLimit);
+	List<String> search(final WebDriver driver, final int resultsLimit);
 
 }
