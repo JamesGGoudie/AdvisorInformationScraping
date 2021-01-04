@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +45,8 @@ public class GoogleSearchService implements SearchService {
 			this.getSearchResultsOnPage(driver, links);
 
 			// If we need more results and there is a next page to look at...
-			if (links.size() < GoogleSearchService.RESULTS_LIMIT &&
-					this.hasNextPage(driver)) {
+			if (links.size() < GoogleSearchService.RESULTS_LIMIT && this.hasNextPage(
+					driver)) {
 				this.goToNextPage(driver);
 			} else {
 				break;
@@ -58,18 +59,23 @@ public class GoogleSearchService implements SearchService {
 	private void getSearchResultsOnPage(
 			final WebDriver driver, final List<String> links
 	) {
-		final List<WebElement>
-				results =
-				driver.findElements(By.className("yuRUbf"));
+		// May contain junk like "People also search".
+		// Filter them out by searching for this class.
+		final List<WebElement> resultGroups = driver.findElements(By.className(
+				"hlcw0c"));
+		final List<WebElement> results = new ArrayList<>();
+
+		if (resultGroups.size() > 0) {
+			for (final WebElement resultGroup : resultGroups) {
+				results.addAll(resultGroup.findElements(By.className("yuRUbf")));
+			}
+		} else {
+			// If there were no result groups, then there was no junk.
+			// Search the whole page for results instead.
+			results.addAll(driver.findElements(By.className("yuRUbf")));
+		}
 
 		for (final WebElement result : results) {
-			// Any results that have extra classes are garbage like "People also
-			// ask".
-			// Ignore these
-			if (!result.getAttribute("class").equals("yuRUbf")) {
-				continue;
-			}
-
 			final WebElement anchor = result.findElement(By.tagName("a"));
 			links.add(anchor.getAttribute("href"));
 
