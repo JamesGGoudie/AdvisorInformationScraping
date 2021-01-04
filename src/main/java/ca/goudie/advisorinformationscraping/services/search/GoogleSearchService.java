@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.search;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
@@ -62,12 +63,12 @@ public class GoogleSearchService implements SearchService {
 
 		if (resultGroups.size() > 0) {
 			for (final WebElement resultGroup : resultGroups) {
-				results.addAll(resultGroup.findElements(By.className("yuRUbf")));
+				results.addAll(this.findResultItems(resultGroup));
 			}
 		} else {
 			// If there were no result groups, then there was no junk.
 			// Search the whole page for results instead.
-			results.addAll(driver.findElements(By.className("yuRUbf")));
+			results.addAll(this.findResultItems(driver));
 		}
 
 		for (final WebElement result : results) {
@@ -87,6 +88,10 @@ public class GoogleSearchService implements SearchService {
 	private void goToNextPage(final WebDriver driver) {
 		final WebElement nextBtn = this.findNextButton(driver);
 		nextBtn.click();
+	}
+
+	private List<WebElement> findResultItems(final SearchContext searchContext) {
+		return searchContext.findElements(By.className("yuRUbf"));
 	}
 
 	private WebElement findNextButton(final WebDriver driver) {
