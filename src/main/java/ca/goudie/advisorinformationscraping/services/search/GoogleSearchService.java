@@ -3,8 +3,6 @@ package ca.goudie.advisorinformationscraping.services.search;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,9 +14,7 @@ public class GoogleSearchService implements SearchService {
 	private static final int RESULTS_LIMIT = 20;
 
 	@Override
-	public String search() {
-		final WebDriver driver = this.initDriver();
-
+	public String search(final WebDriver driver) {
 		this.performQuery(driver, "test");
 		final List<String> links = this.getSearchResults(driver);
 
@@ -27,20 +23,6 @@ public class GoogleSearchService implements SearchService {
 		}
 
 		return driver.getPageSource();
-	}
-
-	private WebDriver initDriver() {
-		System.setProperty("webdriver.chrome.driver",
-				"C:/Program Files/Selenium/chromedriver.exe");
-
-		final ChromeOptions options = new ChromeOptions();
-		options.addArguments("--headless",
-				"--disable-gpu",
-				"--window-size=1920,1200",
-				"--ignore-certificate-errors",
-				"--silent");
-
-		return new ChromeDriver(options);
 	}
 
 	private void performQuery(final WebDriver driver, final String query) {

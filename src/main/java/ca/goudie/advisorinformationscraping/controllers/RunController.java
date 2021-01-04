@@ -1,6 +1,10 @@
 package ca.goudie.advisorinformationscraping.controllers;
 
+import ca.goudie.advisorinformationscraping.services.dihelpers.SearchServiceSelector;
+import ca.goudie.advisorinformationscraping.services.dihelpers.WebDriverSelector;
 import ca.goudie.advisorinformationscraping.services.search.GoogleSearchService;
+import ca.goudie.advisorinformationscraping.services.search.SearchService;
+import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,11 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class RunController {
 
 	@Autowired
-	private GoogleSearchService googleSearchService;
+	private SearchServiceSelector searchServiceSelector;
+
+	@Autowired
+	private WebDriverSelector webDriverSelector;
 
 	@PostMapping("/run")
 	public String run() {
-		return this.googleSearchService.search();
+		SearchService searcher = this.searchServiceSelector.selectSearchService();
+		WebDriver webDriver = this.webDriverSelector.selectWebDriver();
+
+		return searcher.search(webDriver);
 	}
 
 }
