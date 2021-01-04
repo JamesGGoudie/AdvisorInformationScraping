@@ -1,6 +1,6 @@
 package ca.goudie.advisorinformationscraping.controllers;
 
-import ca.goudie.advisorinformationscraping.services.SearchService;
+import ca.goudie.advisorinformationscraping.services.search.GoogleSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class RunController {
 
 	@Autowired
-	private SearchService searchService;
+	private GoogleSearchService googleSearchService;
 
 	@PostMapping("/run")
 	public String run() {
-		return this.searchService.search();
+		return this.googleSearchService.search();
 	}
 
 }

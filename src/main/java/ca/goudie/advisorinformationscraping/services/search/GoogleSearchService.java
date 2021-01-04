@@ -1,4 +1,4 @@
-package ca.goudie.advisorinformationscraping.services;
+package ca.goudie.advisorinformationscraping.services.search;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -11,10 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class SearchService {
+public class GoogleSearchService implements SearchService {
 
 	private static final int RESULTS_LIMIT = 20;
 
+	@Override
 	public String search() {
 		final WebDriver driver = this.initDriver();
 
@@ -57,11 +58,11 @@ public class SearchService {
 		// Could have a while (true) here
 		// Using for to be safe
 		// Expecting at least one result per page
-		for (int i = 0; i < SearchService.RESULTS_LIMIT; ++i) {
+		for (int i = 0; i < GoogleSearchService.RESULTS_LIMIT; ++i) {
 			this.getSearchResultsOnPage(driver, links);
 
 			// If we need more results and there is a next page to look at...
-			if (links.size() < SearchService.RESULTS_LIMIT &&
+			if (links.size() < GoogleSearchService.RESULTS_LIMIT &&
 					this.hasNextPage(driver)) {
 				this.goToNextPage(driver);
 			} else {
@@ -90,7 +91,7 @@ public class SearchService {
 			final WebElement anchor = result.findElement(By.tagName("a"));
 			links.add(anchor.getAttribute("href"));
 
-			if (links.size() >= SearchService.RESULTS_LIMIT) {
+			if (links.size() >= GoogleSearchService.RESULTS_LIMIT) {
 				break;
 			}
 		}
