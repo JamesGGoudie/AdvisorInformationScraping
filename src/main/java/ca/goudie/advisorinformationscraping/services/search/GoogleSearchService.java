@@ -5,19 +5,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class GoogleSearchService implements SearchService {
 
-	private static final int RESULTS_LIMIT = 20;
-
 	@Override
-	public String search(final WebDriver driver) {
+	public String search(final WebDriver driver, final int resultsLimit) {
 		this.performQuery(driver, "test");
-		final List<String> links = this.getSearchResults(driver);
+		final List<String> links = this.getSearchResults(driver, resultsLimit);
 
 		for (final String link : links) {
 			System.out.println(link);
@@ -35,18 +32,20 @@ public class GoogleSearchService implements SearchService {
 		queryEl.submit();
 	}
 
-	private List<String> getSearchResults(final WebDriver driver) {
+	private List<String> getSearchResults(
+			final WebDriver driver,
+			final int resultsLimit
+	) {
 		final List<String> links = new ArrayList<>();
 
 		// Could have a while (true) here
 		// Using for to be safe
 		// Expecting at least one result per page
-		for (int i = 0; i < GoogleSearchService.RESULTS_LIMIT; ++i) {
-			this.getSearchResultsOnPage(driver, links);
+		for (int i = 0; i < resultsLimit; ++i) {
+			this.getSearchResultsOnPage(driver, links, resultsLimit);
 
 			// If we need more results and there is a next page to look at...
-			if (links.size() < GoogleSearchService.RESULTS_LIMIT && this.hasNextPage(
-					driver)) {
+			if (links.size() < resultsLimit && this.hasNextPage(driver)) {
 				this.goToNextPage(driver);
 			} else {
 				break;
@@ -57,7 +56,9 @@ public class GoogleSearchService implements SearchService {
 	}
 
 	private void getSearchResultsOnPage(
-			final WebDriver driver, final List<String> links
+			final WebDriver driver,
+			final List<String> links,
+			final int resultsLimit
 	) {
 		// May contain junk like "People also search".
 		// Filter them out by searching for this class.
@@ -79,7 +80,7 @@ public class GoogleSearchService implements SearchService {
 			final WebElement anchor = result.findElement(By.tagName("a"));
 			links.add(anchor.getAttribute("href"));
 
-			if (links.size() >= GoogleSearchService.RESULTS_LIMIT) {
+			if (links.size() >= resultsLimit) {
 				break;
 			}
 		}

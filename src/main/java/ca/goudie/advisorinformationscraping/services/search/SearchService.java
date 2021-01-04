@@ -4,6 +4,6 @@ import org.openqa.selenium.WebDriver;
 
 public interface SearchService {
 
-	String search(final WebDriver driver);
+	String search(final WebDriver driver, final int resultsLimit);
 
 }
