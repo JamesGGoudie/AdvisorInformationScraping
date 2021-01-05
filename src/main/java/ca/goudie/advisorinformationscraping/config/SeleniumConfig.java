@@ -15,11 +15,11 @@ public class SeleniumConfig {
 				"C:/Program Files/Selenium/chromedriver.exe");
 
 		final ChromeOptions options = new ChromeOptions();
-		options.addArguments("--headless",
-				"--disable-gpu",
-				"--window-size=1920,1200",
-				"--ignore-certificate-errors",
-				"--silent");
+//		options.addArguments("--headless",
+//				"--disable-gpu",
+//				"--window-size=1920,1200",
+//				"--ignore-certificate-errors",
+//				"--silent-launch");
 
 		return new ChromeDriver(options);
 	}
