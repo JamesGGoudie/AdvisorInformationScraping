@@ -15,7 +15,7 @@ public class SearchServiceSelector {
 		return this.googleSearchService;
 	}
 
-	public SearchService selectSearchService(String key) {
+	public SearchService selectSearchService(final String key) {
 		return this.googleSearchService;
 	}
 

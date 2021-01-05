@@ -16,7 +16,7 @@ public class WebDriverSelector {
 		return this.chromeWebDriver;
 	}
 
-	public WebDriver selectWebDriver(String key) {
+	public WebDriver selectWebDriver(final String key) {
 		return this.chromeWebDriver;
 	}
 
