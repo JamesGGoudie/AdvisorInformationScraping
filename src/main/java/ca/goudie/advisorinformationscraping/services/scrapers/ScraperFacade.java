@@ -28,14 +28,14 @@ public class ScraperFacade {
 	private ScrapeResult useGenericScraper(
 			final WebDriver driver, final String url
 	) {
-		return this.specializedScraperSelector.selectSpecializedScraper(url)
-				.scrapeWebsite(driver);
+		return this.genericScraper.scrapeWebsite(driver, url);
 	}
 
 	private ScrapeResult useSpecializedScraper(
 			final WebDriver driver, final String url
 	) {
-		return this.genericScraper.scrapeWebsite(driver, url);
+		return this.specializedScraperSelector.selectSpecializedScraper(url)
+				.scrapeWebsite(driver);
 	}
 
 }
