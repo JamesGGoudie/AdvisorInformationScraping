@@ -34,6 +34,7 @@ public class GenericScraper {
 	}
 
 	private void processChildren(SearchContext context, int depth) {
+		// For every immediate child of the context...
 		for (WebElement el : context.findElements(By.xpath("./*"))) {
 			System.out.println(depth + ": " + el.getTagName());
 			this.processChildren(el, depth + 1);
