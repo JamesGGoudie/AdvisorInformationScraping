@@ -28,27 +28,22 @@ public class RunController {
 	@PostMapping("/run")
 	public List<ScrapeResult> run() {
 		final WebDriver webDriver = this.webDriverSelector.selectWebDriver();
+		final SearchService	searcher =
+				this.searchServiceSelector.selectSearchService();
 
-		try {
-			final SearchService	searcher =
-					this.searchServiceSelector.selectSearchService();
+		String query = "Abaco Asset Management LLP london, UK";
+		int resultsLimit = 3;
 
-			String query = "Abaco Asset Management LLP london, UK";
-			int resultsLimit = 3;
+		final List<String> links = searcher.search(webDriver,
+				query,
+				resultsLimit);
+		final List<ScrapeResult> results = new ArrayList<>();
 
-			final List<String> links = searcher.search(webDriver,
-					query,
-					resultsLimit);
-			final List<ScrapeResult> results = new ArrayList<>();
-
-			for (final String link : links) {
-				results.add(this.scraper.scrapeWebsite(webDriver, link));
-			}
-
-			return results;
-		} finally {
-			webDriver.quit();
+		for (final String link : links) {
+			results.add(this.scraper.scrapeWebsite(webDriver, link));
 		}
+
+		return results;
 	}
 
 }
