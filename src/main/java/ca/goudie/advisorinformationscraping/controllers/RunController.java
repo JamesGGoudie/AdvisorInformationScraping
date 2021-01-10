@@ -1,5 +1,6 @@
 package ca.goudie.advisorinformationscraping.controllers;
 
+import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
 import ca.goudie.advisorinformationscraping.models.ScrapeResult;
 import ca.goudie.advisorinformationscraping.services.dihelpers.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.dihelpers.WebDriverSelector;
@@ -32,7 +33,7 @@ public class RunController {
 				this.searchServiceSelector.selectSearchService();
 
 		String query = "Abaco Asset Management LLP london, UK";
-		int resultsLimit = 1;
+		int resultsLimit = 3;
 
 		final List<String> links = searcher.search(webDriver,
 				query,
@@ -40,7 +41,11 @@ public class RunController {
 		final List<ScrapeResult> results = new ArrayList<>();
 
 		for (final String link : links) {
-			results.add(this.scraper.scrapeWebsite(webDriver, link));
+			try {
+				results.add(this.scraper.scrapeWebsite(webDriver, link));
+			} catch (ScrapingFailedException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return results;
