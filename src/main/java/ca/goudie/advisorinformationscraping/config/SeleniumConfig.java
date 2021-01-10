@@ -11,15 +11,13 @@ public class SeleniumConfig {
 
 	@Bean
 	public WebDriver chromeWebDriver() {
+		// Need to tell Selenium where the chromedriver file is.
 		System.setProperty("webdriver.chrome.driver",
 				"C:/Program Files/Selenium/chromedriver.exe");
 
 		final ChromeOptions options = new ChromeOptions();
-//		options.addArguments("--headless",
-//				"--disable-gpu",
-//				"--window-size=1920,1200",
-//				"--ignore-certificate-errors",
-//				"--silent-launch");
+		// By setting Chrome to headless, we don't need GPU resources.
+		options.setHeadless(true);
 
 		return new ChromeDriver(options);
 	}
