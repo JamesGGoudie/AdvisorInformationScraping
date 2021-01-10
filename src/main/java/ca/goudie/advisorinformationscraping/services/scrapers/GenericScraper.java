@@ -1,7 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
-import ca.goudie.advisorinformationscraping.models.FirmResult;
-import ca.goudie.advisorinformationscraping.models.ScrapeResult;
+import ca.goudie.advisorinformationscraping.models.common.FirmResult;
+import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -20,7 +20,7 @@ public class GenericScraper implements Scraper {
 		ScrapeResult out = new ScrapeResult();
 		FirmResult firm = new FirmResult();
 
-		firm.setSource(driver.getPageSource());
+		firm.setSource(url);
 
 		out.setFirm(firm);
 

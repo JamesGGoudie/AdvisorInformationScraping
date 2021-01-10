@@ -1,7 +1,7 @@
 package ca.goudie.advisorinformationscraping.controllers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
-import ca.goudie.advisorinformationscraping.models.ScrapeResult;
+import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
 import ca.goudie.advisorinformationscraping.services.dihelpers.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.dihelpers.WebDriverSelector;
 import ca.goudie.advisorinformationscraping.services.scrapers.ScraperFacade;

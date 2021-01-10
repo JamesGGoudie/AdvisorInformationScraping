@@ -1,11 +1,21 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
-import ca.goudie.advisorinformationscraping.models.FirmResult;
-import ca.goudie.advisorinformationscraping.models.ScrapeResult;
+import ca.goudie.advisorinformationscraping.models.bloomberg.BloombergEmployee;
+import ca.goudie.advisorinformationscraping.models.bloomberg.BloombergOrganization;
+import ca.goudie.advisorinformationscraping.models.common.FirmResult;
+import ca.goudie.advisorinformationscraping.models.common.IndividualResult;
+import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
+import ca.goudie.advisorinformationscraping.utils.JsonUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -14,11 +24,13 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class BloombergScraper implements Scraper {
 
+	/**
+	 * The value to use in the 'Source' column of the results.
+	 */
+	private static final String BLOOMBERG_SOURCE = "Bloomberg";
+
 	private static final String CAPTCHA_TITLE = "Bloomberg - Are you a robot?";
 	private static final String CRITICAL_COOKIE = "_px2";
-	private static final String
-			CAPTCHA_EXCEPTION_MESSAGE =
-			"Could not beat Bloomberg Captcha";
 	private static final int MAX_COOKIE_WAIT_TIME = 10;
 	private static final int POST_COOKIE_WAIT_TIME = 1;
 
@@ -29,31 +41,25 @@ public class BloombergScraper implements Scraper {
 		driver.get(url);
 
 		this.checkAndCircumventCaptcha(driver, url);
+		BloombergOrganization org = this.extractOrganizationData(driver);
 
-		ScrapeResult out = new ScrapeResult();
-		FirmResult firm = new FirmResult();
-
-		firm.setSource(driver.getPageSource());
-
-		out.setFirm(firm);
-
-		return out;
+		return this.buildScrapeResult(org);
 	}
 
 	/**
 	 * Bloomberg has some kind of system to detect bots and stop them with a
 	 * captcha, but I think that I've found a way around it.
-	 *
+	 * <p>
 	 * From my understanding, we require a specific cookie to bypass the captcha.
 	 * This cookie comes from a request fired when the captcha screen finishes
-	 * loading.
-	 * Once we have the cookie, if we re-navigate to the given URL, we should be
-	 * able to reach the page as intended.
-	 *
+	 * loading. Once we have the cookie, if we re-navigate to the given URL, we
+	 * should be able to reach the page as intended.
+	 * <p>
 	 * This isn't fool proof, obviously, but it's the best that I could come up
 	 * with.
 	 *
 	 * @param driver
+	 *
 	 * @throws ScrapingFailedException
 	 */
 	private void checkAndCircumventCaptcha(
@@ -90,10 +96,81 @@ public class BloombergScraper implements Scraper {
 
 			if (driver.getTitle().equals(BloombergScraper.CAPTCHA_TITLE)) {
 				// Got caught by the Captcha again.
-				throw new ScrapingFailedException(
-						BloombergScraper.CAPTCHA_EXCEPTION_MESSAGE);
+				throw new ScrapingFailedException("Could not beat Bloomberg Captcha");
 			}
 		}
+	}
+
+	/**
+	 * The Bloomberg DOM contains all of the organization in a convenient JSON.
+	 * This method extracts the JSON and converts it to a Java class.
+	 *
+	 * @param driver
+	 * @return
+	 * @throws ScrapingFailedException
+	 */
+	private BloombergOrganization extractOrganizationData(
+			final WebDriver driver
+	) throws ScrapingFailedException {
+		final List<WebElement> scripts = driver.findElements(By.xpath(
+				"/html/head/script"));
+
+		for (final WebElement script : scripts) {
+			try {
+				final String type = script.getAttribute("type");
+
+				if (StringUtils.isNotBlank(type) &&
+						type.equals("application/ld+json")) {
+					final String jsonStr = script.getAttribute("innerText");
+
+					if (JsonUtils.isBloombergOrganizationJson(jsonStr)) {
+						return JsonUtils.parseBloombergJson(jsonStr);
+					}
+				}
+			} catch (StaleElementReferenceException e) {
+				// The element is not present in the DOM; continue
+			}
+		}
+
+		throw new ScrapingFailedException(
+				"Could not find Bloomberg organization JSON.");
+	}
+
+	private ScrapeResult buildScrapeResult(BloombergOrganization org) {
+		ScrapeResult out = new ScrapeResult();
+		out.setFirm(this.buildFirmResult(org));
+		out.setIndividuals(this.buildIndividuals(org));
+
+		return out;
+	}
+
+	private FirmResult buildFirmResult(BloombergOrganization org) {
+		final FirmResult firm = new FirmResult();
+
+		firm.setAddress(org.getAddress());
+		firm.setFirmUrl(org.getUrl());
+		firm.setPhoneNumber(org.getTelephone());
+
+		firm.setSource(BloombergScraper.BLOOMBERG_SOURCE);
+
+		return firm;
+	}
+
+	private List<IndividualResult> buildIndividuals(BloombergOrganization org) {
+		List<IndividualResult> individuals = new ArrayList<>();
+
+		for (final BloombergEmployee employee : org.getEmployees()) {
+			final IndividualResult individual = new IndividualResult();
+
+			individual.setName(employee.getName());
+			individual.setTitle(employee.getTitle());
+
+			individual.setSource(BloombergScraper.BLOOMBERG_SOURCE);
+
+			individuals.add(individual);
+		}
+
+		return individuals;
 	}
 
 }

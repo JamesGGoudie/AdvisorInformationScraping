@@ -1,4 +1,4 @@
-package ca.goudie.advisorinformationscraping.models;
+package ca.goudie.advisorinformationscraping.models.common;
 
 import lombok.Data;
 
