@@ -41,9 +41,8 @@ public class GenericScraper implements Scraper {
 		firm.setEmailAddress(this.findEmailByMailTo(driver));
 		firm.setPhoneNumber(this.findPhoneNumber(driver));
 
-		firm.setSource(url);
-
-		this.compareFirmEmailAndSource(firm);
+		this.formatFirmSource(firm, url);
+		this.compareFirmEmailAndSource(firm, url);
 
 		out.setFirm(firm);
 		out.setIndividuals(new ArrayList<>());
@@ -123,9 +122,12 @@ public class GenericScraper implements Scraper {
 	 * If the email address is not present, then no changes will be made.
 	 *
 	 * @param firm
+	 * @param url
 	 */
-	private void compareFirmEmailAndSource(FirmResult firm)
-			throws ScrapingFailedException {
+	private void compareFirmEmailAndSource(
+			final FirmResult firm,
+			final String url
+	) throws ScrapingFailedException {
 		final String firmEmail = firm.getEmailAddress();
 
 		if (StringUtils.isBlank(firmEmail)) {
@@ -136,17 +138,27 @@ public class GenericScraper implements Scraper {
 		final String emailHost = firmEmail.substring(firmEmail.indexOf('@') + 1);
 
 		try {
-			final String sourceHost = AisUrlUtils.extractHostname(firm.getSource());
+			final String sourceHost = AisUrlUtils.extractHostname(url);
 
 			// If the source host ends with the email host...
 			if (sourceHost.endsWith(emailHost)) {
 				// ...then the source is probably the firms own website.
 				// We only check the end of the source host to account for internal
 				// sites.
-				firm.setFirmUrl(firm.getSource());
+				firm.setFirmUrl(sourceHost);
 			}
 		} catch (URISyntaxException e) {
 			throw new ScrapingFailedException(e);
+		}
+	}
+
+	private void formatFirmSource(final FirmResult firm, final String url) {
+		try {
+			firm.setSource(AisUrlUtils.formatSource(url));
+		} catch (URISyntaxException e) {
+			// Formatting the source failed.
+			// Use the unchanged url as the source.
+			firm.setSource(url);
 		}
 	}
 
