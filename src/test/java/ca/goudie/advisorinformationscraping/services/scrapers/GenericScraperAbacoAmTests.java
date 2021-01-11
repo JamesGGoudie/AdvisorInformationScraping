@@ -41,10 +41,10 @@ public class GenericScraperAbacoAmTests {
 
 		final FirmResult f = r.getFirm();
 
-		assertEquals("http://www.abacoam.com/", f.getFirmUrl());
+		assertEquals("www.abacoam.com", f.getFirmUrl());
 		assertEquals("+44 20 3031 9184", f.getPhoneNumber());
 		assertEquals("Abaco.AssetManagement@abacoam.com", f.getEmailAddress());
-		assertEquals("http://www.abacoam.com/", f.getSource());
+		assertEquals("www.abacoam.com", f.getSource());
 
 		assertNull(f.getAddress());
 
