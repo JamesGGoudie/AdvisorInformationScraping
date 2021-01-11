@@ -22,7 +22,8 @@ public class ScraperSelector {
 			// Use the generic scraper to compensate.
 			return this.genericScraper;
 		} else {
-			return host.getScraper();
+			// return host.getScraper();
+			return this.genericScraper;
 		}
 	}
 
