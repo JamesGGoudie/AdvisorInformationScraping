@@ -1,13 +1,14 @@
 package ca.goudie.advisorinformationscraping.services.search;
 
+import ca.goudie.advisorinformationscraping.exceptions.SearchingFailedException;
 import org.openqa.selenium.WebDriver;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface SearchService {
 
-	List<String> search(
+	Collection<String> search(
 			final WebDriver driver, final String query, final int resultsLimit
-	);
+	) throws SearchingFailedException;
 
 }

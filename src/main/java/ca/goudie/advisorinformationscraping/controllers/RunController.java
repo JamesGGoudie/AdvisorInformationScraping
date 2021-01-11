@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.controllers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
+import ca.goudie.advisorinformationscraping.exceptions.SearchingFailedException;
 import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
 import ca.goudie.advisorinformationscraping.services.dihelpers.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.dihelpers.WebDriverSelector;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -27,7 +29,8 @@ public class RunController {
 	private WebDriverSelector webDriverSelector;
 
 	@PostMapping("/run")
-	public List<ScrapeResult> run() {
+	public List<ScrapeResult> run()
+			throws SearchingFailedException {
 		final WebDriver webDriver = this.webDriverSelector.selectWebDriver();
 		final SearchService	searcher =
 				this.searchServiceSelector.selectSearchService();
@@ -36,7 +39,7 @@ public class RunController {
 		String query = "Prosser Knowles Associates LTD hartlebury, UK";
 		int resultsLimit = 3;
 
-		final List<String> links = searcher.search(webDriver,
+		final Collection<String> links = searcher.search(webDriver,
 				query,
 				resultsLimit);
 		final List<ScrapeResult> results = new ArrayList<>();

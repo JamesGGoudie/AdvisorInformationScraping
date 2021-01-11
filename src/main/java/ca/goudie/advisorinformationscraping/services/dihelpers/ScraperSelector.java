@@ -8,6 +8,8 @@ import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URISyntaxException;
+
 @Service
 public class ScraperSelector {
 
@@ -16,16 +18,20 @@ public class ScraperSelector {
 
 	public Scraper selectScraper(final String link)
 			throws ScrapingFailedException {
-		final KnownHost host = KnownHost.getEnum(AisUrlUtils.extractHostname(
-				link));
+		try {
+			final KnownHost host = KnownHost.getEnum(AisUrlUtils.extractHostname(
+					link));
 
-		// If the host enum is null...
-		if (host == null) {
-			// ...then the link doesn't correspond to any known hosts.
-			// Use the generic scraper to compensate.
-			return this.genericScraper;
-		} else {
-			return host.getScraper();
+			// If the host enum is null...
+			if (host == null) {
+				// ...then the link doesn't correspond to any known hosts.
+				// Use the generic scraper to compensate.
+				return this.genericScraper;
+			} else {
+				return host.getScraper();
+			}
+		} catch (URISyntaxException e) {
+			throw new ScrapingFailedException(e);
 		}
 	}
 

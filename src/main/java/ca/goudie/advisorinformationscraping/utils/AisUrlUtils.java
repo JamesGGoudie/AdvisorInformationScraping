@@ -8,14 +8,10 @@ import java.net.URISyntaxException;
 public class AisUrlUtils {
 
 	public static String extractHostname(final String url)
-			throws ScrapingFailedException {
-		try {
-			final URI uri = new URI(url);
+			throws URISyntaxException {
+		final URI uri = new URI(url);
 
-			return uri.getHost();
-		} catch (URISyntaxException e) {
-			throw new ScrapingFailedException(e);
-		}
+		return uri.getHost();
 	}
 
 }

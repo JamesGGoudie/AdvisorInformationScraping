@@ -12,6 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -133,13 +134,19 @@ public class GenericScraper implements Scraper {
 
 		// The email host is everything after the '@' character.
 		final String emailHost = firmEmail.substring(firmEmail.indexOf('@') + 1);
-		final String sourceHost = AisUrlUtils.extractHostname(firm.getSource());
 
-		// If the source host ends with the email host...
-		if (sourceHost.endsWith(emailHost)) {
-			// ...then the source is probably the firms own website.
-			// We only check the end of the source host to account for internal sites.
-			firm.setFirmUrl(firm.getSource());
+		try {
+			final String sourceHost = AisUrlUtils.extractHostname(firm.getSource());
+
+			// If the source host ends with the email host...
+			if (sourceHost.endsWith(emailHost)) {
+				// ...then the source is probably the firms own website.
+				// We only check the end of the source host to account for internal
+				// sites.
+				firm.setFirmUrl(firm.getSource());
+			}
+		} catch (URISyntaxException e) {
+			throw new ScrapingFailedException(e);
 		}
 	}
 
