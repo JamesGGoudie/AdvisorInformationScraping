@@ -1,6 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.search;
 
-import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
+import ca.goudie.advisorinformationscraping.exceptions.UrlParseError;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -8,7 +8,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -109,7 +108,7 @@ public class GoogleSearchService implements SearchService {
 					// links; skip
 					continue;
 				}
-			} catch (URISyntaxException e) {
+			} catch (UrlParseError e) {
 				// Bad href value; skip
 				continue;
 			}

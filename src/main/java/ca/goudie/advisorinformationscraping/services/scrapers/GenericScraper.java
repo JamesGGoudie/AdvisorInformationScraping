@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
+import ca.goudie.advisorinformationscraping.exceptions.UrlParseError;
 import ca.goudie.advisorinformationscraping.models.common.FirmResult;
 import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
@@ -12,7 +13,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -147,7 +147,7 @@ public class GenericScraper implements Scraper {
 				// sites.
 				firm.setFirmUrl(sourceHost);
 			}
-		} catch (URISyntaxException e) {
+		} catch (UrlParseError e) {
 			throw new ScrapingFailedException(e);
 		}
 	}
@@ -155,7 +155,7 @@ public class GenericScraper implements Scraper {
 	private void formatFirmSource(final FirmResult firm, final String url) {
 		try {
 			firm.setSource(AisUrlUtils.formatSource(url));
-		} catch (URISyntaxException e) {
+		} catch (UrlParseError e) {
 			// Formatting the source failed.
 			// Use the unchanged url as the source.
 			firm.setSource(url);

@@ -2,13 +2,12 @@ package ca.goudie.advisorinformationscraping.services.dihelpers;
 
 import ca.goudie.advisorinformationscraping.enums.KnownHost;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
+import ca.goudie.advisorinformationscraping.exceptions.UrlParseError;
 import ca.goudie.advisorinformationscraping.services.scrapers.GenericScraper;
 import ca.goudie.advisorinformationscraping.services.scrapers.Scraper;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.net.URISyntaxException;
 
 @Service
 public class ScraperSelector {
@@ -30,7 +29,7 @@ public class ScraperSelector {
 			} else {
 				return host.getScraper();
 			}
-		} catch (URISyntaxException e) {
+		} catch (UrlParseError e) {
 			throw new ScrapingFailedException(e);
 		}
 	}

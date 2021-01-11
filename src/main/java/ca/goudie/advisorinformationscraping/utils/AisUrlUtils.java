@@ -1,15 +1,21 @@
 package ca.goudie.advisorinformationscraping.utils;
 
+import ca.goudie.advisorinformationscraping.exceptions.UrlParseError;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
 public class AisUrlUtils {
 
 	public static String extractHostname(final String url)
-			throws URISyntaxException {
-		final URI uri = new URI(url);
+			throws UrlParseError {
+		try {
+			final URI uri = new URI(url);
 
-		return uri.getHost();
+			return uri.getHost();
+		} catch (URISyntaxException e) {
+			throw new UrlParseError(e);
+		}
 	}
 
 	/**
@@ -25,22 +31,26 @@ public class AisUrlUtils {
 	 * @throws URISyntaxException
 	 */
 	public static String formatSource(final String url)
-			throws URISyntaxException {
-		final URI uri = new URI(url);
+			throws UrlParseError {
+		try {
+			final URI uri = new URI(url);
 
-		String out = uri.getHost();
+			String out = uri.getHost();
 
-		if (uri.getPort() != -1) {
-			out += ":" + uri.getPort();
+			if (uri.getPort() != -1) {
+				out += ":" + uri.getPort();
+			}
+
+			out += uri.getPath();
+
+			if (out.endsWith("/")) {
+				out = out.substring(0, out.length() - 1);
+			}
+
+			return out;
+		} catch (URISyntaxException e) {
+			throw new UrlParseError(e);
 		}
-
-		out += uri.getPath();
-
-		if (out.endsWith("/")) {
-			out = out.substring(0, out.length() - 1);
-		}
-
-		return out;
 	}
 
 }
