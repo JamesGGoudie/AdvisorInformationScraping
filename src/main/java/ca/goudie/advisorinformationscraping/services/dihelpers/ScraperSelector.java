@@ -4,7 +4,7 @@ import ca.goudie.advisorinformationscraping.enums.KnownHost;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
 import ca.goudie.advisorinformationscraping.services.scrapers.GenericScraper;
 import ca.goudie.advisorinformationscraping.services.scrapers.Scraper;
-import ca.goudie.advisorinformationscraping.utils.UrlUtils;
+import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ public class ScraperSelector {
 
 	public Scraper selectScraper(final String link)
 			throws ScrapingFailedException {
-		final KnownHost host = KnownHost.getEnum(UrlUtils.extractHostname(
+		final KnownHost host = KnownHost.getEnum(AisUrlUtils.extractHostname(
 				link));
 
 		// If the host enum is null...

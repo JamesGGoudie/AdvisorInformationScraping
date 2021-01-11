@@ -5,7 +5,7 @@ import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class UrlUtils {
+public class AisUrlUtils {
 
 	public static String extractHostname(final String url)
 			throws ScrapingFailedException {
