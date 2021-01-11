@@ -4,6 +4,7 @@ import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseError;
 import ca.goudie.advisorinformationscraping.models.common.FirmResult;
 import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
+import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import com.google.i18n.phonenumbers.PhoneNumberMatch;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -15,20 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class GenericScraper implements Scraper {
-
-	/**
-	 * Comprehensive regex for identifying email addresses shamelessly stolen from
-	 * from the Chromium repository.
-	 */
-	private static final String EMAIL_REGEX =
-			"(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\"" +
-					".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|" +
-					"(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))";
 
 	public ScrapeResult scrapeWebsite(
 			final WebDriver driver, final String url
@@ -61,7 +51,7 @@ public class GenericScraper implements Scraper {
 	 * Anchor tags can be used to open a mail app to send an email. This is done
 	 * by starting the anchor href value with 'mailto:'
 	 * <p>
-	 * Search the page for these anchors to find email addresses.
+	 * Search the page for these anchors and return the first email address.
 	 *
 	 * @param driver
 	 *
@@ -76,23 +66,20 @@ public class GenericScraper implements Scraper {
 			if (StringUtils.isNotBlank(href) && href.startsWith("mailto:")) {
 				// Check the innerText for an email that is displayed to the user.
 				final String innerText = anchor.getAttribute("innerText");
+				final String innerEmail = AisRegexUtils.findEmail(innerText);
 
-				Pattern emailPattern = Pattern.compile(GenericScraper.EMAIL_REGEX);
-				Matcher innerMatcher = emailPattern.matcher(innerText);
-
-				if (innerMatcher.find()) {
-					return innerMatcher.group();
+				if (innerEmail != null) {
+					return innerEmail;
 				}
 
 				// We could not find an email in the innerText
-				// Check what is in the mailto instead.
+				// Check what is after the mailto: instead and see if that is valid.
 
-				final String hrefEmail = href.substring(7);
+				final String hrefText = href.substring(7);
+				final String hrefEmail = AisRegexUtils.findEmail(hrefText);
 
-				Matcher hrefMatcher = emailPattern.matcher(hrefEmail);
-
-				if (hrefMatcher.find()) {
-					return hrefMatcher.group();
+				if (hrefEmail != null) {
+					return hrefEmail;
 				}
 			}
 		}
