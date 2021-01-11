@@ -1,8 +1,5 @@
 package ca.goudie.advisorinformationscraping.utils;
 
-import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
-import org.apache.commons.lang3.StringUtils;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 
