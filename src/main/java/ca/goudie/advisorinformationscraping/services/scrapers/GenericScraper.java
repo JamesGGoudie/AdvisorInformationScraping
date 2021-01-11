@@ -12,7 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
-import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +45,7 @@ public class GenericScraper implements Scraper {
 		this.compareFirmEmailAndSource(firm);
 
 		out.setFirm(firm);
+		out.setIndividuals(new ArrayList<>());
 
 		return out;
 	}
