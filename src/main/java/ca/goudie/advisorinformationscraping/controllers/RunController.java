@@ -33,7 +33,7 @@ public class RunController {
 				this.searchServiceSelector.selectSearchService();
 
 		String query = "Abaco Asset Management LLP london, UK";
-		int resultsLimit = 1;
+		int resultsLimit = 3;
 
 		final List<String> links = searcher.search(webDriver,
 				query,
