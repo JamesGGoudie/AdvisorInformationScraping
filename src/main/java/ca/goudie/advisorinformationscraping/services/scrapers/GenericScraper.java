@@ -152,6 +152,13 @@ public class GenericScraper implements Scraper {
 		}
 	}
 
+	/**
+	 * Formats the URL that was used to search for the firm's general information.
+	 * All that should remain is the host, port (if present), and path.
+	 *
+	 * @param firm
+	 * @param url
+	 */
 	private void formatFirmSource(final FirmResult firm, final String url) {
 		try {
 			firm.setSource(AisUrlUtils.formatSource(url));
