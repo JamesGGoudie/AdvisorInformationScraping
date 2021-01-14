@@ -24,12 +24,13 @@ public class GenericScraper implements Scraper {
 	) throws ScrapingFailedException {
 		driver.get(url);
 
+		this.findEmployeePageAnchors(driver);
+
 		ScrapeResult out = new ScrapeResult();
 		FirmResult firm = new FirmResult();
 
-		firm.setEmailAddress(this.findEmailByMailTo(driver));
-		firm.setPhoneNumber(
-				AisPhoneUtils.findFirstPhoneNumber(driver.getPageSource()));
+		firm.setEmailAddress(this.findFirstEmailByAnchor(driver));
+		firm.setPhoneNumber(this.findPhoneNumber(driver));
 
 		this.formatFirmSource(firm, url);
 		this.compareFirmEmailAndSource(firm, url);
@@ -40,10 +41,12 @@ public class GenericScraper implements Scraper {
 		return out;
 	}
 
-	private void processChildren(final WebElement context, int depth) {
-		// For every immediate child of the context...
-		for (WebElement el : context.findElements(By.xpath("./*"))) {
-			this.processChildren(el, depth + 1);
+	private void findEmployeePageAnchors(final WebDriver driver) {
+		final List<WebElement> anchors = driver.findElements(By.cssSelector("a"));
+
+		for (final WebElement anchor : anchors) {
+			System.out.println(anchor.getAttribute("href") + "; " +
+					anchor.getAttribute("innerText"));
 		}
 	}
 
@@ -57,18 +60,19 @@ public class GenericScraper implements Scraper {
 	 *
 	 * @return
 	 */
-	private String findEmailByMailTo(final WebDriver driver) {
+	private String findFirstEmailByAnchor(final WebDriver driver) {
 		final List<WebElement> anchors = driver.findElements(By.cssSelector("a"));
 
 		for (final WebElement anchor : anchors) {
 			final String href = anchor.getAttribute("href");
 
-			if (StringUtils.isNotBlank(href) && href.startsWith("mailto:")) {
+			if (StringUtils.isNotBlank(href) &&
+					href.toLowerCase().startsWith("mailto:")) {
 				// Check the innerText for an email that is displayed to the user.
 				final String innerText = anchor.getAttribute("innerText");
 				final String innerEmail = AisRegexUtils.findEmail(innerText);
 
-				if (innerEmail != null) {
+				if (StringUtils.isNotBlank(innerEmail)) {
 					return innerEmail;
 				}
 
@@ -78,9 +82,62 @@ public class GenericScraper implements Scraper {
 				final String hrefText = href.substring(7);
 				final String hrefEmail = AisRegexUtils.findEmail(hrefText);
 
-				if (hrefEmail != null) {
+				if (StringUtils.isNotBlank(hrefEmail)) {
 					return hrefEmail;
 				}
+			}
+		}
+
+		return null;
+	}
+
+	private String findPhoneNumber(final WebDriver driver) {
+		final String anchorPhone = this.findFirstPhoneNumberByAnchor(driver);
+
+		if (StringUtils.isNotBlank(anchorPhone)) {
+			return anchorPhone;
+		}
+
+		final String fullPagePhone =
+				AisPhoneUtils.findFirstPhoneNumber(driver.getPageSource());
+
+		if (StringUtils.isNotBlank(fullPagePhone)) {
+			return fullPagePhone;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Searches the page for any anchor tags that are indicated to contain
+	 * telephone numbers.
+	 *
+	 * An anchor contains a phone number if the href value starts with 'tel:'
+	 *
+	 * @param driver
+	 * @return
+	 */
+	private String findFirstPhoneNumberByAnchor(final WebDriver driver) {
+		final List<WebElement> anchors = driver.findElements(By.cssSelector("a"));
+
+		for (final WebElement anchor : anchors) {
+			final String href = anchor.getAttribute("href");
+
+			if (StringUtils.isNotBlank(href) &&
+					href.toLowerCase().startsWith("tel:")) {
+				// Check the value in the href first since it is more likely to be
+				// accurate.
+				// This is because numbers displayed to the user may have letters in
+				// place of numbers.
+				final String hrefText = href.substring(4);
+				final String hrefPhone = AisPhoneUtils.findFirstPhoneNumber(hrefText);
+
+				if (StringUtils.isNotBlank(hrefPhone)) {
+					return hrefPhone;
+				}
+
+				// Blindly accept the phone number displayed to the user.
+				return anchor.getAttribute("innerText");
 			}
 		}
 
