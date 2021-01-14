@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
-public class JsonUtils {
+public class AisJsonUtils {
 
 	/**
 	 * Converts the given JSON string to a class that represents the organization
@@ -25,7 +25,7 @@ public class JsonUtils {
 		final ObjectMapper om = new ObjectMapper();
 
 		try {
-			if (!JsonUtils.isBloombergOrganizationJson(jsonStr)) {
+			if (!AisJsonUtils.isBloombergOrganizationJson(jsonStr)) {
 				return null;
 			}
 

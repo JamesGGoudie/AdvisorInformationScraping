@@ -6,7 +6,7 @@ import ca.goudie.advisorinformationscraping.models.bloomberg.BloombergOrganizati
 import ca.goudie.advisorinformationscraping.models.common.FirmResult;
 import ca.goudie.advisorinformationscraping.models.common.IndividualResult;
 import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
-import ca.goudie.advisorinformationscraping.utils.JsonUtils;
+import ca.goudie.advisorinformationscraping.utils.AisJsonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -123,8 +123,8 @@ public class BloombergScraper implements Scraper {
 						type.equals("application/ld+json")) {
 					final String jsonStr = script.getAttribute("innerText");
 
-					if (JsonUtils.isBloombergOrganizationJson(jsonStr)) {
-						return JsonUtils.parseBloombergJson(jsonStr);
+					if (AisJsonUtils.isBloombergOrganizationJson(jsonStr)) {
+						return AisJsonUtils.parseBloombergJson(jsonStr);
 					}
 				}
 			} catch (StaleElementReferenceException e) {
