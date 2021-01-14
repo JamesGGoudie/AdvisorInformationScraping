@@ -4,10 +4,9 @@ import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseError;
 import ca.goudie.advisorinformationscraping.models.common.FirmResult;
 import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
+import ca.goudie.advisorinformationscraping.utils.AisPhoneUtils;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
-import com.google.i18n.phonenumbers.PhoneNumberMatch;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -29,7 +28,8 @@ public class GenericScraper implements Scraper {
 		FirmResult firm = new FirmResult();
 
 		firm.setEmailAddress(this.findEmailByMailTo(driver));
-		firm.setPhoneNumber(this.findPhoneNumber(driver));
+		firm.setPhoneNumber(
+				AisPhoneUtils.findFirstPhoneNumber(driver.getPageSource()));
 
 		this.formatFirmSource(firm, url);
 		this.compareFirmEmailAndSource(firm, url);
@@ -82,18 +82,6 @@ public class GenericScraper implements Scraper {
 					return hrefEmail;
 				}
 			}
-		}
-
-		return null;
-	}
-
-	private String findPhoneNumber(final WebDriver driver) {
-		Iterable<PhoneNumberMatch> numbers =
-				PhoneNumberUtil.getInstance().findNumbers(driver.getPageSource(),
-						null);
-
-		for (final PhoneNumberMatch number : numbers) {
-			return number.rawString();
 		}
 
 		return null;
