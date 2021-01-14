@@ -39,7 +39,7 @@ public class GenericScraper implements Scraper {
 
 	public FirmResult scrapeWebsite(
 			final WebDriver driver, final String url
-	) throws ScrapingFailedException {
+	) {
 		final FirmResult firm = this.scrapeLandingPage(driver, url);
 
 		this.scrapeEmployeePages(driver, firm);
@@ -56,12 +56,11 @@ public class GenericScraper implements Scraper {
 	 * @param driver
 	 * @param url
 	 * @return
-	 * @throws ScrapingFailedException
 	 */
 	private FirmResult scrapeLandingPage(
 			final WebDriver driver,
 			final String url
-	) throws ScrapingFailedException {
+	) {
 		driver.get(url);
 
 		final FirmResult firm = new FirmResult();
