@@ -3,7 +3,6 @@ package ca.goudie.advisorinformationscraping.services.scrapers;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.models.common.FirmResult;
-import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
 import ca.goudie.advisorinformationscraping.utils.AisPhoneUtils;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
@@ -13,7 +12,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -39,18 +37,14 @@ public class GenericScraper implements Scraper {
 				"/about-us/our-team/");
 	}
 
-	public ScrapeResult scrapeWebsite(
+	public FirmResult scrapeWebsite(
 			final WebDriver driver, final String url
 	) throws ScrapingFailedException {
-		final ScrapeResult out = new ScrapeResult();
 		final FirmResult firm = this.scrapeLandingPage(driver, url);
 
 		this.scrapeEmployeePages(driver, firm);
 
-		out.setFirm(firm);
-		out.setIndividuals(new ArrayList<>());
-
-		return out;
+		return firm;
 	}
 
 	/**
@@ -72,8 +66,8 @@ public class GenericScraper implements Scraper {
 
 		final FirmResult firm = new FirmResult();
 
-		firm.setEmailAddress(this.findFirstEmailByAnchor(driver));
-		firm.setPhoneNumber(this.findPhoneNumber(driver));
+		firm.getEmails().add(this.findFirstEmailByAnchor(driver));
+		firm.getPhones().add(this.findPhoneNumber(driver));
 
 		this.formatFirmSource(firm, url);
 		this.compareFirmEmailAndSource(firm, url);
@@ -231,28 +225,30 @@ public class GenericScraper implements Scraper {
 	private void compareFirmEmailAndSource(
 			final FirmResult firm,
 			final String url
-	) throws ScrapingFailedException {
-		final String firmEmail = firm.getEmailAddress();
+	) {
+		final Collection<String> firmEmails = firm.getEmails();
 
-		if (StringUtils.isBlank(firmEmail)) {
-			return;
-		}
-
-		// The email host is everything after the '@' character.
-		final String emailHost = firmEmail.substring(firmEmail.indexOf('@') + 1);
-
-		try {
-			final String sourceHost = AisUrlUtils.extractHostname(url);
-
-			// If the source host ends with the email host...
-			if (sourceHost.endsWith(emailHost)) {
-				// ...then the source is probably the firms own website.
-				// We only check the end of the source host to account for internal
-				// sites.
-				firm.setFirmUrl(sourceHost);
+		for (final String firmEmail : firmEmails) {
+			if (StringUtils.isBlank(firmEmail)) {
+				return;
 			}
-		} catch (UrlParseException e) {
-			throw new ScrapingFailedException(e);
+
+			// The email host is everything after the '@' character.
+			final String emailHost = firmEmail.substring(firmEmail.indexOf('@') + 1);
+
+			try {
+				final String sourceHost = AisUrlUtils.extractHostname(url);
+
+				// If the source host ends with the email host...
+				if (sourceHost.endsWith(emailHost)) {
+					// ...then the source is probably the firms own website.
+					// We only check the end of the source host to account for internal
+					// sites.
+					firm.setFirmUrl(sourceHost);
+
+					break;
+				}
+			} catch (UrlParseException e) {}
 		}
 	}
 

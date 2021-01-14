@@ -3,14 +3,14 @@ package ca.goudie.advisorinformationscraping.services.scrapers;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
 import ca.goudie.advisorinformationscraping.models.common.FirmResult;
 import ca.goudie.advisorinformationscraping.models.common.IndividualResult;
-import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -34,24 +34,33 @@ public class GenericScraperAbacoAmTests {
 
 		WebDriver mockDriver = spy(this.chromeWebDriver);
 
-		final ScrapeResult r = this.genericScraper.scrapeWebsite(mockDriver,
+		final FirmResult f = this.genericScraper.scrapeWebsite(mockDriver,
 				abacoUrl);
 
 		verify(mockDriver).get(abacoUrl);
 
-		final FirmResult f = r.getFirm();
-
 		assertEquals("www.abacoam.com", f.getFirmUrl());
-		assertEquals("+44 20 3031 9184", f.getPhoneNumber());
-		assertEquals("Abaco.AssetManagement@abacoam.com", f.getEmailAddress());
 		assertEquals("www.abacoam.com", f.getSource());
 
-		assertNull(f.getAddress());
+		final Collection<String> ePhones = new HashSet<>();
+		ePhones.add("+44 20 3031 9184");
 
-		final List<IndividualResult> listI = r.getIndividuals();
+		assertEquals(ePhones, f.getPhones());
 
-		assertNotNull(listI);
-		assertEquals(0, listI.size());
+		final Collection<String> eEmails = new HashSet<>();
+		eEmails.add("Abaco.AssetManagement@abacoam.com");
+
+		assertEquals(eEmails, f.getEmails());
+
+		final Collection<String> aAddresses = f.getAddresses();
+
+		assertNotNull(aAddresses);
+		assertEquals(0, aAddresses.size());
+
+		final Collection<IndividualResult> aIndividuals = f.getIndividuals();
+
+		assertNotNull(aIndividuals);
+		assertEquals(0, aIndividuals.size());
 	}
 
 }

@@ -2,12 +2,16 @@ package ca.goudie.advisorinformationscraping.models.common;
 
 import lombok.Data;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 
+/**
+ * A collection of firm results for a single firm.
+ */
 @Data
 public class ScrapeResult {
 
-	private FirmResult firm;
-	private List<IndividualResult> individuals;
+	private String firmId;
+	private final Collection<FirmResult> firmResults = new ArrayList<>();
 
 }

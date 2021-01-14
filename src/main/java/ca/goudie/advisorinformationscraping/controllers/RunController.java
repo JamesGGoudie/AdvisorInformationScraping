@@ -2,6 +2,7 @@ package ca.goudie.advisorinformationscraping.controllers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchingFailedException;
+import ca.goudie.advisorinformationscraping.models.common.FirmResult;
 import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
 import ca.goudie.advisorinformationscraping.services.dihelpers.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.dihelpers.WebDriverSelector;
@@ -29,7 +30,7 @@ public class RunController {
 	private WebDriverSelector webDriverSelector;
 
 	@PostMapping("/run")
-	public List<ScrapeResult> run()
+	public ScrapeResult run()
 			throws SearchingFailedException {
 		final WebDriver webDriver = this.webDriverSelector.selectWebDriver();
 		final SearchService	searcher =
@@ -42,7 +43,8 @@ public class RunController {
 		final Collection<String> links = searcher.search(webDriver,
 				query,
 				resultsLimit);
-		final List<ScrapeResult> results = new ArrayList<>();
+		final ScrapeResult out = new ScrapeResult();
+		final Collection<FirmResult> results = new ArrayList<>();
 
 		for (final String link : links) {
 			try {
@@ -52,7 +54,9 @@ public class RunController {
 			}
 		}
 
-		return results;
+		out.getFirmResults().addAll(results);
+
+		return out;
 	}
 
 }

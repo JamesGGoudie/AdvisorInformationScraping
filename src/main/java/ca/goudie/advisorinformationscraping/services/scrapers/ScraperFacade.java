@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
+import ca.goudie.advisorinformationscraping.models.common.FirmResult;
 import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
 import ca.goudie.advisorinformationscraping.services.dihelpers.ScraperSelector;
 import org.openqa.selenium.WebDriver;
@@ -16,7 +17,7 @@ public class ScraperFacade {
 	@Autowired
 	private ScraperSelector scraperSelector;
 
-	public ScrapeResult scrapeWebsite(
+	public FirmResult scrapeWebsite(
 			final WebDriver driver, final String url
 	) throws ScrapingFailedException {
 		return scraperSelector.selectScraper(url).scrapeWebsite(driver, url);

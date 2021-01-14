@@ -5,7 +5,6 @@ import ca.goudie.advisorinformationscraping.models.bloomberg.BloombergEmployee;
 import ca.goudie.advisorinformationscraping.models.bloomberg.BloombergOrganization;
 import ca.goudie.advisorinformationscraping.models.common.FirmResult;
 import ca.goudie.advisorinformationscraping.models.common.IndividualResult;
-import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
 import ca.goudie.advisorinformationscraping.utils.AisJsonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -15,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +35,7 @@ public class BloombergScraper implements Scraper {
 	private static final int POST_COOKIE_WAIT_TIME = 1;
 
 	@Override
-	public ScrapeResult scrapeWebsite(
+	public FirmResult scrapeWebsite(
 			final WebDriver driver, final String url
 	) throws ScrapingFailedException {
 		driver.get(url);
@@ -43,7 +43,7 @@ public class BloombergScraper implements Scraper {
 		this.checkAndCircumventCaptcha(driver, url);
 		BloombergOrganization org = this.extractOrganizationData(driver);
 
-		return this.buildScrapeResult(org);
+		return this.buildFirmResult(org);
 	}
 
 	/**
@@ -136,28 +136,23 @@ public class BloombergScraper implements Scraper {
 				"Could not find Bloomberg organization JSON.");
 	}
 
-	private ScrapeResult buildScrapeResult(BloombergOrganization org) {
-		ScrapeResult out = new ScrapeResult();
-		out.setFirm(this.buildFirmResult(org));
-		out.setIndividuals(this.buildIndividuals(org));
-
-		return out;
-	}
-
-	private FirmResult buildFirmResult(BloombergOrganization org) {
+	private FirmResult buildFirmResult(final BloombergOrganization org) {
 		final FirmResult firm = new FirmResult();
 
-		firm.setAddress(org.getAddress());
+		firm.getAddresses().add(org.getAddress());
 		firm.setFirmUrl(org.getUrl());
-		firm.setPhoneNumber(org.getTelephone());
+		firm.getPhones().add(org.getTelephone());
+		firm.getIndividuals().addAll(this.buildIndividuals(org));
 
 		firm.setSource(BloombergScraper.BLOOMBERG_SOURCE);
 
 		return firm;
 	}
 
-	private List<IndividualResult> buildIndividuals(BloombergOrganization org) {
-		List<IndividualResult> individuals = new ArrayList<>();
+	private Collection<IndividualResult> buildIndividuals(
+			final BloombergOrganization org
+	) {
+		final Collection<IndividualResult> individuals = new ArrayList<>();
 
 		for (final BloombergEmployee employee : org.getEmployees()) {
 			final IndividualResult individual = new IndividualResult();
