@@ -22,7 +22,7 @@ public class AisRegexUtils {
 	 * @param text
 	 * @return
 	 */
-	public static String findEmail(final String text) {
+	public static String findFirstEmail(final String text) {
 		Pattern emailPattern = Pattern.compile(AisRegexUtils.EMAIL_REGEX);
 		Matcher innerMatcher = emailPattern.matcher(text);
 
