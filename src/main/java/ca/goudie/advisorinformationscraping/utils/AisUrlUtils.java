@@ -1,6 +1,6 @@
 package ca.goudie.advisorinformationscraping.utils;
 
-import ca.goudie.advisorinformationscraping.exceptions.UrlParseError;
+import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -8,13 +8,23 @@ import java.net.URISyntaxException;
 public class AisUrlUtils {
 
 	public static String extractHostname(final String url)
-			throws UrlParseError {
+			throws UrlParseException {
 		try {
 			final URI uri = new URI(url);
 
 			return uri.getHost();
 		} catch (URISyntaxException e) {
-			throw new UrlParseError(e);
+			throw new UrlParseException(e);
+		}
+	}
+
+	public static String extractPath(final String url) throws UrlParseException {
+		try {
+			final URI uri = new URI(url);
+
+			return uri.getPath();
+		} catch (URISyntaxException e) {
+			throw new UrlParseException(e);
 		}
 	}
 
@@ -31,7 +41,7 @@ public class AisUrlUtils {
 	 * @throws URISyntaxException
 	 */
 	public static String formatSource(final String url)
-			throws UrlParseError {
+			throws UrlParseException {
 		try {
 			final URI uri = new URI(url);
 
@@ -49,7 +59,7 @@ public class AisUrlUtils {
 
 			return out;
 		} catch (URISyntaxException e) {
-			throw new UrlParseError(e);
+			throw new UrlParseException(e);
 		}
 	}
 

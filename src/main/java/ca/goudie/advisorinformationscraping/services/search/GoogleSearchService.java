@@ -1,6 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.search;
 
-import ca.goudie.advisorinformationscraping.exceptions.UrlParseError;
+import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -108,7 +108,7 @@ public class GoogleSearchService implements SearchService {
 					// links; skip
 					continue;
 				}
-			} catch (UrlParseError e) {
+			} catch (UrlParseException e) {
 				// Bad href value; skip
 				continue;
 			}

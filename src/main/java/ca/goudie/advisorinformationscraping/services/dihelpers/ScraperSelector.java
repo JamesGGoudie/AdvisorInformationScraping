@@ -2,7 +2,7 @@ package ca.goudie.advisorinformationscraping.services.dihelpers;
 
 import ca.goudie.advisorinformationscraping.enums.KnownHost;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
-import ca.goudie.advisorinformationscraping.exceptions.UrlParseError;
+import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.services.scrapers.GenericScraper;
 import ca.goudie.advisorinformationscraping.services.scrapers.Scraper;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
@@ -29,7 +29,7 @@ public class ScraperSelector {
 			} else {
 				return host.getScraper();
 			}
-		} catch (UrlParseError e) {
+		} catch (UrlParseException e) {
 			throw new ScrapingFailedException(e);
 		}
 	}

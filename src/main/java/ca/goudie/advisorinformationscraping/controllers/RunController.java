@@ -37,7 +37,7 @@ public class RunController {
 
 		// String query = "Abaco Asset Management LLP london, UK";
 		String query = "Prosser Knowles Associates LTD hartlebury, UK";
-		int resultsLimit = 3;
+		int resultsLimit = 1;
 
 		final Collection<String> links = searcher.search(webDriver,
 				query,

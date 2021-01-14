@@ -1,7 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
-import ca.goudie.advisorinformationscraping.exceptions.UrlParseError;
+import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.models.common.FirmResult;
 import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
 import ca.goudie.advisorinformationscraping.utils.AisPhoneUtils;
@@ -14,26 +14,38 @@ import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
 public class GenericScraper implements Scraper {
 
+	/**
+	 * A list of possible paths that a website could be using for its employees
+	 * page.
+	 *
+	 * An employees page is a page that contains information about relevant
+	 * employees within the company.
+	 *
+	 * These pages may contain anchors for individual employees.
+	 */
+	private static final Collection<String> EMPLOYEE_PAGE_PATHS = new HashSet<>();
+
+	public GenericScraper() {
+		// Populate the list of employee page paths here.
+		Collections.addAll(GenericScraper.EMPLOYEE_PAGE_PATHS,
+				"/about-us/our-team/");
+	}
+
 	public ScrapeResult scrapeWebsite(
 			final WebDriver driver, final String url
 	) throws ScrapingFailedException {
-		driver.get(url);
+		final ScrapeResult out = new ScrapeResult();
+		final FirmResult firm = this.scrapeLandingPage(driver, url);
 
-		this.findEmployeePageAnchors(driver);
-
-		ScrapeResult out = new ScrapeResult();
-		FirmResult firm = new FirmResult();
-
-		firm.setEmailAddress(this.findFirstEmailByAnchor(driver));
-		firm.setPhoneNumber(this.findPhoneNumber(driver));
-
-		this.formatFirmSource(firm, url);
-		this.compareFirmEmailAndSource(firm, url);
+		this.scrapeEmployeePages(driver, firm);
 
 		out.setFirm(firm);
 		out.setIndividuals(new ArrayList<>());
@@ -41,12 +53,72 @@ public class GenericScraper implements Scraper {
 		return out;
 	}
 
-	private void findEmployeePageAnchors(final WebDriver driver) {
+	/**
+	 * Scrapes the page that was given to us by the search link.
+	 *
+	 * We expect this page to provide information relevant specifically to the
+	 * firm itself.
+	 *
+	 * @param driver
+	 * @param url
+	 * @return
+	 * @throws ScrapingFailedException
+	 */
+	private FirmResult scrapeLandingPage(
+			final WebDriver driver,
+			final String url
+	) throws ScrapingFailedException {
+		driver.get(url);
+
+		final FirmResult firm = new FirmResult();
+
+		firm.setEmailAddress(this.findFirstEmailByAnchor(driver));
+		firm.setPhoneNumber(this.findPhoneNumber(driver));
+
+		this.formatFirmSource(firm, url);
+		this.compareFirmEmailAndSource(firm, url);
+
+		return firm;
+	}
+
+	/**
+	 * Finds possible employee pages by looking at the paths and comparing it to a
+	 * pre-determined list of suspected paths.
+	 *
+	 * @param driver
+	 * @return
+	 */
+	private Collection<String> findEmployeePageLinks(final WebDriver driver) {
 		final List<WebElement> anchors = driver.findElements(By.cssSelector("a"));
+		// Using a hashset to avoid scraping the same page multiple times.
+		final Collection<String> employeePageLinks = new HashSet<>();
 
 		for (final WebElement anchor : anchors) {
-			System.out.println(anchor.getAttribute("href") + "; " +
-					anchor.getAttribute("innerText"));
+			final String href = anchor.getAttribute("href");
+
+			if (StringUtils.isNotBlank(href)) {
+				try {
+					final String path = AisUrlUtils.extractPath(href);
+
+					if (GenericScraper.EMPLOYEE_PAGE_PATHS.contains(path)) {
+						employeePageLinks.add(href);
+					}
+				} catch (UrlParseException e) {}
+			}
+		}
+
+		return employeePageLinks;
+	}
+
+	private void scrapeEmployeePages(
+			final WebDriver driver,
+			final FirmResult firm
+	) {
+		final Collection<String> employeePageLinks =
+				this.findEmployeePageLinks(driver);
+
+		for (final String employeePageLink : employeePageLinks) {
+			driver.get(employeePageLink);
 		}
 	}
 
@@ -179,7 +251,7 @@ public class GenericScraper implements Scraper {
 				// sites.
 				firm.setFirmUrl(sourceHost);
 			}
-		} catch (UrlParseError e) {
+		} catch (UrlParseException e) {
 			throw new ScrapingFailedException(e);
 		}
 	}
@@ -194,7 +266,7 @@ public class GenericScraper implements Scraper {
 	private void formatFirmSource(final FirmResult firm, final String url) {
 		try {
 			firm.setSource(AisUrlUtils.formatSource(url));
-		} catch (UrlParseError e) {
+		} catch (UrlParseException e) {
 			// Formatting the source failed.
 			// Use the unchanged url as the source.
 			firm.setSource(url);
