@@ -2,23 +2,22 @@ package ca.goudie.advisorinformationscraping.models.common;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
 /**
- * A collection of data about an individual from a website.
+ * A collection of data about a firm collection from a website.
  */
 @Data
-public class IndividualResult {
+public class Firm {
 
-	private String name;
-	private String title;
+	private String firmUrl;
 	private final Collection<String> phones = new HashSet<>();
-	private Float phoneScore;
 	private final Collection<String> emails = new HashSet<>();
-	private Float emailScore;
 	private final Collection<String> addresses = new HashSet<>();
-	private Float addressScore;
 	private String source;
+
+	private final Collection<Employee> employees = new ArrayList<>();
 
 }

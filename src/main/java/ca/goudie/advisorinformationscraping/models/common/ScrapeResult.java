@@ -12,6 +12,6 @@ import java.util.Collection;
 public class ScrapeResult {
 
 	private String firmId;
-	private final Collection<FirmResult> firmResults = new ArrayList<>();
+	private final Collection<Firm> firms = new ArrayList<>();
 
 }

@@ -2,7 +2,7 @@ package ca.goudie.advisorinformationscraping.controllers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchingFailedException;
-import ca.goudie.advisorinformationscraping.models.common.FirmResult;
+import ca.goudie.advisorinformationscraping.models.common.Firm;
 import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
 import ca.goudie.advisorinformationscraping.services.dihelpers.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.dihelpers.WebDriverSelector;
@@ -43,7 +43,7 @@ public class RunController {
 				query,
 				resultsLimit);
 		final ScrapeResult out = new ScrapeResult();
-		final Collection<FirmResult> results = new ArrayList<>();
+		final Collection<Firm> results = new ArrayList<>();
 
 		for (final String link : links) {
 			try {
@@ -53,7 +53,7 @@ public class RunController {
 			}
 		}
 
-		out.getFirmResults().addAll(results);
+		out.getFirms().addAll(results);
 
 		return out;
 	}

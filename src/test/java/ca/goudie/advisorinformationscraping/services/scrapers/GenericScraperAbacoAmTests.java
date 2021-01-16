@@ -1,8 +1,8 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
-import ca.goudie.advisorinformationscraping.models.common.FirmResult;
-import ca.goudie.advisorinformationscraping.models.common.IndividualResult;
+import ca.goudie.advisorinformationscraping.models.common.Firm;
+import ca.goudie.advisorinformationscraping.models.common.Employee;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class GenericScraperAbacoAmTests {
 
 		WebDriver mockDriver = spy(this.chromeWebDriver);
 
-		final FirmResult f = this.genericScraper.scrapeWebsite(mockDriver,
+		final Firm f = this.genericScraper.scrapeWebsite(mockDriver,
 				abacoUrl);
 
 		verify(mockDriver).get(abacoUrl);
@@ -56,10 +56,10 @@ public class GenericScraperAbacoAmTests {
 		assertNotNull(aAddresses);
 		assertEquals(0, aAddresses.size());
 
-		final Collection<IndividualResult> aIndividuals = f.getIndividuals();
+		final Collection<Employee> aEmployees = f.getEmployees();
 
-		assertNotNull(aIndividuals);
-		assertEquals(0, aIndividuals.size());
+		assertNotNull(aEmployees);
+		assertEquals(0, aEmployees.size());
 	}
 
 }

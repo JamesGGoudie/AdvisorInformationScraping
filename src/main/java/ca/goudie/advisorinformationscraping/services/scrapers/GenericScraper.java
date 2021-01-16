@@ -1,8 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
-import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
-import ca.goudie.advisorinformationscraping.models.common.FirmResult;
+import ca.goudie.advisorinformationscraping.models.common.Firm;
 import ca.goudie.advisorinformationscraping.utils.AisPhoneUtils;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
@@ -27,7 +26,7 @@ public class GenericScraper implements Scraper {
 	 * An employees page is a page that contains information about relevant
 	 * employees within the company.
 	 *
-	 * These pages may contain anchors for individual employees.
+	 * These pages may contain anchors for employee's personal pages.
 	 */
 	private static final Collection<String> EMPLOYEE_PAGE_PATHS = new HashSet<>();
 
@@ -37,10 +36,10 @@ public class GenericScraper implements Scraper {
 				"/about-us/our-team/");
 	}
 
-	public FirmResult scrapeWebsite(
+	public Firm scrapeWebsite(
 			final WebDriver driver, final String url
 	) {
-		final FirmResult firm = this.scrapeLandingPage(driver, url);
+		final Firm firm = this.scrapeLandingPage(driver, url);
 
 		this.scrapeEmployeePages(driver, firm);
 
@@ -57,13 +56,13 @@ public class GenericScraper implements Scraper {
 	 * @param url
 	 * @return
 	 */
-	private FirmResult scrapeLandingPage(
+	private Firm scrapeLandingPage(
 			final WebDriver driver,
 			final String url
 	) {
 		driver.get(url);
 
-		final FirmResult firm = new FirmResult();
+		final Firm firm = new Firm();
 
 		firm.getEmails().addAll(this.findEmailsByAnchor(driver));
 		firm.getPhones().addAll(this.findPhones(driver));
@@ -105,7 +104,7 @@ public class GenericScraper implements Scraper {
 
 	private void scrapeEmployeePages(
 			final WebDriver driver,
-			final FirmResult firm
+			final Firm firm
 	) {
 		final Collection<String> employeePageLinks =
 				this.findEmployeePageLinks(driver);
@@ -230,7 +229,7 @@ public class GenericScraper implements Scraper {
 	 * @param url
 	 */
 	private void compareFirmEmailAndSource(
-			final FirmResult firm,
+			final Firm firm,
 			final String url
 	) {
 		final Collection<String> firmEmails = firm.getEmails();
@@ -266,7 +265,7 @@ public class GenericScraper implements Scraper {
 	 * @param firm
 	 * @param url
 	 */
-	private void formatFirmSource(final FirmResult firm, final String url) {
+	private void formatFirmSource(final Firm firm, final String url) {
 		try {
 			firm.setSource(AisUrlUtils.formatSource(url));
 		} catch (UrlParseException e) {
