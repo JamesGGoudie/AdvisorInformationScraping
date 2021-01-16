@@ -120,7 +120,7 @@ public class GenericScraper implements Scraper {
 			}
 		}
 
-		return employeePageLinks;
+		return this.cleanLinks(employeePageLinks, driver.getCurrentUrl());
 	}
 
 	/**
@@ -132,34 +132,43 @@ public class GenericScraper implements Scraper {
 	private Collection<String> findPersonalPageLinks(
 			final WebDriver driver
 	) {
-		final Collection<String> personalPageLinks = new HashSet<>();
+		String currentPath;
 
 		try {
-			final String currentPath =
-					AisUrlUtils.extractPath(driver.getCurrentUrl());
+			currentPath =	AisUrlUtils.extractPath(driver.getCurrentUrl());
+		} catch (UrlParseException e) {
+			// Couldn't parse the current URL.
+			// Return an empty set instead.
+			return new HashSet<>();
+		}
 
-			final List<WebElement> anchors = driver.findElements(By.cssSelector("a"));
+		final Collection<String> personalPageLinks = new HashSet<>();
+		final List<WebElement> anchors = driver.findElements(By.cssSelector("a"));
 
-			for (final WebElement anchor : anchors) {
-				final String href = anchor.getAttribute("href");
+		for (final WebElement anchor : anchors) {
+			final String href = anchor.getAttribute("href");
 
-				if (StringUtils.isNotBlank(href)) {
-					try {
-						final String path = AisUrlUtils.extractPath(href);
+			if (StringUtils.isNotBlank(href)) {
+				String path;
 
-						// We expect any personal pages to be child pages of the employee
-						// group page.
-						if (StringUtils.isNotBlank(path) &&
-								path.startsWith(currentPath) &&
-								path.length() > currentPath.length()) {
-							personalPageLinks.add(href);
-						}
-					} catch (UrlParseException e) {}
+				try {
+					path = AisUrlUtils.extractPath(href);
+				} catch (UrlParseException e) {
+					// Parsing failed, but there are other URLs to try.
+					continue;
+				}
+
+				// We expect any personal pages to be child pages of the employee
+				// group page.
+				if (StringUtils.isNotBlank(path) &&
+						path.startsWith(currentPath) &&
+						path.length() > currentPath.length()) {
+					personalPageLinks.add(href);
 				}
 			}
-		} catch (UrlParseException e) {}
+		}
 
-		return personalPageLinks;
+		return this.cleanLinks(personalPageLinks, driver.getCurrentUrl());
 	}
 
 	/**
@@ -290,19 +299,24 @@ public class GenericScraper implements Scraper {
 			// The email host is everything after the '@' character.
 			final String emailHost = firmEmail.substring(firmEmail.indexOf('@') + 1);
 
+			String sourceHost;
+
 			try {
-				final String sourceHost = AisUrlUtils.extractHostname(url);
+				sourceHost = AisUrlUtils.extractHostname(url);
+			} catch (UrlParseException e) {
+				// Parsing failed, but there are other urls to try.
+				continue;
+			}
 
-				// If the source host ends with the email host...
-				if (sourceHost.endsWith(emailHost)) {
-					// ...then the source is probably the firms own website.
-					// We only check the end of the source host to account for internal
-					// sites.
-					firm.setFirmUrl(sourceHost);
+			// If the source host ends with the email host...
+			if (sourceHost.endsWith(emailHost)) {
+				// ...then the source is probably the firms own website.
+				// We only check the end of the source host to account for internal
+				// sites.
+				firm.setFirmUrl(sourceHost);
 
-					break;
-				}
-			} catch (UrlParseException e) {}
+				break;
+			}
 		}
 	}
 
@@ -321,6 +335,52 @@ public class GenericScraper implements Scraper {
 			// Use the unchanged url as the source.
 			firm.setSource(url);
 		}
+	}
+
+	/**
+	 * It is possible to have anchors that are missing the hostname.
+	 *
+	 * These anchors would use the hostname of the current page in a normal
+	 * browser.
+	 *
+	 * Unfortunately, this doesn't work too well with Selenium, so we have to fix
+	 * the links.
+	 *
+	 * @param links
+	 * @param pageUrl
+	 * @return
+	 */
+	private Collection<String> cleanLinks(
+			final Collection<String> links,
+			final String pageUrl
+	) {
+		String pageAuthority;
+
+		try {
+			pageAuthority = AisUrlUtils.removePath(pageUrl);
+		} catch (UrlParseException e) {
+			return links;
+		}
+
+		final Collection<String> fixedLinks = new HashSet<>();
+
+		for (final String link : links) {
+			try {
+				// If the link is missing the hostname...
+				if (!AisUrlUtils.hasAuthority(link)) {
+					// Prepend the link with the page authority.
+					fixedLinks.add(pageAuthority + link);
+				} else {
+					// No need to modify the link.
+					fixedLinks.add(link);
+				}
+			} catch (UrlParseException e) {
+				// Parsing failed, but let's keep the link just in case.
+				fixedLinks.add(link);
+			}
+		}
+
+		return fixedLinks;
 	}
 
 }
