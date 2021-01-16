@@ -74,6 +74,27 @@ public class GenericScraper implements Scraper {
 	}
 
 	/**
+	 * Searches for and scrapes employee pages.
+	 *
+	 * @param driver
+	 * @param firm
+	 */
+	private void scrapeEmployeePages(
+			final WebDriver driver,
+			final Firm firm
+	) {
+		final Collection<String> employeePageLinks =
+				this.findEmployeePageLinks(driver);
+
+		for (final String employeePageLink : employeePageLinks) {
+			driver.get(employeePageLink);
+			final Collection<String> personalPageLinks =
+					this.findPersonalPageLinks(driver);
+			System.out.println(personalPageLinks);
+		}
+	}
+
+	/**
 	 * Finds possible employee pages by looking at the paths and comparing it to a
 	 * pre-determined list of suspected paths.
 	 *
@@ -102,16 +123,43 @@ public class GenericScraper implements Scraper {
 		return employeePageLinks;
 	}
 
-	private void scrapeEmployeePages(
-			final WebDriver driver,
-			final Firm firm
+	/**
+	 * Finds possible personal employee pages by comparing the path of anchors to
+	 * the current URL.
+	 *
+	 * @param driver
+	 */
+	private Collection<String> findPersonalPageLinks(
+			final WebDriver driver
 	) {
-		final Collection<String> employeePageLinks =
-				this.findEmployeePageLinks(driver);
+		final Collection<String> personalPageLinks = new HashSet<>();
 
-		for (final String employeePageLink : employeePageLinks) {
-			driver.get(employeePageLink);
-		}
+		try {
+			final String currentPath =
+					AisUrlUtils.extractPath(driver.getCurrentUrl());
+
+			final List<WebElement> anchors = driver.findElements(By.cssSelector("a"));
+
+			for (final WebElement anchor : anchors) {
+				final String href = anchor.getAttribute("href");
+
+				if (StringUtils.isNotBlank(href)) {
+					try {
+						final String path = AisUrlUtils.extractPath(href);
+
+						// We expect any personal pages to be child pages of the employee
+						// group page.
+						if (StringUtils.isNotBlank(path) &&
+								path.startsWith(currentPath) &&
+								path.length() > currentPath.length()) {
+							personalPageLinks.add(href);
+						}
+					} catch (UrlParseException e) {}
+				}
+			}
+		} catch (UrlParseException e) {}
+
+		return personalPageLinks;
 	}
 
 	/**
