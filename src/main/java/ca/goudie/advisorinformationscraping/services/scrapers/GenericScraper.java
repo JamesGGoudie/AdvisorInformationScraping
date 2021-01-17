@@ -84,7 +84,7 @@ public class GenericScraper implements Scraper {
 		firm.getEmails().addAll(this.findEmailsByAnchor(driver));
 		firm.getPhones().addAll(this.findPhones(driver));
 
-		this.formatFirmSource(firm, url);
+		firm.setSource(this.formatSource(url));
 		this.compareFirmEmailAndSource(firm, url);
 
 		return firm;
@@ -121,8 +121,29 @@ public class GenericScraper implements Scraper {
 	) {
 		final Employee employee = new Employee();
 
-		employee.setName(this.findEmployeeNameInUrl(driver.getCurrentUrl()));
-		employee.setTitle(this.findEmployeeTitleByHeaders(driver));
+		employee.setTitle(this.findEmployeeTitleInBlock(employeeBlock));
+
+		if (StringUtils.isBlank(employee.getTitle())) {
+			// The employee's title isn't in the list of known titles.
+			// Assume that the employee is not relevant.
+			return;
+		}
+
+		final Collection<WebElement> personalPageAnchors =
+				this.findPersonalPageAnchors(employeeBlock);
+
+		for (final WebElement anchor : personalPageAnchors) {
+			final String href = anchor.getAttribute("href");
+			final String cleanHref = this.cleanLink(href, driver.getCurrentUrl());
+
+			employee.setSource(this.formatSource(cleanHref));
+			employee.setName(this.findEmployeeNameInUrl(cleanHref));
+
+			// Only expecting one anchor, but break just in case
+			break;
+		}
+
+		firm.getEmployees().add(employee);
 	}
 
 	private void scrapePersonalPage(final WebDriver driver, final Firm firm) {
@@ -293,12 +314,12 @@ public class GenericScraper implements Scraper {
 		return AisRegexUtils.isPossiblyName(candidate) ? candidate : null;
 	}
 
-	private String findEmployeeTitleByHeaders(final SearchContext context) {
-		final Collection<String> headers = new HashSet<>();
-		Collections.addAll(headers, "h1", "h2", "h3");
+	private String findEmployeeTitleInBlock(final WebElement employeeBlock) {
+		final Collection<String> tags = new HashSet<>();
+		Collections.addAll(tags, "span");
 
-		for (final String header : headers) {
-			final String title = this.findEmployeeTitleByHeader(context, header);
+		for (final String tag : tags) {
+			final String title = this.findEmployeeTitleByTag(employeeBlock, tag);
 
 			if (StringUtils.isNotBlank(title)) {
 				return title;
@@ -308,14 +329,37 @@ public class GenericScraper implements Scraper {
 		return null;
 	}
 
-	private String findEmployeeTitleByHeader(
-			final SearchContext context,
-			final String header
-	) {
-		final List<WebElement> anchors = context.findElements(By.tagName(header));
+	private String findEmployeeTitleByHeaders(final SearchContext context) {
+		final Collection<String> headers = new HashSet<>();
+		Collections.addAll(headers, "h1", "h2", "h3");
 
-		for (final WebElement anchor : anchors) {
-			final String innerText = anchor.getAttribute("innerText");
+		for (final String header : headers) {
+			final String title = this.findEmployeeTitleByTag(context, header);
+
+			if (StringUtils.isNotBlank(title)) {
+				return title;
+			}
+		}
+
+		return null;
+	}
+
+	private String findEmployeeTitleByTag(
+			final SearchContext context,
+			final String tag
+	) {
+		final List<WebElement> els = context.findElements(By.tagName(tag));
+
+		for (final WebElement el : els) {
+			final List<WebElement> children = el.findElements(By.xpath("./*"));
+
+			// We only want to check for titles in leaf tags since searching any
+			// higher would give us less useful information.
+			if (children.size() > 0) {
+				continue;
+			}
+
+			final String innerText = el.getAttribute("innerText");
 
 			for (final String title : GenericScraper.EMPLOYEE_TITLES) {
 				if (innerText.toLowerCase().contains(title)) {
@@ -514,19 +558,18 @@ public class GenericScraper implements Scraper {
 	}
 
 	/**
-	 * Formats the URL that was used to search for the firm's general information.
-	 * All that should remain is the host, port (if present), and path.
+	 * Formats the given URL into something that can be presented by removing
+	 * unnecessary information such as query parameters and scheme.
 	 *
-	 * @param firm
 	 * @param url
 	 */
-	private void formatFirmSource(final Firm firm, final String url) {
+	private String formatSource(final String url) {
 		try {
-			firm.setSource(AisUrlUtils.formatSource(url));
+			return AisUrlUtils.formatSource(url);
 		} catch (UrlParseException e) {
 			// Formatting the source failed.
 			// Use the unchanged url as the source.
-			firm.setSource(url);
+			return url;
 		}
 	}
 
@@ -574,6 +617,28 @@ public class GenericScraper implements Scraper {
 		}
 
 		return fixedLinks;
+	}
+
+	private String cleanLink(final String link, final String pageUrl) {
+		String pageAuthority;
+
+		try {
+			pageAuthority = AisUrlUtils.removePath(pageUrl);
+		} catch (UrlParseException e) {
+			return link;
+		}
+
+		try {
+			// If the link is missing the hostname...
+			if (!AisUrlUtils.hasAuthority(link)) {
+				// Prepend the link with the page authority.
+				return pageAuthority + link;
+			} else {
+				return link;
+			}
+		} catch (UrlParseException e) {
+			return link;
+		}
 	}
 
 }
