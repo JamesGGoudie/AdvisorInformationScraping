@@ -1,16 +1,19 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
+import ca.goudie.advisorinformationscraping.models.common.Employee;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
 import ca.goudie.advisorinformationscraping.utils.AisPhoneUtils;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,10 +33,23 @@ public class GenericScraper implements Scraper {
 	 */
 	private static final Collection<String> EMPLOYEE_PAGE_PATHS = new HashSet<>();
 
+	/**
+	 * A list of employee titles that we are interested in.
+	 *
+	 * This allows us to ignore non-relevant employees.
+	 */
+	private static final Collection<String> EMPLOYEE_TITLES = new HashSet<>();
+
 	public GenericScraper() {
-		// Populate the list of employee page paths here.
+		// Populate our static hash-sets here for simplicity.
 		Collections.addAll(GenericScraper.EMPLOYEE_PAGE_PATHS,
 				"/about-us/our-team/");
+
+		Collections.addAll(GenericScraper.EMPLOYEE_TITLES,
+				"chartered financial planner",
+				"financial planning specialist",
+				"trust specialist",
+				"financial planning consultant");
 	}
 
 	public Firm scrapeWebsite(
@@ -85,13 +101,95 @@ public class GenericScraper implements Scraper {
 	) {
 		final Collection<String> employeePageLinks =
 				this.findEmployeePageLinks(driver);
+		final Collection<String> personalPageLinks = new HashSet<>();
 
 		for (final String employeePageLink : employeePageLinks) {
 			driver.get(employeePageLink);
-			final Collection<String> personalPageLinks =
-					this.findPersonalPageLinks(driver);
-			System.out.println(personalPageLinks);
+			personalPageLinks.addAll(this.findPersonalPageLinks(driver));
 		}
+
+		for (final String personalPageLink : personalPageLinks) {
+			driver.get(personalPageLink);
+			this.scrapePersonalPage(driver, firm);
+		}
+	}
+
+	private void scrapePersonalPage(final WebDriver driver, final Firm firm) {
+		final Employee employee = new Employee();
+
+		employee.setName(this.findEmployeeNameInUrl(driver.getCurrentUrl()));
+		employee.setTitle(this.findEmployeeTitleByHeaders(driver));
+
+		employee.getPhones().addAll(this.findPhones(driver));
+		employee.getEmails().addAll(this.findEmailsByAnchor(driver));
+
+		firm.getEmployees().add(employee);
+	}
+
+	/**
+	 * Tries to determine the name of the employee from the URL.
+	 *
+	 * We expect this to be the final segment of the path.
+	 *
+	 * Will disregard if the final segment contains numbers or specials symbols.
+	 *
+	 * @param url
+	 * @return
+	 */
+	private String findEmployeeNameInUrl(final String url) {
+		String path;
+
+		try {
+			path = AisUrlUtils.extractPath(url);
+		} catch (UrlParseException e) {
+			return null;
+		}
+
+		final List<String> pathSegments = AisRegexUtils.findPathSegments(path);
+
+		if (pathSegments.size() == 0) {
+			return null;
+		}
+
+		final String candidate = pathSegments.get(pathSegments.size() - 1);
+
+		return AisRegexUtils.isPossiblyName(candidate) ? candidate : null;
+	}
+
+	private String findEmployeeTitleByHeaders(final WebDriver driver) {
+		final Collection<String> headers = new HashSet<>();
+		Collections.addAll(headers, "h1", "h2", "h3");
+
+		for (final String header : headers) {
+			final String title = this.findEmployeeTitleByHeader(driver, header);
+
+			if (StringUtils.isNotBlank(title)) {
+				return title;
+			}
+		}
+
+		return null;
+	}
+
+	private String findEmployeeTitleByHeader(
+			final WebDriver driver,
+			final String header
+	) {
+		final List<WebElement> anchors = driver.findElements(By.tagName(header));
+
+		for (final WebElement anchor : anchors) {
+			final String innerText = anchor.getAttribute("innerText");
+
+			for (final String title : GenericScraper.EMPLOYEE_TITLES) {
+				if (innerText.toLowerCase().contains(title)) {
+					// Return innerText instead of title because the employee's full title
+					// may contain more than just one role.
+					return innerText;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -182,11 +280,17 @@ public class GenericScraper implements Scraper {
 	 * @return
 	 */
 	private Collection<String> findEmailsByAnchor(final WebDriver driver) {
-		final List<WebElement> anchors = driver.findElements(By.cssSelector("a"));
+		final List<WebElement> anchors = driver.findElements(By.tagName("a"));
 		final Collection<String> out = new HashSet<>();
 
 		for (final WebElement anchor : anchors) {
-			final String href = anchor.getAttribute("href");
+			String href;
+
+			try {
+				href = anchor.getAttribute("href");
+			} catch (StaleElementReferenceException e) {
+				continue;
+			}
 
 			if (StringUtils.isNotBlank(href) &&
 					href.toLowerCase().startsWith("mailto:")) {
@@ -240,11 +344,17 @@ public class GenericScraper implements Scraper {
 	 * @return
 	 */
 	private Collection<String> findPhonesByAnchor(final WebDriver driver) {
-		final List<WebElement> anchors = driver.findElements(By.cssSelector("a"));
+		final List<WebElement> anchors = driver.findElements(By.tagName("a"));
 		final Collection<String> out = new HashSet<>();
 
 		for (final WebElement anchor : anchors) {
-			final String href = anchor.getAttribute("href");
+			String href;
+
+			try {
+				href = anchor.getAttribute("href");
+			} catch (StaleElementReferenceException e) {
+				continue;
+			}
 
 			if (StringUtils.isNotBlank(href) &&
 					href.toLowerCase().startsWith("tel:")) {
