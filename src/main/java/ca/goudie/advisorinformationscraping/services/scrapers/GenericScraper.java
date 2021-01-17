@@ -82,7 +82,8 @@ public class GenericScraper implements Scraper {
 		final Firm firm = new Firm();
 
 		firm.getEmails().addAll(this.findEmailsByAnchor(driver));
-		firm.getPhones().addAll(this.findPhones(driver));
+		firm.getPhones().addAll(
+				this.findPhones(driver.findElement(By.tagName("body"))));
 
 		firm.setSource(this.formatSource(url));
 		this.compareFirmEmailAndSource(firm, url);
@@ -114,7 +115,7 @@ public class GenericScraper implements Scraper {
 		}
 
 		for (final Employee employee : firm.getEmployees()) {
-			this.scrapePersonalPage(driver, employee);
+			this.scrapePersonalPage(driver, firm, employee);
 		}
 	}
 
@@ -152,13 +153,17 @@ public class GenericScraper implements Scraper {
 
 	private void scrapePersonalPage(
 			final WebDriver driver,
+			final Firm firm,
 			final Employee employee
 	) {
 		driver.get(employee.getSource());
 		employee.setSource(this.formatSource(employee.getSource()));
 
-		employee.getPhones().addAll(this.findPhones(driver));
-		employee.getEmails().addAll(this.findEmailsByAnchor(driver));
+		final WebElement personalBlock =
+				this.findPersonalPageBlockByEmailAnchor(driver, firm);
+
+		employee.getPhones().addAll(this.findPhones(personalBlock));
+		employee.getEmails().addAll(this.findEmailsByAnchor(personalBlock));
 	}
 
 	private Collection<WebElement> findEmployeePageBlocksByAnchors(
@@ -195,8 +200,52 @@ public class GenericScraper implements Scraper {
 	}
 
 	private WebElement findPersonalPageBlockByEmailAnchor(
-			final SearchContext context
+			final SearchContext context,
+			final Firm firm
 	) {
+		final Collection<WebElement> anchors = this.findEmailAnchors(context);
+
+		for (final WebElement anchor : anchors) {
+			final String href = anchor.getAttribute("href").substring(7);
+
+			// If this email was already found for the firm...
+			if (firm.getEmails().contains(href)) {
+				// ...then disregard this anchor.
+				continue;
+			}
+
+			WebElement currentNode = anchor;
+
+			do {
+				final WebElement parentNode =
+						currentNode.findElement(By.xpath(".."));
+				final Collection<WebElement> localAnchors =
+						parentNode.findElements(By.tagName("a"));
+
+				int badAnchors = 0;
+
+				// Look for any anchors that refer to non-relevant information.
+				for (final WebElement localAnchor : localAnchors) {
+					if (!(this.isPhoneAnchor(localAnchor) ||
+							this.isEmailAnchor(localAnchor))) {
+						++badAnchors;
+					}
+				}
+
+				// Personal blocks can have all kinds of different anchors in them.
+				// Some examples are external review sites and navigation buttons
+				// We need to have a certain level of tolerance so that we don't return
+				// too small of a block.
+				if (badAnchors > 5) {
+					break;
+				}
+
+				currentNode = parentNode;
+			} while (!currentNode.getTagName().equalsIgnoreCase("body"));
+
+			return currentNode;
+		}
+
 		return null;
 	}
 
@@ -487,14 +536,14 @@ public class GenericScraper implements Scraper {
 	/**
 	 * Finds all phone numbers in the current page.
 	 *
-	 * @param driver
+	 * @param element
 	 * @return
 	 */
-	private Collection<String> findPhones(final WebDriver driver) {
+	private Collection<String> findPhones(final WebElement element) {
 		final Collection<String> out = new HashSet<>();
 
-		out.addAll(this.findPhonesByAnchor(driver));
-		out.addAll(AisPhoneUtils.findPhones(driver.getPageSource()));
+		out.addAll(this.findPhonesByAnchor(element));
+		out.addAll(AisPhoneUtils.findPhones(element.getAttribute("innerHTML")));
 
 		return out;
 	}
