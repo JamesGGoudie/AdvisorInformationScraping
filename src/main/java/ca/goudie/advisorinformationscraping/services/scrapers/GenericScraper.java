@@ -311,7 +311,19 @@ public class GenericScraper implements Scraper {
 
 		final String candidate = pathSegments.get(pathSegments.size() - 1);
 
-		return AisRegexUtils.isPossiblyName(candidate) ? candidate : null;
+		if (!AisRegexUtils.isPossiblyName(candidate)) {
+			return null;
+		}
+
+		final String[] names = candidate.split("-");
+
+		String out = "";
+
+		for (final String name : names) {
+			out += name.substring(0, 1).toUpperCase() + name.substring(1) + " ";
+		}
+
+		return out.trim();
 	}
 
 	private String findEmployeeTitleInBlock(final WebElement employeeBlock) {
