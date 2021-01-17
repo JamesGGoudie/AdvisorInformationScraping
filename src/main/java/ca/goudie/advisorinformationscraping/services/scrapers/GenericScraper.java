@@ -112,6 +112,10 @@ public class GenericScraper implements Scraper {
 		for (final WebElement employeeBlock : employeeBlocks) {
 			this.processEmployeeBlock(driver, employeeBlock, firm);
 		}
+
+		for (final Employee employee : firm.getEmployees()) {
+			this.scrapePersonalPage(driver, employee);
+		}
 	}
 
 	private void processEmployeeBlock(
@@ -136,7 +140,7 @@ public class GenericScraper implements Scraper {
 			final String href = anchor.getAttribute("href");
 			final String cleanHref = this.cleanLink(href, driver.getCurrentUrl());
 
-			employee.setSource(this.formatSource(cleanHref));
+			employee.setSource(cleanHref);
 			employee.setName(this.findEmployeeNameInUrl(cleanHref));
 
 			// Only expecting one anchor, but break just in case
@@ -146,16 +150,15 @@ public class GenericScraper implements Scraper {
 		firm.getEmployees().add(employee);
 	}
 
-	private void scrapePersonalPage(final WebDriver driver, final Firm firm) {
-		final Employee employee = new Employee();
-
-		employee.setName(this.findEmployeeNameInUrl(driver.getCurrentUrl()));
-		employee.setTitle(this.findEmployeeTitleByHeaders(driver));
+	private void scrapePersonalPage(
+			final WebDriver driver,
+			final Employee employee
+	) {
+		driver.get(employee.getSource());
+		employee.setSource(this.formatSource(employee.getSource()));
 
 		employee.getPhones().addAll(this.findPhones(driver));
 		employee.getEmails().addAll(this.findEmailsByAnchor(driver));
-
-		firm.getEmployees().add(employee);
 	}
 
 	private Collection<WebElement> findEmployeePageBlocksByAnchors(
@@ -189,6 +192,12 @@ public class GenericScraper implements Scraper {
 		}
 
 		return employeeBlocks;
+	}
+
+	private WebElement findPersonalPageBlockByEmailAnchor(
+			final SearchContext context
+	) {
+		return null;
 	}
 
 	private Collection<WebElement> findPersonalPageAnchors(
@@ -419,39 +428,56 @@ public class GenericScraper implements Scraper {
 	 * @return
 	 */
 	private Collection<String> findEmailsByAnchor(final SearchContext context) {
-		final List<WebElement> anchors = context.findElements(By.tagName("a"));
+		final Collection<WebElement> anchors = this.findEmailAnchors(context);
 		final Collection<String> out = new HashSet<>();
 
 		for (final WebElement anchor : anchors) {
-			String href;
+			final String href = anchor.getAttribute("href");
 
-			try {
-				href = anchor.getAttribute("href");
-			} catch (StaleElementReferenceException e) {
+			// Check the innerText for an email that is displayed to the user.
+			final String innerText = anchor.getAttribute("innerText");
+			final String innerEmail = AisRegexUtils.findFirstEmail(innerText);
+
+			if (StringUtils.isNotBlank(innerEmail)) {
+				out.add(innerEmail);
+
 				continue;
 			}
 
-			if (StringUtils.isNotBlank(href) &&
-					href.toLowerCase().startsWith("mailto:")) {
-				// Check the innerText for an email that is displayed to the user.
-				final String innerText = anchor.getAttribute("innerText");
-				final String innerEmail = AisRegexUtils.findFirstEmail(innerText);
+			// We could not find an email in the innerText
+			// Check what is after the mailto: instead and see if that is valid.
 
-				if (StringUtils.isNotBlank(innerEmail)) {
-					out.add(innerEmail);
+			final String hrefText = href.substring(7);
+			final String hrefEmail = AisRegexUtils.findFirstEmail(hrefText);
 
-					continue;
+			if (StringUtils.isNotBlank(hrefEmail)) {
+				out.add(hrefEmail);
+			}
+		}
+
+		return out;
+	}
+
+	private boolean isEmailAnchor(
+			final WebElement anchor
+	) throws StaleElementReferenceException {
+		final String href = anchor.getAttribute("href");
+
+		return StringUtils.isNotBlank(href) &&
+				href.toLowerCase().startsWith("mailto:");
+	}
+
+	private Collection<WebElement> findEmailAnchors(final SearchContext context) {
+		final List<WebElement> anchors = context.findElements(By.tagName("a"));
+		final Collection<WebElement> out = new HashSet<>();
+
+		for (final WebElement anchor : anchors) {
+			try {
+				if (this.isEmailAnchor(anchor)) {
+					out.add(anchor);
 				}
-
-				// We could not find an email in the innerText
-				// Check what is after the mailto: instead and see if that is valid.
-
-				final String hrefText = href.substring(7);
-				final String hrefEmail = AisRegexUtils.findFirstEmail(hrefText);
-
-				if (StringUtils.isNotBlank(hrefEmail)) {
-					out.add(hrefEmail);
-				}
+			} catch (StaleElementReferenceException e) {
+				continue;
 			}
 		}
 
@@ -483,39 +509,54 @@ public class GenericScraper implements Scraper {
 	 * @return
 	 */
 	private Collection<String> findPhonesByAnchor(final SearchContext context) {
-		final List<WebElement> anchors = context.findElements(By.tagName("a"));
+		final Collection<WebElement> anchors = this.findPhoneAnchors(context);
 		final Collection<String> out = new HashSet<>();
 
 		for (final WebElement anchor : anchors) {
-			String href;
+			final String href = anchor.getAttribute("href");
 
-			try {
-				href = anchor.getAttribute("href");
-			} catch (StaleElementReferenceException e) {
+			// Check the value in the href first since it is more likely to be
+			// accurate.
+			// This is because numbers displayed to the user may have letters in
+			// place of numbers.
+			final String hrefText = href.substring(4);
+			final String hrefPhone = AisPhoneUtils.findFirstPhone(hrefText);
+
+			if (StringUtils.isNotBlank(hrefPhone)) {
+				out.add(hrefPhone);
+
 				continue;
 			}
 
-			if (StringUtils.isNotBlank(href) &&
-					href.toLowerCase().startsWith("tel:")) {
-				// Check the value in the href first since it is more likely to be
-				// accurate.
-				// This is because numbers displayed to the user may have letters in
-				// place of numbers.
-				final String hrefText = href.substring(4);
-				final String hrefPhone = AisPhoneUtils.findFirstPhone(hrefText);
+			// Take whatever is displayed to the user instead.
+			final String innerPhone = anchor.getAttribute("innerText");
 
-				if (StringUtils.isNotBlank(hrefPhone)) {
-					out.add(hrefPhone);
+			if (StringUtils.isNotBlank(innerPhone)) {
+				out.add(innerPhone);
+			}
+		}
 
-					continue;
+		return out;
+	}
+
+	private boolean isPhoneAnchor(final WebElement anchor) {
+		final String href = anchor.getAttribute("href");
+
+		return StringUtils.isNotBlank(href) &&
+				href.toLowerCase().startsWith("tel:");
+	}
+
+	private Collection<WebElement> findPhoneAnchors(final SearchContext context) {
+		final List<WebElement> anchors = context.findElements(By.tagName("a"));
+		final Collection<WebElement> out = new HashSet<>();
+
+		for (final WebElement anchor : anchors) {
+			try {
+				if (this.isPhoneAnchor(anchor)) {
+					out.add(anchor);
 				}
-
-				// Take whatever is displayed to the user instead.
-				final String innerPhone = anchor.getAttribute("innerText");
-
-				if (StringUtils.isNotBlank(innerPhone)) {
-					out.add(innerPhone);
-				}
+			} catch (StaleElementReferenceException e) {
+				continue;
 			}
 		}
 
