@@ -1,7 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.dihelpers;
 
 import ca.goudie.advisorinformationscraping.enums.KnownHost;
-import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
+import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
 import ca.goudie.advisorinformationscraping.services.scrapers.Scraper;
@@ -16,7 +16,7 @@ public class ScraperSelector {
 	private GenericScraper genericScraper;
 
 	public Scraper selectScraper(final String link)
-			throws ScrapingFailedException {
+			throws ScrapeException {
 		try {
 			final KnownHost host = KnownHost.getEnum(AisUrlUtils.extractHostname(
 					link));
@@ -30,7 +30,7 @@ public class ScraperSelector {
 				return host.getScraper();
 			}
 		} catch (UrlParseException e) {
-			throw new ScrapingFailedException(e);
+			throw new ScrapeException(e);
 		}
 	}
 

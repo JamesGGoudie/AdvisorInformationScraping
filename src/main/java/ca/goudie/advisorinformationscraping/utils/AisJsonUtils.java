@@ -1,6 +1,6 @@
 package ca.goudie.advisorinformationscraping.utils;
 
-import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
+import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.models.bloomberg.BloombergOrganization;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,11 +17,11 @@ public class AisJsonUtils {
 	 *
 	 * @param jsonStr
 	 * @return
-	 * @throws ScrapingFailedException
+	 * @throws ScrapeException
 	 */
 	public static BloombergOrganization parseBloombergJson(
 			final String jsonStr
-	) throws ScrapingFailedException {
+	) throws ScrapeException {
 		final ObjectMapper om = new ObjectMapper();
 
 		try {
@@ -34,7 +34,7 @@ public class AisJsonUtils {
 
 			return org;
 		} catch (JsonProcessingException e) {
-			throw new ScrapingFailedException(e);
+			throw new ScrapeException(e);
 		}
 	}
 
@@ -44,10 +44,10 @@ public class AisJsonUtils {
 	 *
 	 * @param jsonStr
 	 * @return
-	 * @throws ScrapingFailedException
+	 * @throws ScrapeException
 	 */
 	public static boolean isBloombergOrganizationJson(final String jsonStr)
-			throws ScrapingFailedException {
+			throws ScrapeException {
 		final ObjectMapper om = new ObjectMapper();
 
 		try {
@@ -55,7 +55,7 @@ public class AisJsonUtils {
 
 			return tempMap.get("@type").equals("Organization");
 		} catch (JsonProcessingException e) {
-			throw new ScrapingFailedException(e);
+			throw new ScrapeException(e);
 		}
 	}
 

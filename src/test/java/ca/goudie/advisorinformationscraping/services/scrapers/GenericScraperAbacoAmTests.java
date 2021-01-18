@@ -1,6 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
-import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
+import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
 import ca.goudie.advisorinformationscraping.models.common.Employee;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
@@ -29,7 +29,7 @@ public class GenericScraperAbacoAmTests {
 	private WebDriver chromeWebDriver;
 
 	@Test
-	public void shouldScrapeAbacoAm() throws ScrapingFailedException {
+	public void shouldScrapeAbacoAm() throws ScrapeException {
 		final String abacoUrl = "http://www.abacoam.com/";
 
 		WebDriver mockDriver = spy(this.chromeWebDriver);

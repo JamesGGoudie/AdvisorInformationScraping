@@ -1,6 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
-import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
+import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.models.bloomberg.BloombergEmployee;
 import ca.goudie.advisorinformationscraping.models.bloomberg.BloombergOrganization;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
@@ -37,7 +37,7 @@ public class BloombergScraper implements Scraper {
 	@Override
 	public Firm scrapeWebsite(
 			final WebDriver driver, final String url
-	) throws ScrapingFailedException {
+	) throws ScrapeException {
 		driver.get(url);
 
 		this.checkAndCircumventCaptcha(driver, url);
@@ -60,11 +60,11 @@ public class BloombergScraper implements Scraper {
 	 *
 	 * @param driver
 	 *
-	 * @throws ScrapingFailedException
+	 * @throws ScrapeException
 	 */
 	private void checkAndCircumventCaptcha(
 			final WebDriver driver, final String url
-	) throws ScrapingFailedException {
+	) throws ScrapeException {
 		// Check the title to see if we were stopped by the captcha.
 		if (driver.getTitle().equals(BloombergScraper.CAPTCHA_TITLE)) {
 			// To bypass the captcha, we need a cookie from a pending request.
@@ -78,7 +78,7 @@ public class BloombergScraper implements Scraper {
 				try {
 					TimeUnit.SECONDS.sleep(1);
 				} catch (InterruptedException e) {
-					throw new ScrapingFailedException(e);
+					throw new ScrapeException(e);
 				}
 			}
 
@@ -87,7 +87,7 @@ public class BloombergScraper implements Scraper {
 			try {
 				TimeUnit.SECONDS.sleep(BloombergScraper.POST_COOKIE_WAIT_TIME);
 			} catch (InterruptedException e) {
-				throw new ScrapingFailedException(e);
+				throw new ScrapeException(e);
 			}
 
 			// Now that we have the cookie, we need to re-navigate to the website.
@@ -96,7 +96,7 @@ public class BloombergScraper implements Scraper {
 
 			if (driver.getTitle().equals(BloombergScraper.CAPTCHA_TITLE)) {
 				// Got caught by the Captcha again.
-				throw new ScrapingFailedException("Could not beat Bloomberg Captcha");
+				throw new ScrapeException("Could not beat Bloomberg Captcha");
 			}
 		}
 	}
@@ -107,11 +107,11 @@ public class BloombergScraper implements Scraper {
 	 *
 	 * @param driver
 	 * @return
-	 * @throws ScrapingFailedException
+	 * @throws ScrapeException
 	 */
 	private BloombergOrganization extractOrganizationData(
 			final WebDriver driver
-	) throws ScrapingFailedException {
+	) throws ScrapeException {
 		final List<WebElement> scripts = driver.findElements(By.xpath(
 				"/html/head/script"));
 
@@ -132,7 +132,7 @@ public class BloombergScraper implements Scraper {
 			}
 		}
 
-		throw new ScrapingFailedException(
+		throw new ScrapeException(
 				"Could not find Bloomberg organization JSON.");
 	}
 
