@@ -21,7 +21,7 @@ public class GenericNameHelper {
 	 * @return
 	 */
 	String findEmployeeNameInUrl(final String url) {
-		String path;
+		final String path;
 
 		try {
 			path = AisUrlUtils.extractPath(url);

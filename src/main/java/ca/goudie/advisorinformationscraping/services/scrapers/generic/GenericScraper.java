@@ -4,6 +4,7 @@ import ca.goudie.advisorinformationscraping.models.common.Firm;
 import ca.goudie.advisorinformationscraping.services.scrapers.Scraper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,7 +106,13 @@ public class GenericScraper implements Scraper {
 		final Collection<String> employeePageLinks = new HashSet<>();
 
 		for (final WebElement anchor : anchors) {
-			final String href = anchor.getAttribute("href");
+			final String href;
+
+			try {
+				href = anchor.getAttribute("href");
+			} catch (StaleElementReferenceException e) {
+				continue;
+			}
 
 			if (this.employeesPageHelper.isAnchorEmployeesPage(anchor)) {
 				employeePageLinks.add(href);

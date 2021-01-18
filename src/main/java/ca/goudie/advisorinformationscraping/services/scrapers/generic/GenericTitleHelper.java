@@ -3,6 +3,7 @@ package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
@@ -75,7 +76,13 @@ public class GenericTitleHelper {
 				continue;
 			}
 
-			final String innerText = el.getAttribute("innerText");
+			final String innerText;
+
+			try {
+				innerText = el.getAttribute("innerText");
+			} catch (StaleElementReferenceException e) {
+				continue;
+			}
 
 			for (final String title : GenericTitleHelper.EMPLOYEE_TITLES) {
 				if (innerText.toLowerCase().contains(title)) {

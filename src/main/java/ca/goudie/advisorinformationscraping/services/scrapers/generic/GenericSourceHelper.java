@@ -53,7 +53,7 @@ public class GenericSourceHelper {
 			// The email host is everything after the '@' character.
 			final String emailHost = firmEmail.substring(firmEmail.indexOf('@') + 1);
 
-			String sourceHost;
+			final String sourceHost;
 
 			try {
 				sourceHost = AisUrlUtils.extractHostname(url);

@@ -1,5 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
+import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.models.common.Employee;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
@@ -8,6 +9,7 @@ import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,13 +135,23 @@ public class GenericEmployeesPageHelper {
 	 * @return
 	 */
 	boolean isAnchorEmployeesPage(final WebElement anchor) {
-		if (!this.hrefHelper.doesHrefExist(anchor)) {
+		try {
+			if (!this.hrefHelper.doesHrefExist(anchor)) {
+				return false;
+			}
+		} catch (DomReadException e) {
 			return false;
 		}
 
-		final String href = anchor.getAttribute("href");
+		final String href;
 
-		String path;
+		try {
+			href = anchor.getAttribute("href");
+		} catch (StaleElementReferenceException e) {
+			return false;
+		}
+
+		final String path;
 
 		try {
 			path = AisUrlUtils.extractPath(href);
@@ -194,7 +206,14 @@ public class GenericEmployeesPageHelper {
 				this.findPersonalPageAnchors(employeeBlock);
 
 		for (final WebElement anchor : personalPageAnchors) {
-			final String href = anchor.getAttribute("href");
+			final String href;
+
+			try {
+				href = anchor.getAttribute("href");
+			} catch (StaleElementReferenceException e) {
+				continue;
+			}
+
 			final String cleanHref =
 					this.hrefHelper.cleanLink(href, currentUrl);
 

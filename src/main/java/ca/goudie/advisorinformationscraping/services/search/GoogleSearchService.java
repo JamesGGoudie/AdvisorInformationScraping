@@ -4,6 +4,7 @@ import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
@@ -98,7 +99,13 @@ public class GoogleSearchService implements SearchService {
 
 		for (final WebElement result : results) {
 			final WebElement anchor = result.findElement(By.tagName("a"));
-			final String href = anchor.getAttribute("href");
+			final String href;
+
+			try {
+				href = anchor.getAttribute("href");
+			} catch (StaleElementReferenceException e) {
+				continue;
+			}
 
 			try {
 				final String host = AisUrlUtils.extractHostname(href);

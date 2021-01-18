@@ -23,7 +23,7 @@ public class GenericEmailHelper {
 	 *
 	 * @param anchor
 	 * @return
-	 * @throws StaleElementReferenceException
+	 * @throws DomReadException
 	 */
 	boolean isEmailAnchor(
 			final WebElement anchor
@@ -76,10 +76,18 @@ public class GenericEmailHelper {
 		final Collection<String> out = new HashSet<>();
 
 		for (final WebElement anchor : anchors) {
-			final String href = anchor.getAttribute("href");
+			final String href;
+			final String innerText;
 
-			// Check the innerText for an email that is displayed to the user.
-			final String innerText = anchor.getAttribute("innerText");
+			try {
+				href = anchor.getAttribute("href");
+
+				// Check the innerText for an email that is displayed to the user.
+				innerText = anchor.getAttribute("innerText");
+			} catch (StaleElementReferenceException e) {
+				continue;
+			}
+
 			final String innerEmail = AisRegexUtils.findFirstEmail(innerText);
 
 			if (StringUtils.isNotBlank(innerEmail)) {

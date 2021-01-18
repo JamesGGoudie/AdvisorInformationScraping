@@ -116,19 +116,28 @@ public class BloombergScraper implements Scraper {
 				"/html/head/script"));
 
 		for (final WebElement script : scripts) {
+			final String type;
+
 			try {
-				final String type = script.getAttribute("type");
-
-				if (StringUtils.isNotBlank(type) &&
-						type.equals("application/ld+json")) {
-					final String jsonStr = script.getAttribute("innerText");
-
-					if (AisJsonUtils.isBloombergOrganizationJson(jsonStr)) {
-						return AisJsonUtils.parseBloombergJson(jsonStr);
-					}
-				}
+				type = script.getAttribute("type");
 			} catch (StaleElementReferenceException e) {
 				// The element is not present in the DOM; continue
+				continue;
+			}
+
+			if (StringUtils.isNotBlank(type) &&
+					type.equals("application/ld+json")) {
+				final String jsonStr;
+
+				try {
+					jsonStr = script.getAttribute("innerText");
+				} catch (StaleElementReferenceException e) {
+					continue;
+				}
+
+				if (AisJsonUtils.isBloombergOrganizationJson(jsonStr)) {
+					return AisJsonUtils.parseBloombergJson(jsonStr);
+				}
 			}
 		}
 

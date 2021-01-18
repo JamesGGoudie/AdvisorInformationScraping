@@ -26,7 +26,13 @@ public class GenericPhoneHelper {
 		final Collection<String> out = new HashSet<>();
 
 		out.addAll(this.findPhonesByAnchor(element));
-		out.addAll(AisPhoneUtils.findPhones(element.getAttribute("innerHTML")));
+
+		try {
+			final String innerHtml = element.getAttribute("innerHTML");
+			out.addAll(AisPhoneUtils.findPhones(innerHtml));
+		} catch (StaleElementReferenceException e) {
+			// Couldn't get innerHTML, but we may have still gotten anchor phones.
+		}
 
 		return out;
 	}
@@ -68,7 +74,13 @@ public class GenericPhoneHelper {
 		final Collection<String> out = new HashSet<>();
 
 		for (final WebElement anchor : anchors) {
-			final String href = anchor.getAttribute("href");
+			final String href;
+
+			try {
+				href = anchor.getAttribute("href");
+			} catch (StaleElementReferenceException e) {
+				continue;
+			}
 
 			// Check the value in the href first since it is more likely to be
 			// accurate.
@@ -84,7 +96,13 @@ public class GenericPhoneHelper {
 			}
 
 			// Take whatever is displayed to the user instead.
-			final String innerPhone = anchor.getAttribute("innerText");
+			final String innerPhone;
+
+			try {
+				innerPhone = anchor.getAttribute("innerText");
+			} catch (StaleElementReferenceException e) {
+				continue;
+			}
 
 			if (StringUtils.isNotBlank(innerPhone)) {
 				out.add(innerPhone);

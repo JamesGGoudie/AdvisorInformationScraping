@@ -1,8 +1,10 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
+import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +20,14 @@ public class GenericHrefHelper {
 	 * @param anchor
 	 * @return
 	 */
-	boolean doesHrefExist(final WebElement anchor) {
-		final String href = anchor.getAttribute("href");
+	boolean doesHrefExist(final WebElement anchor) throws DomReadException {
+		try {
+			final String href = anchor.getAttribute("href");
 
-		return StringUtils.isNotBlank(href);
+			return StringUtils.isNotBlank(href);
+		} catch (StaleElementReferenceException e) {
+			throw new DomReadException(e);
+		}
 	}
 
 	/**
@@ -41,7 +47,7 @@ public class GenericHrefHelper {
 			final Collection<String> links,
 			final String pageUrl
 	) {
-		String pageAuthority;
+		final String pageAuthority;
 
 		try {
 			pageAuthority = AisUrlUtils.removePath(pageUrl);
@@ -78,7 +84,7 @@ public class GenericHrefHelper {
 	 * @return
 	 */
 	String cleanLink(final String link, final String pageUrl) {
-		String pageAuthority;
+		final String pageAuthority;
 
 		try {
 			pageAuthority = AisUrlUtils.removePath(pageUrl);

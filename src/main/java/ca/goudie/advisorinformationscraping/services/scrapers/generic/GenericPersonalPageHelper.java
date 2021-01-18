@@ -10,6 +10,7 @@ import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,13 +81,23 @@ public class GenericPersonalPageHelper {
 	 * @return
 	 */
 	boolean isAnchorPersonalPage(final WebElement anchor) {
-		if (!this.hrefHelper.doesHrefExist(anchor)) {
+		try {
+			if (!this.hrefHelper.doesHrefExist(anchor)) {
+				return false;
+			}
+		} catch (DomReadException e) {
 			return false;
 		}
 
-		final String href = anchor.getAttribute("href");
+		final String href;
 
-		String path;
+		try {
+			 href = anchor.getAttribute("href");
+		} catch (StaleElementReferenceException e) {
+			return false;
+		}
+
+		final String path;
 
 		try {
 			path = AisUrlUtils.extractPath(href);
@@ -142,7 +153,13 @@ public class GenericPersonalPageHelper {
 				this.emailHelper.findEmailAnchors(context);
 
 		for (final WebElement anchor : anchors) {
-			final String href = anchor.getAttribute("href").substring(7);
+			final String href;
+
+			try {
+				href = anchor.getAttribute("href").substring(7);
+			} catch (StaleElementReferenceException e) {
+				continue;
+			}
 
 			// If this email was already found for the firm...
 			if (firm.getEmails().contains(href)) {
