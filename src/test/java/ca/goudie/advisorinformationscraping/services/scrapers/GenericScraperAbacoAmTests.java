@@ -3,6 +3,7 @@ package ca.goudie.advisorinformationscraping.services.scrapers;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapingFailedException;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
 import ca.goudie.advisorinformationscraping.models.common.Employee;
+import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
