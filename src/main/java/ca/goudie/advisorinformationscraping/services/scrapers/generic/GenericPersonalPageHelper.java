@@ -1,5 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
+import ca.goudie.advisorinformationscraping.constants.GenericConstants;
 import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.models.common.Employee;
@@ -58,11 +59,20 @@ public class GenericPersonalPageHelper {
 		final WebElement personalBlock =
 				this.findPersonalPageBlockByEmailAnchor(driver, firm);
 
-		employee.getPhones().addAll(this.phoneHelper.findPhones(personalBlock));
-		employee.getEmails().addAll(
-				this.emailHelper.findEmailsByAnchor(personalBlock));
-	}
+		final Collection<String> phones =
+				this.phoneHelper.findPhones(personalBlock);
 
+		for (final String phone : phones) {
+			employee.getPhones().put(phone, GenericConstants.INIT_SCORE);
+		}
+
+		final Collection<String> emails =
+				this.emailHelper.findEmailsByAnchor(personalBlock);
+
+		for (final String email : emails) {
+			employee.getEmails().put(email, GenericConstants.INIT_SCORE);
+		}
+	}
 
 	/**
 	 * Returns true if the anchor given likely represents a personal page.

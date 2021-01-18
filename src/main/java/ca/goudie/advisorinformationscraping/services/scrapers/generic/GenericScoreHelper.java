@@ -1,5 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
+import ca.goudie.advisorinformationscraping.constants.GenericConstants;
 import ca.goudie.advisorinformationscraping.models.common.Employee;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,6 @@ import java.util.Map;
 @Service
 public class GenericScoreHelper {
 
-	private static final float INIT_SCORE = 1.0f;
-	private static final float FIRM_PENALTY = 0.5f;
-
 	/**
 	 * Generates confidence scores for the email, phone, and address values of the
 	 * firm's employees.
@@ -25,37 +23,8 @@ public class GenericScoreHelper {
 	 * @param firm
 	 */
 	void calculateScores(final Firm firm) {
-		this.initScores(firm);
-		this.compareValuesToFirm(firm);
-		this.compareValuesAcrossEmployees(firm);
-	}
-
-	/**
-	 * Initializes all of the scores maps of all of the firm's employees.
-	 *
-	 * @param firm
-	 */
-	private void initScores(final Firm firm) {
-		for (final Employee employee : firm.getEmployees()) {
-			this.initScores(employee.getAddresses(), employee.getAddressScores());
-			this.initScores(employee.getEmails(), employee.getEmailScores());
-			this.initScores(employee.getPhones(), employee.getPhoneScores());
-		}
-	}
-
-	/**
-	 * Initializes the given scores map.
-	 *
-	 * @param employeeKeys
-	 * @param employeeScores
-	 */
-	private void initScores(
-			final Collection<String> employeeKeys,
-			final Map<String, Float> employeeScores
-	) {
-		for (final String key : employeeKeys) {
-			employeeScores.put(key, GenericScoreHelper.INIT_SCORE);
-		}
+		this.compareFirmsEmployeesToFirm(firm);
+		this.compareFirmsEmployeesToEachOther(firm);
 	}
 
 	/**
@@ -63,17 +32,14 @@ public class GenericScoreHelper {
 	 *
 	 * @param firm
 	 */
-	private void compareValuesToFirm(final Firm firm) {
+	private void compareFirmsEmployeesToFirm(final Firm firm) {
 		for (final Employee employee : firm.getEmployees()) {
 			this.compareValuesToFirm(firm.getAddresses(),
-					employee.getAddresses(),
-					employee.getAddressScores());
+					employee.getAddresses());
 			this.compareValuesToFirm(firm.getEmails(),
-					employee.getEmails(),
-					employee.getEmailScores());
+					employee.getEmails());
 			this.compareValuesToFirm(firm.getPhones(),
-					employee.getPhones(),
-					employee.getPhoneScores());
+					employee.getPhones());
 		}
 	}
 
@@ -83,18 +49,16 @@ public class GenericScoreHelper {
 	 * If it does, the score will be lowered.
 	 *
 	 * @param firmKeys
-	 * @param employeeKeys
 	 * @param employeeScores
 	 */
 	private void compareValuesToFirm(
 			final Collection<String> firmKeys,
-			final Collection<String> employeeKeys,
 			final Map<String, Float> employeeScores
 	) {
-		for (final String key : employeeKeys) {
+		for (final String key : employeeScores.keySet()) {
 			if (firmKeys.contains(key)) {
 				final float penalty =
-						GenericScoreHelper.FIRM_PENALTY * employeeScores.get(key);
+						GenericConstants.FIRM_PENALTY * employeeScores.get(key);
 				employeeScores.put(key, penalty);
 			}
 		}
@@ -108,42 +72,34 @@ public class GenericScoreHelper {
 	 *
 	 * @param firm
 	 */
-	private void compareValuesAcrossEmployees(final Firm firm) {
-		final Collection<Collection<String>> addressKeys = new ArrayList<>();
+	private void compareFirmsEmployeesToEachOther(final Firm firm) {
 		final Collection<Map<String, Float>> addressScores = new ArrayList<>();
-		final Collection<Collection<String>> emailKeys = new ArrayList<>();
 		final Collection<Map<String, Float>> emailScores = new ArrayList<>();
-		final Collection<Collection<String>> phoneKeys = new ArrayList<>();
 		final Collection<Map<String, Float>> phoneScores = new ArrayList<>();
 
 		for (final Employee employee : firm.getEmployees()) {
-			addressKeys.add(employee.getAddresses());
-			addressScores.add(employee.getAddressScores());
-			emailKeys.add(employee.getEmails());
-			emailScores.add(employee.getEmailScores());
-			phoneKeys.add(employee.getPhones());
-			phoneScores.add(employee.getPhoneScores());
+			addressScores.add(employee.getAddresses());
+			emailScores.add(employee.getEmails());
+			phoneScores.add(employee.getPhones());
 		}
 
-		this.compareValuesAcrossEmployees(addressKeys, addressScores);
-		this.compareValuesAcrossEmployees(emailKeys, emailScores);
-		this.compareValuesAcrossEmployees(phoneKeys, phoneScores);
+		this.compareValuesAcrossEmployees(addressScores);
+		this.compareValuesAcrossEmployees(emailScores);
+		this.compareValuesAcrossEmployees(phoneScores);
 	}
 
 	/**
 	 * Lower the scores of keys based on how common the keys are.
 	 *
-	 * @param employeeKeysCollection
 	 * @param employeeScoresCollection
 	 */
 	private void compareValuesAcrossEmployees(
-			final Collection<Collection<String>> employeeKeysCollection,
 			final Collection<Map<String, Float>> employeeScoresCollection
 	) {
 		final Map<String, Integer> occurrences = new HashMap<>();
 
-		for (final Collection<String> employeeKeys : employeeKeysCollection) {
-			for (final String key : employeeKeys) {
+		for (final Map<String, Float> employeeScores : employeeScoresCollection) {
+			for (final String key : employeeScores.keySet()) {
 				if (occurrences.get(key) == null) {
 					occurrences.put(key, 1);
 				} else {
