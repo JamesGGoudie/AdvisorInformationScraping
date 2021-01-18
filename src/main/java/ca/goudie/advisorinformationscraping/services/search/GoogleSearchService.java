@@ -1,5 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.search;
 
+import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
+import ca.goudie.advisorinformationscraping.exceptions.SearchException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.openqa.selenium.By;
@@ -20,16 +22,23 @@ public class GoogleSearchService implements SearchService {
 	@Override
 	public Collection<String> search(
 			final WebDriver driver, final String query, final int resultsLimit
-	) {
+	) throws SearchException {
 		this.performQuery(driver, query);
 
 		return this.getSearchResults(driver, resultsLimit);
 	}
 
-	private void performQuery(final WebDriver driver, final String query) {
+	private void performQuery(final WebDriver driver, final String query)
+			throws SearchException {
 		driver.get("https://www.google.ca");
 
-		final WebElement queryEl = driver.findElement(By.name("q"));
+		final WebElement queryEl;
+
+		try {
+			queryEl = driver.findElement(By.name("q"));
+		} catch (StaleElementReferenceException e) {
+			throw new SearchException("Could not find query element.");
+		}
 
 		queryEl.sendKeys(query);
 		queryEl.submit();
@@ -46,7 +55,7 @@ public class GoogleSearchService implements SearchService {
 	 */
 	private Collection<String> getSearchResults(
 			final WebDriver driver, final int resultsLimit
-	) {
+	) throws SearchException {
 		final Collection<String> links = new ArrayList<>();
 		final Collection<String> hosts = new HashSet<>();
 
@@ -56,10 +65,15 @@ public class GoogleSearchService implements SearchService {
 		for (int i = 0; i < resultsLimit; ++i) {
 			this.getSearchResultsOnPage(driver, links, hosts, resultsLimit);
 
-			// If we need more results and there is a next page to look at...
-			if (links.size() < resultsLimit && this.hasNextPage(driver)) {
-				this.goToNextPage(driver);
-			} else {
+			try {
+				// If we need more results and there is a next page to look at...
+				if (links.size() < resultsLimit && this.hasNextPage(driver)) {
+					this.goToNextPage(driver);
+				} else {
+					break;
+				}
+			} catch (DomReadException e) {
+				// Failed to find or click next-page button.
 				break;
 			}
 		}
@@ -80,43 +94,62 @@ public class GoogleSearchService implements SearchService {
 			final Collection<String> links,
 			final Collection<String> hosts,
 			final int resultsLimit
-	) {
+	) throws SearchException {
 		// May contain junk like "People also search".
 		// Filter them out by searching for this class.
-		final List<WebElement> resultGroups = driver.findElements(By.className(
-				"hlcw0c"));
+		List<WebElement> resultGroups;
+
+		try {
+			resultGroups = driver.findElements(By.className("hlcw0c"));
+		} catch (StaleElementReferenceException e) {
+			resultGroups = new ArrayList<>();
+		}
+
 		final List<WebElement> results = new ArrayList<>();
 
 		if (resultGroups.size() > 0) {
 			for (final WebElement resultGroup : resultGroups) {
-				results.addAll(this.findResultItems(resultGroup));
+				try {
+					results.addAll(this.findResultItems(resultGroup));
+				} catch (DomReadException e) {
+					continue;
+				}
 			}
 		} else {
 			// If there were no result groups, then there was no junk.
 			// Search the whole page for results instead.
-			results.addAll(this.findResultItems(driver));
+			try {
+				results.addAll(this.findResultItems(driver));
+			} catch (DomReadException e) {}
+		}
+
+		if (results.size() == 0) {
+			throw new SearchException("Could not find any search results.");
 		}
 
 		for (final WebElement result : results) {
-			final WebElement anchor = result.findElement(By.tagName("a"));
+			final WebElement anchor;
 			final String href;
 
 			try {
+				anchor = result.findElement(By.tagName("a"));
 				href = anchor.getAttribute("href");
 			} catch (StaleElementReferenceException e) {
 				continue;
 			}
 
-			try {
-				final String host = AisUrlUtils.extractHostname(href);
+			final String host;
 
-				if (!hosts.add(host)) {
-					// The host was already in the collection of hosts from previous
-					// links; skip
-					continue;
-				}
+			try {
+				host = AisUrlUtils.extractHostname(href);
 			} catch (UrlParseException e) {
 				// Bad href value; skip
+				continue;
+			}
+
+			if (!hosts.add(host)) {
+				// The host was already in the collection of hosts from previous
+				// links; skip
 				continue;
 			}
 
@@ -128,21 +161,31 @@ public class GoogleSearchService implements SearchService {
 		}
 	}
 
-	private boolean hasNextPage(final WebDriver driver) {
+	private boolean hasNextPage(final WebDriver driver) throws DomReadException {
 		return this.findNextButton(driver) != null;
 	}
 
-	private void goToNextPage(final WebDriver driver) {
+	private void goToNextPage(final WebDriver driver) throws DomReadException {
 		final WebElement nextBtn = this.findNextButton(driver);
 		nextBtn.click();
 	}
 
-	private List<WebElement> findResultItems(final SearchContext searchContext) {
-		return searchContext.findElements(By.className("yuRUbf"));
+	private List<WebElement> findResultItems(final SearchContext searchContext)
+			throws DomReadException {
+		try {
+			return searchContext.findElements(By.className("yuRUbf"));
+		} catch (StaleElementReferenceException e) {
+			throw new DomReadException(e);
+		}
 	}
 
-	private WebElement findNextButton(final WebDriver driver) {
-		return driver.findElement(By.id("pnnext"));
+	private WebElement findNextButton(final WebDriver driver)
+			throws DomReadException {
+		try {
+			return driver.findElement(By.id("pnnext"));
+		} catch (StaleElementReferenceException e) {
+			throw new DomReadException(e);
+		}
 	}
 
 }

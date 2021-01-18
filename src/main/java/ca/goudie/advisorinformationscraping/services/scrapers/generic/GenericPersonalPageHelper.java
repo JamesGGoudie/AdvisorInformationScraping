@@ -172,10 +172,15 @@ public class GenericPersonalPageHelper {
 			WebElement currentNode = anchor;
 
 			do {
-				final WebElement parentNode =
-						currentNode.findElement(By.xpath(".."));
-				final Collection<WebElement> localAnchors =
-						parentNode.findElements(By.tagName("a"));
+				final WebElement parentNode;
+				final Collection<WebElement> localAnchors;
+
+				try {
+					parentNode = currentNode.findElement(By.xpath(".."));
+					localAnchors = parentNode.findElements(By.tagName("a"));
+				} catch (StaleElementReferenceException e) {
+					break;
+				}
 
 				int badAnchors = 0;
 

@@ -45,8 +45,14 @@ public class GenericEmailHelper {
 	 * @return
 	 */
 	Collection<WebElement> findEmailAnchors(final SearchContext context) {
-		final List<WebElement> anchors = context.findElements(By.tagName("a"));
 		final Collection<WebElement> out = new HashSet<>();
+		final List<WebElement> anchors;
+
+		try {
+			anchors = context.findElements(By.tagName("a"));
+		} catch (StaleElementReferenceException e) {
+			return out;
+		}
 
 		for (final WebElement anchor : anchors) {
 			try {

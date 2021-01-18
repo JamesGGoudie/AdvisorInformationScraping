@@ -29,6 +29,9 @@ public class BloombergScraper implements Scraper {
 	 */
 	private static final String BLOOMBERG_SOURCE = "Bloomberg";
 
+	private static final String JSON_NOT_FOUND_MSG =
+			"Could not find Bloomberg organization JSON.";
+
 	private static final String CAPTCHA_TITLE = "Bloomberg - Are you a robot?";
 	private static final String CRITICAL_COOKIE = "_px2";
 	private static final int MAX_COOKIE_WAIT_TIME = 10;
@@ -112,8 +115,13 @@ public class BloombergScraper implements Scraper {
 	private BloombergOrganization extractOrganizationData(
 			final WebDriver driver
 	) throws ScrapeException {
-		final List<WebElement> scripts = driver.findElements(By.xpath(
-				"/html/head/script"));
+		final List<WebElement> scripts;
+
+		try {
+			scripts = driver.findElements(By.xpath("/html/head/script"));
+		} catch (StaleElementReferenceException e) {
+			throw new ScrapeException(BloombergScraper.JSON_NOT_FOUND_MSG);
+		}
 
 		for (final WebElement script : scripts) {
 			final String type;
@@ -141,8 +149,7 @@ public class BloombergScraper implements Scraper {
 			}
 		}
 
-		throw new ScrapeException(
-				"Could not find Bloomberg organization JSON.");
+		throw new ScrapeException(BloombergScraper.JSON_NOT_FOUND_MSG);
 	}
 
 	private Firm buildFirmResult(final BloombergOrganization org) {

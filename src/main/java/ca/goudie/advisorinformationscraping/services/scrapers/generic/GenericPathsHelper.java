@@ -23,7 +23,9 @@ public class GenericPathsHelper {
 	public GenericPathsHelper() {
 		// Populate our static hash-sets here for simplicity.
 		Collections.addAll(GenericPathsHelper.EMPLOYEE_PAGE_PATHS,
-				"our-team");
+				"our-team",
+				"our-people",
+				"contact-us");
 	}
 
 	/**

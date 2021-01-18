@@ -65,10 +65,22 @@ public class GenericTitleHelper {
 			final SearchContext context,
 			final String tag
 	) {
-		final List<WebElement> els = context.findElements(By.tagName(tag));
+		final List<WebElement> els;
+
+		try {
+			els = context.findElements(By.tagName(tag));
+		} catch (StaleElementReferenceException e) {
+			return null;
+		}
 
 		for (final WebElement el : els) {
-			final List<WebElement> children = el.findElements(By.xpath("./*"));
+			final List<WebElement> children;
+
+			try {
+				children = el.findElements(By.xpath("./*"));
+			} catch (StaleElementReferenceException e) {
+				break;
+			}
 
 			// We only want to check for titles in leaf tags since searching any
 			// higher would give us less useful information.

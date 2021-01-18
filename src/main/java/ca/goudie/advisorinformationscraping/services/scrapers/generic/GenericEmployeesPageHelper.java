@@ -92,8 +92,14 @@ public class GenericEmployeesPageHelper {
 			// After this, the current node should represent the block of information
 			// for a single employee.
 			do {
-				final WebElement parentNode =
-						currentNode.findElement(By.xpath(".."));
+				final WebElement parentNode;
+
+				try {
+					parentNode = currentNode.findElement(By.xpath(".."));
+				} catch (StaleElementReferenceException e) {
+					break;
+				}
+
 				final Collection<WebElement> localAnchors =
 						this.findPersonalPageAnchors(parentNode);
 
@@ -119,16 +125,22 @@ public class GenericEmployeesPageHelper {
 	Collection<WebElement> findPersonalPageAnchors(
 			final SearchContext context
 	) {
-		final List<WebElement> anchors = context.findElements(By.tagName("a"));
-		final Collection<WebElement> validAnchors = new ArrayList<>();
+		final Collection<WebElement> out = new ArrayList<>();
+		final List<WebElement> anchors;
+
+		try {
+			anchors = context.findElements(By.tagName("a"));
+		} catch (StaleElementReferenceException e) {
+			return out;
+		}
 
 		for (final WebElement anchor : anchors) {
 			if (this.personalPageHelper.isAnchorPersonalPage(anchor)) {
-				validAnchors.add(anchor);
+				out.add(anchor);
 			}
 		}
 
-		return validAnchors;
+		return out;
 	}
 
 	/**

@@ -107,9 +107,15 @@ public class GenericScraper implements Scraper {
 			final SearchContext context,
 			final String currentUrl
 	) {
-		final List<WebElement> anchors = context.findElements(By.cssSelector("a"));
 		// Using a hashset to avoid scraping the same page multiple times.
-		final Collection<String> employeePageLinks = new HashSet<>();
+		final Collection<String> out = new HashSet<>();
+		final List<WebElement> anchors;
+
+		try {
+			anchors = context.findElements(By.cssSelector("a"));
+		} catch (StaleElementReferenceException e) {
+			return out;
+		}
 
 		for (final WebElement anchor : anchors) {
 			final String href;
@@ -121,11 +127,11 @@ public class GenericScraper implements Scraper {
 			}
 
 			if (this.employeesPageHelper.isAnchorEmployeesPage(anchor)) {
-				employeePageLinks.add(href);
+				out.add(href);
 			}
 		}
 
-		return this.hrefHelper.cleanLinks(employeePageLinks, currentUrl);
+		return this.hrefHelper.cleanLinks(out, currentUrl);
 	}
 
 }
