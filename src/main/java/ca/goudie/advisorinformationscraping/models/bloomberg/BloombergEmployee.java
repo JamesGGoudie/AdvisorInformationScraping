@@ -15,4 +15,7 @@ public class BloombergEmployee {
 	@JsonProperty
 	private String title;
 
+	@JsonProperty
+	private String worksFor;
+
 }

@@ -37,19 +37,17 @@ public class RunController {
 		final SearchService	searcher =
 				this.searchServiceSelector.selectSearchService();
 
+		/*
 		final String firm = "Abaco Asset Management LLP";
 		final String city = "London";
 		final String country = "UK";
-		/*
 		final String firm = "Prosser Knowles Associates LTD";
 		final String city = "Hartlebury";
 		final String country = "UK";
 		*/
-		/*
 		final String firm = "Wren Sterling Financial Planning LTD";
 		final String city = "";
 		final String country = "";
-		*/
 
 		String query = firm;
 
@@ -65,7 +63,7 @@ public class RunController {
 
 		final String countryCode = AisCountryUtils.findCountryCode(country);
 
-		int resultsLimit = 3;
+		int resultsLimit = 1;
 
 		final Collection<String> links = searcher.search(webDriver,
 				query,

@@ -32,7 +32,7 @@ public class BloombergScraper implements Scraper {
 	private static final String CAPTCHA_TITLE = "Bloomberg - Are you a robot?";
 	private static final String CRITICAL_COOKIE = "_px2";
 	private static final int MAX_COOKIE_WAIT_TIME = 10;
-	private static final int POST_COOKIE_WAIT_TIME = 1;
+	private static final int POST_COOKIE_WAIT_TIME = 2;
 
 	@Override
 	public Firm scrapeWebsite(
@@ -148,7 +148,7 @@ public class BloombergScraper implements Scraper {
 	private Firm buildFirmResult(final BloombergOrganization org) {
 		final Firm firm = new Firm();
 
-		firm.getAddresses().add(org.getAddress());
+		firm.getAddresses().add(this.cleanAddress(org.getAddress()));
 		firm.setFirmUrl(org.getUrl());
 		firm.getPhones().add(org.getTelephone());
 		firm.getEmployees().addAll(this.buildEmployees(org));
@@ -175,6 +175,17 @@ public class BloombergScraper implements Scraper {
 		}
 
 		return employees;
+	}
+
+	/**
+	 * The address in the JSON object contains newline characters that need to be
+	 * removed.
+	 *
+	 * @param address
+	 * @return
+	 */
+	private String cleanAddress(final String address) {
+		return address.replace("\n", " - ");
 	}
 
 }
