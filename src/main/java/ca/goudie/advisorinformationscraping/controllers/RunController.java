@@ -9,6 +9,7 @@ import ca.goudie.advisorinformationscraping.services.dihelpers.WebDriverSelector
 import ca.goudie.advisorinformationscraping.services.scrapers.ScraperFacade;
 import ca.goudie.advisorinformationscraping.services.search.SearchService;
 import ca.goudie.advisorinformationscraping.utils.AisCountryUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,16 +37,32 @@ public class RunController {
 		final SearchService	searcher =
 				this.searchServiceSelector.selectSearchService();
 
-		/*
 		final String firm = "Abaco Asset Management LLP";
 		final String city = "London";
 		final String country = "UK";
-		*/
+		/*
 		final String firm = "Prosser Knowles Associates LTD";
 		final String city = "Hartlebury";
 		final String country = "UK";
+		*/
+		/*
+		final String firm = "Wren Sterling Financial Planning LTD";
+		final String city = "";
+		final String country = "";
+		*/
 
-		final String query = firm + " " + city + ", " + country;
+		String query = firm;
+
+		if (StringUtils.isNotBlank(city)) {
+			if (StringUtils.isNotBlank(country)) {
+				query += " " + city + ", " + country;
+			} else {
+				query += " " + city;
+			}
+		} else if (StringUtils.isNotBlank(country)) {
+			query += " " + country;
+		}
+
 		final String countryCode = AisCountryUtils.findCountryCode(country);
 
 		int resultsLimit = 3;
