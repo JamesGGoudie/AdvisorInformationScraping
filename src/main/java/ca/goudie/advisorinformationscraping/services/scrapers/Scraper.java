@@ -6,7 +6,10 @@ import org.openqa.selenium.WebDriver;
 
 public interface Scraper {
 
-	Firm scrapeWebsite(final WebDriver driver, final String url)
-			throws ScrapeException;
+	Firm scrapeWebsite(
+			final WebDriver driver,
+			final String url,
+			final String countryCode
+	) throws ScrapeException;
 
 }

@@ -47,11 +47,13 @@ public class GenericPersonalPageHelper {
 	 * @param driver
 	 * @param firm
 	 * @param employee
+	 * @param countryCode
 	 */
 	void scrapePersonalPage(
 			final WebDriver driver,
 			final Firm firm,
-			final Employee employee
+			final Employee employee,
+			final String countryCode
 	) {
 		driver.get(employee.getSource());
 		employee.setSource(this.commonHelper.formatSource(employee.getSource()));
@@ -60,7 +62,7 @@ public class GenericPersonalPageHelper {
 				this.findPersonalPageBlockByEmailAnchor(driver, firm);
 
 		final Collection<String> phones =
-				this.phoneHelper.findPhones(personalBlock);
+				this.phoneHelper.findPhones(personalBlock, countryCode);
 
 		for (final String phone : phones) {
 			employee.getPhones().put(phone, GenericConstants.INIT_SCORE);

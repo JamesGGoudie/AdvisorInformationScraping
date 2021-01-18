@@ -14,11 +14,15 @@ public class AisPhoneUtils {
 	 * If no phone numbers are found, returns null.
 	 *
 	 * @param text
+	 * @param countryCode
 	 * @return
 	 */
-	public static String findFirstPhone(final String text) {
+	public static String findFirstPhone(
+			final String text,
+			final String countryCode
+	) {
 		final Iterable<PhoneNumberMatch> numbers =
-				PhoneNumberUtil.getInstance().findNumbers(text, null);
+				PhoneNumberUtil.getInstance().findNumbers(text, countryCode);
 
 		for (final PhoneNumberMatch number : numbers) {
 			return number.rawString();
@@ -33,11 +37,15 @@ public class AisPhoneUtils {
 	 * If none are found, an empty collection is returned.
 	 *
 	 * @param text
+	 * @param countryCode
 	 * @return
 	 */
-	public static Collection<String> findPhones(final String text) {
+	public static Collection<String> findPhones(
+			final String text,
+			final String countryCode
+	) {
 		final Iterable<PhoneNumberMatch> numbers =
-				PhoneNumberUtil.getInstance().findNumbers(text, null);
+				PhoneNumberUtil.getInstance().findNumbers(text, countryCode);
 		final Collection<String> out = new HashSet<>();
 
 		for (final PhoneNumberMatch number : numbers) {

@@ -100,11 +100,7 @@ public class GenericScoreHelper {
 
 		for (final Map<String, Float> employeeScores : employeeScoresCollection) {
 			for (final String key : employeeScores.keySet()) {
-				if (occurrences.get(key) == null) {
-					occurrences.put(key, 1);
-				} else {
-					occurrences.put(key, occurrences.get(key) + 1);
-				}
+				occurrences.merge(key, 1, Integer::sum);
 			}
 		}
 

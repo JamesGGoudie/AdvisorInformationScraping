@@ -36,7 +36,7 @@ public class BloombergScraper implements Scraper {
 
 	@Override
 	public Firm scrapeWebsite(
-			final WebDriver driver, final String url
+			final WebDriver driver, final String url, final String countryCode
 	) throws ScrapeException {
 		driver.get(url);
 

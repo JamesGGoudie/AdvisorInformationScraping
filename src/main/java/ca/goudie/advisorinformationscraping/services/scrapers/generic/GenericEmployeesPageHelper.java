@@ -42,11 +42,14 @@ public class GenericEmployeesPageHelper {
 	 *
 	 * @param driver
 	 * @param firm
+	 * @param employeePageLinks
+	 * @param countryCode
 	 */
 	void scrapeEmployeePages(
 			final WebDriver driver,
 			final Firm firm,
-			Collection<String> employeePageLinks
+			final Collection<String> employeePageLinks,
+			final String countryCode
 	) {
 		final Collection<WebElement> employeeBlocks = new ArrayList<>();
 
@@ -60,7 +63,8 @@ public class GenericEmployeesPageHelper {
 		}
 
 		for (final Employee employee : firm.getEmployees()) {
-			this.personalPageHelper.scrapePersonalPage(driver, firm, employee);
+			this.personalPageHelper.scrapePersonalPage(
+					driver, firm, employee, countryCode);
 		}
 	}
 

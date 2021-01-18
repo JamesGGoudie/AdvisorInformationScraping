@@ -31,11 +31,13 @@ public class GenericScraperAbacoAmTests {
 	@Test
 	public void shouldScrapeAbacoAm() throws ScrapeException {
 		final String abacoUrl = "http://www.abacoam.com/";
+		final String countryCode = "GB";
 
 		WebDriver mockDriver = spy(this.chromeWebDriver);
 
 		final Firm f = this.genericScraper.scrapeWebsite(mockDriver,
-				abacoUrl);
+				abacoUrl,
+				countryCode);
 
 		verify(mockDriver).get(abacoUrl);
 

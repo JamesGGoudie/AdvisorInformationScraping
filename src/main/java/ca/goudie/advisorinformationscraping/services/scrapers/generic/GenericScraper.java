@@ -1,5 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
+import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
 import ca.goudie.advisorinformationscraping.services.scrapers.Scraper;
 import org.openqa.selenium.By;
@@ -36,10 +37,12 @@ public class GenericScraper implements Scraper {
 	private GenericSourceHelper sourceHelper;
 
 	public Firm scrapeWebsite(
-			final WebDriver driver, final String url
-	) {
-		final Firm firm = this.scrapeLandingPage(driver, url);
-		this.scrapeEmployeePages(driver, firm);
+			final WebDriver driver,
+			final String url,
+			final String countryCode
+	) throws ScrapeException {
+		final Firm firm = this.scrapeLandingPage(driver, url, countryCode);
+		this.scrapeEmployeePages(driver, firm, countryCode);
 		this.scoreHelper.calculateScores(firm);
 
 		return firm;
@@ -53,19 +56,20 @@ public class GenericScraper implements Scraper {
 	 *
 	 * @param driver
 	 * @param url
+	 * @param countryCode
 	 * @return
 	 */
 	private Firm scrapeLandingPage(
 			final WebDriver driver,
-			final String url
+			final String url,
+			final String countryCode
 	) {
 		driver.get(url);
 
 		final Firm firm = new Firm();
 
 		firm.getEmails().addAll(this.emailHelper.findEmailsByAnchor(driver));
-		firm.getPhones().addAll(
-				this.phoneHelper.findPhones(driver.findElement(By.tagName("body"))));
+		firm.getPhones().addAll(this.phoneHelper.findPhones(driver, countryCode));
 
 		firm.setSource(this.sourceHelper.formatSource(url));
 		this.sourceHelper.compareFirmEmailAndSource(firm, url);
@@ -78,15 +82,17 @@ public class GenericScraper implements Scraper {
 	 *
 	 * @param driver
 	 * @param firm
+	 * @param countryCode
 	 */
 	private void scrapeEmployeePages(
 			final WebDriver driver,
-			final Firm firm
+			final Firm firm,
+			final String countryCode
 	) {
 		final Collection<String> employeePageLinks =
 				this.findEmployeePageLinks(driver, driver.getCurrentUrl());
 		this.employeesPageHelper.scrapeEmployeePages(
-				driver, firm, employeePageLinks);
+				driver, firm, employeePageLinks, countryCode);
 	}
 
 	/**

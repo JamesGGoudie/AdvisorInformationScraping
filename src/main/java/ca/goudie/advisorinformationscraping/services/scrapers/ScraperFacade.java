@@ -18,9 +18,10 @@ public class ScraperFacade {
 	private ScraperSelector scraperSelector;
 
 	public Firm scrapeWebsite(
-			final WebDriver driver, final String url
+			final WebDriver driver, final String url, final String countryCode
 	) throws ScrapeException {
-		return scraperSelector.selectScraper(url).scrapeWebsite(driver, url);
+		return scraperSelector.selectScraper(url).scrapeWebsite(
+				driver, url, countryCode);
 	}
 
 }
