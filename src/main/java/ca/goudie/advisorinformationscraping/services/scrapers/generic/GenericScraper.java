@@ -29,14 +29,17 @@ public class GenericScraper implements Scraper {
 	private GenericPhoneHelper phoneHelper;
 
 	@Autowired
+	private GenericScoreHelper scoreHelper;
+
+	@Autowired
 	private GenericSourceHelper sourceHelper;
 
 	public Firm scrapeWebsite(
 			final WebDriver driver, final String url
 	) {
 		final Firm firm = this.scrapeLandingPage(driver, url);
-
 		this.scrapeEmployeePages(driver, firm);
+		this.scoreHelper.calculateScores(firm);
 
 		return firm;
 	}
