@@ -3,6 +3,7 @@ package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
 import ca.goudie.advisorinformationscraping.services.scrapers.Scraper;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +80,7 @@ public class GenericScraper implements Scraper {
 			final Firm firm
 	) {
 		final Collection<String> employeePageLinks =
-				this.findEmployeePageLinks(driver);
+				this.findEmployeePageLinks(driver, driver.getCurrentUrl());
 		this.employeesPageHelper.scrapeEmployeePages(
 				driver, firm, employeePageLinks);
 	}
@@ -88,11 +89,15 @@ public class GenericScraper implements Scraper {
 	 * Finds possible employee pages by looking at the paths and comparing it to a
 	 * pre-determined list of suspected paths.
 	 *
-	 * @param driver
+	 * @param context
+	 * @param currentUrl
 	 * @return
 	 */
-	private Collection<String> findEmployeePageLinks(final WebDriver driver) {
-		final List<WebElement> anchors = driver.findElements(By.cssSelector("a"));
+	private Collection<String> findEmployeePageLinks(
+			final SearchContext context,
+			final String currentUrl
+	) {
+		final List<WebElement> anchors = context.findElements(By.cssSelector("a"));
 		// Using a hashset to avoid scraping the same page multiple times.
 		final Collection<String> employeePageLinks = new HashSet<>();
 
@@ -104,8 +109,7 @@ public class GenericScraper implements Scraper {
 			}
 		}
 
-		return this.hrefHelper.cleanLinks(
-				employeePageLinks, driver.getCurrentUrl());
+		return this.hrefHelper.cleanLinks(employeePageLinks, currentUrl);
 	}
 
 }

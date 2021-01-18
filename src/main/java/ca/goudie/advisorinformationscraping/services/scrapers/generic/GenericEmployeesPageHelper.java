@@ -54,7 +54,7 @@ public class GenericEmployeesPageHelper {
 		}
 
 		for (final WebElement employeeBlock : employeeBlocks) {
-			this.processEmployeeBlock(driver, employeeBlock, firm);
+			this.processEmployeeBlock(employeeBlock, firm, driver.getCurrentUrl());
 		}
 
 		for (final Employee employee : firm.getEmployees()) {
@@ -171,14 +171,14 @@ public class GenericEmployeesPageHelper {
 	 *
 	 * This employee will only be saved if the title given is one of interest.
 	 *
-	 * @param driver
 	 * @param employeeBlock
 	 * @param firm
+	 * @param currentUrl
 	 */
 	private void processEmployeeBlock(
-			final WebDriver driver,
 			final WebElement employeeBlock,
-			final Firm firm
+			final Firm firm,
+			final String currentUrl
 	) {
 		final Employee employee = new Employee();
 
@@ -196,7 +196,7 @@ public class GenericEmployeesPageHelper {
 		for (final WebElement anchor : personalPageAnchors) {
 			final String href = anchor.getAttribute("href");
 			final String cleanHref =
-					this.hrefHelper.cleanLink(href, driver.getCurrentUrl());
+					this.hrefHelper.cleanLink(href, currentUrl);
 
 			employee.setSource(cleanHref);
 			employee.setName(this.nameHelper.findEmployeeNameInUrl(cleanHref));
