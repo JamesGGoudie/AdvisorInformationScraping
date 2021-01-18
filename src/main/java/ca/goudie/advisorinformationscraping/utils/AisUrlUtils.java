@@ -8,6 +8,13 @@ import java.net.URISyntaxException;
 
 public class AisUrlUtils {
 
+	/**
+	 * Returns the hostname of the URL.
+	 *
+	 * @param url
+	 * @return
+	 * @throws UrlParseException
+	 */
 	public static String extractHostname(final String url)
 			throws UrlParseException {
 		try {
@@ -19,6 +26,15 @@ public class AisUrlUtils {
 		}
 	}
 
+	/**
+	 * Returns true if the given URL contains an authority.
+	 *
+	 * The hostname is part of the authority.
+	 *
+	 * @param url
+	 * @return
+	 * @throws UrlParseException
+	 */
 	public static boolean hasAuthority(
 			final String url
 	) throws UrlParseException {
@@ -31,6 +47,13 @@ public class AisUrlUtils {
 		}
 	}
 
+	/**
+	 * Returns the path of the URL.
+	 *
+	 * @param url
+	 * @return
+	 * @throws UrlParseException
+	 */
 	public static String extractPath(final String url) throws UrlParseException {
 		try {
 			final URI uri = new URI(url);
@@ -41,6 +64,13 @@ public class AisUrlUtils {
 		}
 	}
 
+	/**
+	 * Returns the URL with the path, if any, removed.
+	 *
+	 * @param url
+	 * @return
+	 * @throws UrlParseException
+	 */
 	public static String removePath(final String url) throws UrlParseException {
 		try {
 			final URI uri = new URI(url);
@@ -71,7 +101,7 @@ public class AisUrlUtils {
 	 *
 	 * @return
 	 *
-	 * @throws URISyntaxException
+	 * @throws UrlParseException
 	 */
 	public static String formatSource(final String url)
 			throws UrlParseException {
