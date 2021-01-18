@@ -1,5 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
+import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -26,11 +27,15 @@ public class GenericEmailHelper {
 	 */
 	boolean isEmailAnchor(
 			final WebElement anchor
-	) throws StaleElementReferenceException {
-		final String href = anchor.getAttribute("href");
+	) throws DomReadException {
+		try {
+			final String href = anchor.getAttribute("href");
 
-		return StringUtils.isNotBlank(href) &&
-				href.toLowerCase().startsWith("mailto:");
+			return StringUtils.isNotBlank(href) &&
+					href.toLowerCase().startsWith("mailto:");
+		} catch (StaleElementReferenceException e) {
+			throw new DomReadException(e);
+		}
 	}
 
 	/**
@@ -48,7 +53,7 @@ public class GenericEmailHelper {
 				if (this.isEmailAnchor(anchor)) {
 					out.add(anchor);
 				}
-			} catch (StaleElementReferenceException e) {
+			} catch (DomReadException e) {
 				continue;
 			}
 		}

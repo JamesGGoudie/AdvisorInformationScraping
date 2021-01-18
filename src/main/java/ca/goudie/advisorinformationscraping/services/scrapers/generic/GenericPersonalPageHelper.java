@@ -1,5 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
+import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.models.common.Employee;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
@@ -8,6 +9,7 @@ import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,9 +153,14 @@ public class GenericPersonalPageHelper {
 
 				// Look for any anchors that refer to non-relevant information.
 				for (final WebElement localAnchor : localAnchors) {
-					if (!(this.phoneHelper.isPhoneAnchor(localAnchor) ||
-							this.emailHelper.isEmailAnchor(localAnchor))) {
-						++badAnchors;
+					try {
+						if (!(this.phoneHelper.isPhoneAnchor(localAnchor) ||
+								this.emailHelper.isEmailAnchor(localAnchor))) {
+							++badAnchors;
+						}
+					} catch (DomReadException e) {
+						// Still other anchors to check.
+						continue;
 					}
 				}
 

@@ -1,5 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
+import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.utils.AisPhoneUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -38,12 +39,19 @@ public class GenericPhoneHelper {
 	 *
 	 * @param anchor
 	 * @return
+	 * @throws DomReadException
 	 */
-	boolean isPhoneAnchor(final WebElement anchor) {
-		final String href = anchor.getAttribute("href");
+	boolean isPhoneAnchor(
+			final WebElement anchor
+	) throws DomReadException {
+		try {
+			final String href = anchor.getAttribute("href");
 
-		return StringUtils.isNotBlank(href) &&
-				href.toLowerCase().startsWith("tel:");
+			return StringUtils.isNotBlank(href) &&
+					href.toLowerCase().startsWith("tel:");
+		} catch (StaleElementReferenceException e) {
+			throw new DomReadException(e);
+		}
 	}
 
 	/**
@@ -101,7 +109,7 @@ public class GenericPhoneHelper {
 				if (this.isPhoneAnchor(anchor)) {
 					out.add(anchor);
 				}
-			} catch (StaleElementReferenceException e) {
+			} catch (DomReadException e) {
 				continue;
 			}
 		}
