@@ -1,11 +1,11 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
-import ca.goudie.advisorinformationscraping.models.bloomberg.BloombergEmployee;
-import ca.goudie.advisorinformationscraping.models.bloomberg.BloombergOrganization;
+import ca.goudie.advisorinformationscraping.utils.json.bloomberg.BloombergEmployee;
+import ca.goudie.advisorinformationscraping.utils.json.bloomberg.BloombergOrganization;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
 import ca.goudie.advisorinformationscraping.models.common.Employee;
-import ca.goudie.advisorinformationscraping.utils.AisJsonUtils;
+import ca.goudie.advisorinformationscraping.utils.json.AisJsonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;

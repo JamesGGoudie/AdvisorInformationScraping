@@ -1,7 +1,7 @@
-package ca.goudie.advisorinformationscraping.utils;
+package ca.goudie.advisorinformationscraping.utils.json;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
-import ca.goudie.advisorinformationscraping.models.bloomberg.BloombergOrganization;
+import ca.goudie.advisorinformationscraping.utils.json.bloomberg.BloombergOrganization;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

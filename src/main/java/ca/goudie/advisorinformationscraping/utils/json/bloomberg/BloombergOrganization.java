@@ -1,4 +1,4 @@
-package ca.goudie.advisorinformationscraping.models.bloomberg;
+package ca.goudie.advisorinformationscraping.utils.json.bloomberg;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
