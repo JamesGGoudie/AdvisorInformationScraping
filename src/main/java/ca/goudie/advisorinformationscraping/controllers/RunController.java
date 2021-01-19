@@ -8,7 +8,7 @@ import ca.goudie.advisorinformationscraping.services.BlacklistService;
 import ca.goudie.advisorinformationscraping.services.selectors.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.selectors.WebDriverSelector;
 import ca.goudie.advisorinformationscraping.services.scrapers.ScraperFacade;
-import ca.goudie.advisorinformationscraping.services.searchers.ISearchService;
+import ca.goudie.advisorinformationscraping.services.searchers.ISearcher;
 import ca.goudie.advisorinformationscraping.utils.AisCountryUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
@@ -38,7 +38,7 @@ public class RunController {
 	public ScrapeResult run()
 			throws SearchException {
 		final WebDriver webDriver = this.webDriverSelector.selectWebDriver();
-		final ISearchService searcher = this.searchServiceSelector.selectSearcher();
+		final ISearcher searcher = this.searchServiceSelector.selectSearcher();
 
 		/*
 		final String firm = "Abaco Asset Management LLP";

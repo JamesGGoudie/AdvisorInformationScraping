@@ -5,7 +5,7 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.Collection;
 
-public interface ISearchService {
+public interface ISearcher {
 
 	Collection<String> search(
 			final WebDriver driver,

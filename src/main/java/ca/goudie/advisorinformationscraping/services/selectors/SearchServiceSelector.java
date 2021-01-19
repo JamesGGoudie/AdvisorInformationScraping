@@ -1,8 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.selectors;
 
-import ca.goudie.advisorinformationscraping.services.searchers.GoogleSearchService;
-import ca.goudie.advisorinformationscraping.services.searchers.ISearchService;
-import org.openqa.selenium.WebDriver;
+import ca.goudie.advisorinformationscraping.services.searchers.GoogleSearcher;
+import ca.goudie.advisorinformationscraping.services.searchers.ISearcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +11,14 @@ public class SearchServiceSelector {
 	private static final String GOOGLE_KEY = "G";
 
 	@Autowired
-	private GoogleSearchService googleSearchService;
+	private GoogleSearcher googleSearcher;
 
 	/**
 	 * Selects the default searcher.
 	 *
 	 * @return
 	 */
-	public ISearchService selectSearcher() {
+	public ISearcher selectSearcher() {
 		return this.selectSearcher(null);
 	}
 
@@ -29,10 +28,10 @@ public class SearchServiceSelector {
 	 * @param key
 	 * @return
 	 */
-	public ISearchService selectSearcher(final String key) {
+	public ISearcher selectSearcher(final String key) {
 		switch (key) {
 			default: {
-				return this.googleSearchService;
+				return this.googleSearcher;
 			}
 		}
 	}

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
-public abstract class ASearchService implements ISearchService {
+public abstract class ASearcher implements ISearcher {
 
 	@Override
 	public Collection<String> search(

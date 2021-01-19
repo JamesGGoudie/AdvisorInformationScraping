@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
-public class GoogleSearchService extends ASearchService {
+public class GoogleSearcher extends ASearcher {
 
 	void performQuery(final WebDriver driver, final String query)
 			throws SearchException {
