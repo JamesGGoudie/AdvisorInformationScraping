@@ -34,4 +34,8 @@ public class AisCountryUtils {
 		return AisCountryUtils.COUNTRIES.get(countryName);
 	}
 
+	public static String findUsaCode() {
+		return AisCountryUtils.findCountryCode("USA");
+	}
+
 }

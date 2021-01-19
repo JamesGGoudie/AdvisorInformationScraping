@@ -10,6 +10,8 @@ import ca.goudie.advisorinformationscraping.services.selectors.ScraperSelector;
 import ca.goudie.advisorinformationscraping.services.selectors.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.selectors.WebDriverSelector;
 import ca.goudie.advisorinformationscraping.utils.AisCountryUtils;
+import ca.goudie.advisorinformationscraping.utils.csv.models.QueryInfo;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,59 +35,85 @@ public class RunService {
 	@Autowired
 	private WebDriverSelector webDriverSelector;
 
-	public ScrapeResult run() throws SearchException {
+	public Collection<ScrapeResult> run(
+			final Collection<QueryInfo> allQueryInfo
+	) {
+
 		final WebDriver webDriver = this.webDriverSelector.selectWebDriver();
 		final ISearcher searcher = this.searchServiceSelector.selectSearcher();
+		final Collection<String> blacklist = this.blacklistService.getBlacklist();
 
-		/*
-		final String firm = "Abaco Asset Management LLP";
-		final String city = "London";
-		final String country = "UK";
-		final String firm = "Prosser Knowles Associates LTD";
-		final String city = "Hartlebury";
-		final String country = "UK";
-		*/
-		final String firm = "Wren Sterling Financial Planning LTD";
-		final String city = "";
-		final String country = "";
+		final int resultsLimit = 1;
 
-		String query = firm;
+		final Collection<ScrapeResult> out = new ArrayList<>();
 
-		if (StringUtils.isNotBlank(city)) {
-			if (StringUtils.isNotBlank(country)) {
-				query += " " + city + ", " + country;
-			} else {
-				query += " " + city;
+		for (final QueryInfo queryInfo : allQueryInfo) {
+			try {
+				out.add(this.processQuery(
+						queryInfo, webDriver, searcher, blacklist, resultsLimit));
+			} catch (SearchException e) {
+				continue;
 			}
-		} else if (StringUtils.isNotBlank(country)) {
-			query += " " + country;
 		}
 
-		final String countryCode = AisCountryUtils.findCountryCode(country);
+		return out;
+	}
 
-		int resultsLimit = 1;
+	private ScrapeResult processQuery(
+			final QueryInfo info,
+			final WebDriver webDriver,
+			final ISearcher searcher,
+			final Collection<String> blacklist,
+			final int resultsLimit
+	) throws SearchException {
+		final String query = this.buildQuery(info);
+		final String countryCode = this.determineCountryCode(info);
 
-		final Collection<String> blacklist = this.blacklistService.getBlacklist();
 		final Collection<String> links = searcher.search(webDriver,
-				query,
-				resultsLimit,
-				blacklist);
-		final ScrapeResult out = new ScrapeResult();
-		final Collection<Firm> results = new ArrayList<>();
+					query,
+					resultsLimit,
+					blacklist);
+
+		final Collection<Firm> firms = new ArrayList<>();
 
 		for (final String link : links) {
 			final IScraper scraper = this.scraperSelector.selectScraper(link);
 
 			try {
-				results.add(scraper.scrapeWebsite(webDriver, link, countryCode));
+				firms.add(scraper.scrapeWebsite(webDriver, link, countryCode));
 			} catch (ScrapeException e) {
 				e.printStackTrace();
 			}
 		}
 
-		out.getFirms().addAll(results);
+		final ScrapeResult out = new ScrapeResult();
+		out.getFirms().addAll(firms);
 
 		return out;
+	}
+
+	private String buildQuery(final QueryInfo info) {
+		String query = info.getFirmName();
+
+		if (StringUtils.isNotBlank(info.getCity())) {
+			if (StringUtils.isNotBlank(info.getRegion())) {
+				query += " " + info.getCity() + ", " + info.getRegion();
+			} else {
+				query += " " + info.getCity();
+			}
+		} else if (StringUtils.isNotBlank(info.getRegion())) {
+			query += " " + info.getRegion();
+		}
+
+		return query;
+	}
+
+	private String determineCountryCode(final QueryInfo info) {
+		if (BooleanUtils.isTrue(info.getIsUsa())) {
+			return AisCountryUtils.findUsaCode();
+		}
+
+		return AisCountryUtils.findCountryCode(info.getRegion());
 	}
 
 }
