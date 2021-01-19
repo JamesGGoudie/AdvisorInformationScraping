@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/advisor_information_scraping
+    username: ais_dev
+    password: ais_dev_pass
+
+  jpa:
+    generate-ddl: true
+    show-sql: true
+
+    hibernate:
+      ddl-auto: none
