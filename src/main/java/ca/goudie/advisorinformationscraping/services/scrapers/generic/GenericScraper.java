@@ -2,7 +2,7 @@ package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
-import ca.goudie.advisorinformationscraping.services.scrapers.Scraper;
+import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @Service
-public class GenericScraper implements Scraper {
+public class GenericScraper implements IScraper {
 
 	@Autowired
 	private GenericEmailHelper emailHelper;

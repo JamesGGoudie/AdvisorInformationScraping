@@ -2,7 +2,7 @@ package ca.goudie.advisorinformationscraping.enums;
 
 import ca.goudie.advisorinformationscraping.services.scrapers.BloombergScraper;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
-import ca.goudie.advisorinformationscraping.services.scrapers.Scraper;
+import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -95,7 +95,7 @@ public enum KnownHost {
 	 *
 	 * @return
 	 */
-	public Scraper getScraper() {
+	public IScraper getScraper() {
 		switch (this) {
 			case BLOOMBERG: {
 				return this.bloombergScraper;

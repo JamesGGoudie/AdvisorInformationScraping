@@ -4,7 +4,7 @@ import ca.goudie.advisorinformationscraping.enums.KnownHost;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
-import ca.goudie.advisorinformationscraping.services.scrapers.Scraper;
+import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ public class ScraperSelector {
 	@Autowired
 	private GenericScraper genericScraper;
 
-	public Scraper selectScraper(final String link)
+	public IScraper selectScraper(final String link)
 			throws ScrapeException {
 		try {
 			final KnownHost host = KnownHost.getEnum(AisUrlUtils.extractHostname(

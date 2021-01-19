@@ -4,7 +4,7 @@ import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
 import org.openqa.selenium.WebDriver;
 
-public interface Scraper {
+public interface IScraper {
 
 	Firm scrapeWebsite(
 			final WebDriver driver,

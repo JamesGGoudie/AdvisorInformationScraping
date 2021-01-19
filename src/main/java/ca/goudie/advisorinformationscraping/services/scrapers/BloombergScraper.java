@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  * https://www.bloomberg.com
  */
 @Service
-public class BloombergScraper implements Scraper {
+public class BloombergScraper implements IScraper {
 
 	/**
 	 * The value to use in the 'Source' column of the results.
