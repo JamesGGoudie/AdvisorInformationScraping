@@ -19,7 +19,7 @@ public class SearchServiceSelector {
 	 * @return
 	 */
 	public ISearcher selectSearcher() {
-		return this.selectSearcher(null);
+		return this.getDefault();
 	}
 
 	/**
@@ -31,9 +31,13 @@ public class SearchServiceSelector {
 	public ISearcher selectSearcher(final String key) {
 		switch (key) {
 			default: {
-				return this.googleSearcher;
+				return this.getDefault();
 			}
 		}
+	}
+
+	private ISearcher getDefault() {
+		return this.googleSearcher;
 	}
 
 }

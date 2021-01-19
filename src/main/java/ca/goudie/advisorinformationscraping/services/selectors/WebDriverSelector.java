@@ -1,5 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.selectors;
 
+import ca.goudie.advisorinformationscraping.logging.LoggingWebDriver;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,7 +21,7 @@ public class WebDriverSelector {
 	 * @return
 	 */
 	public WebDriver selectWebDriver() {
-		return this.selectWebDriver(null);
+		return this.getDefault();
 	}
 
 	/**
@@ -32,9 +33,13 @@ public class WebDriverSelector {
 	public WebDriver selectWebDriver(final String key) {
 		switch (key) {
 			default: {
-				return this.chromeWebDriver;
+				return this.getDefault();
 			}
 		}
+	}
+
+	private WebDriver getDefault() {
+		return this.chromeWebDriver;
 	}
 
 }
