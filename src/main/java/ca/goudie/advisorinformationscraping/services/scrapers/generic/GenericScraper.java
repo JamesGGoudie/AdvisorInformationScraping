@@ -3,6 +3,7 @@ package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.dto.Firm;
 import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
+import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -15,6 +16,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+@Log4j2
 @Service
 public class GenericScraper implements IScraper {
 
@@ -41,6 +43,8 @@ public class GenericScraper implements IScraper {
 			final String url,
 			final String countryCode
 	) throws ScrapeException {
+		log.info("Beginning Generic Scrape of: " + url);
+
 		final Firm firm = this.scrapeLandingPage(driver, url, countryCode);
 		this.scrapeEmployeePages(driver, firm, countryCode);
 		this.scoreHelper.calculateScores(firm);
@@ -78,7 +82,7 @@ public class GenericScraper implements IScraper {
 	}
 
 	/**
-	 * Searches for and scrapes employee pages.
+	 * Searches for and scrapes Employee Pages.
 	 *
 	 * @param driver
 	 * @param firm
@@ -107,6 +111,8 @@ public class GenericScraper implements IScraper {
 			final SearchContext context,
 			final String currentUrl
 	) {
+		log.info("Searching for employee pages");
+
 		// Using a hashset to avoid scraping the same page multiple times.
 		final Collection<String> out = new HashSet<>();
 		final List<WebElement> anchors;

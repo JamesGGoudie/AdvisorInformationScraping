@@ -2,6 +2,7 @@ package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
 import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -13,6 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+@Log4j2
 @Service
 public class GenericEmailHelper {
 
@@ -78,6 +80,8 @@ public class GenericEmailHelper {
 	 * @return
 	 */
 	Collection<String> findEmailsByAnchor(final SearchContext context) {
+		log.info("Searching for Emails by Anchor");
+
 		final Collection<WebElement> anchors = this.findEmailAnchors(context);
 		final Collection<String> out = new HashSet<>();
 

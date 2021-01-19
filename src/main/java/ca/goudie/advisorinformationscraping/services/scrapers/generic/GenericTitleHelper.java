@@ -1,5 +1,6 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -12,6 +13,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+@Log4j2
 @Service
 public class GenericTitleHelper {
 
@@ -39,6 +41,8 @@ public class GenericTitleHelper {
 	 * @return
 	 */
 	String findEmployeeTitleInBlock(final SearchContext context) {
+		log.info("Searching for Employee Title");
+
 		final Collection<String> tags = new HashSet<>();
 		Collections.addAll(tags, "span");
 

@@ -3,6 +3,7 @@ package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 import ca.goudie.advisorinformationscraping.constants.GenericConstants;
 import ca.goudie.advisorinformationscraping.dto.Employee;
 import ca.goudie.advisorinformationscraping.dto.Firm;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Log4j2
 @Service
 public class GenericScoreHelper {
 
@@ -23,6 +25,8 @@ public class GenericScoreHelper {
 	 * @param firm
 	 */
 	void calculateScores(final Firm firm) {
+		log.info("Calculating Firm Scores");
+
 		this.compareFirmsEmployeesToFirm(firm);
 		this.compareFirmsEmployeesToEachOther(firm);
 	}

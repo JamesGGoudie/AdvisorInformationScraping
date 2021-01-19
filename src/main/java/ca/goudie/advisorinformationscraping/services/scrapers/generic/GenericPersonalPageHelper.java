@@ -7,6 +7,7 @@ import ca.goudie.advisorinformationscraping.dto.Employee;
 import ca.goudie.advisorinformationscraping.dto.Firm;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
+@Log4j2
 @Service
 public class GenericPersonalPageHelper {
 
@@ -55,6 +57,8 @@ public class GenericPersonalPageHelper {
 			final Employee employee,
 			final String countryCode
 	) {
+		log.info("Scraping Personal Page");
+
 		driver.get(employee.getSource());
 		employee.setSource(this.commonHelper.formatSource(employee.getSource()));
 
@@ -151,6 +155,8 @@ public class GenericPersonalPageHelper {
 			final SearchContext context,
 			final Firm firm
 	) {
+		log.info("Searching for Personal Page Block by Email Anchor");
+
 		final Collection<WebElement> anchors =
 				this.emailHelper.findEmailAnchors(context);
 

@@ -6,6 +6,7 @@ import ca.goudie.advisorinformationscraping.dto.Employee;
 import ca.goudie.advisorinformationscraping.dto.Firm;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Log4j2
 @Service
 public class GenericEmployeesPageHelper {
 
@@ -51,6 +53,8 @@ public class GenericEmployeesPageHelper {
 			final Collection<String> employeePageLinks,
 			final String countryCode
 	) {
+		log.info("Scraping Employee Pages");
+
 		final Collection<WebElement> employeeBlocks = new ArrayList<>();
 
 		for (final String employeePageLink : employeePageLinks) {
@@ -82,6 +86,8 @@ public class GenericEmployeesPageHelper {
 	Collection<WebElement> findEmployeePageBlocksByAnchors(
 			final SearchContext context
 	) {
+		log.info("Searching for Employee Page Blocks by Anchors");
+
 		final Collection<WebElement> employeeBlocks = new ArrayList<>();
 		final Collection<WebElement> anchors =
 				this.findPersonalPageAnchors(context);
@@ -210,6 +216,8 @@ public class GenericEmployeesPageHelper {
 			final Firm firm,
 			final String currentUrl
 	) {
+		log.info("Processing Employee Block");
+
 		final Employee employee = new Employee();
 
 		employee.setTitle(this.titleHelper.findEmployeeTitleInBlock(employeeBlock));
