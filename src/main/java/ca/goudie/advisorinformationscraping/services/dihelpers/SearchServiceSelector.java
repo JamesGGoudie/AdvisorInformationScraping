@@ -1,7 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.dihelpers;
 
-import ca.goudie.advisorinformationscraping.services.search.GoogleSearchService;
-import ca.goudie.advisorinformationscraping.services.search.ISearchService;
+import ca.goudie.advisorinformationscraping.services.searchers.GoogleSearchService;
+import ca.goudie.advisorinformationscraping.services.searchers.ISearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

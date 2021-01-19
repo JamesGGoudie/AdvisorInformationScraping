@@ -1,4 +1,4 @@
-package ca.goudie.advisorinformationscraping.services.search;
+package ca.goudie.advisorinformationscraping.services.searchers;
 
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
 import org.openqa.selenium.WebDriver;

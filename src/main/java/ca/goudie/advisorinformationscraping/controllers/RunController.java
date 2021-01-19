@@ -8,7 +8,7 @@ import ca.goudie.advisorinformationscraping.services.BlacklistService;
 import ca.goudie.advisorinformationscraping.services.dihelpers.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.dihelpers.WebDriverSelector;
 import ca.goudie.advisorinformationscraping.services.scrapers.ScraperFacade;
-import ca.goudie.advisorinformationscraping.services.search.ISearchService;
+import ca.goudie.advisorinformationscraping.services.searchers.ISearchService;
 import ca.goudie.advisorinformationscraping.utils.AisCountryUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
