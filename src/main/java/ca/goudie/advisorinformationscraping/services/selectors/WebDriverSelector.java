@@ -39,7 +39,7 @@ public class WebDriverSelector {
 	}
 
 	private WebDriver getDefault() {
-		return this.chromeWebDriver;
+		return new LoggingWebDriver(this.chromeWebDriver);
 	}
 
 }
