@@ -2,41 +2,21 @@ package ca.goudie.advisorinformationscraping.services.search;
 
 import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
-import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
-import ca.goudie.advisorinformationscraping.services.BlacklistService;
-import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 @Service
-public class GoogleSearchService implements SearchService {
+public class GoogleSearchService extends ASearchService {
 
-	@Autowired
-	private BlacklistService blacklistService;
-
-	@Override
-	public Collection<String> search(
-			final WebDriver driver,
-			final String query,
-			final int resultsLimit,
-			final Collection<String> blacklist
-	) throws SearchException {
-		this.performQuery(driver, query);
-
-		return this.getSearchResults(driver, resultsLimit, blacklist);
-	}
-
-	private void performQuery(final WebDriver driver, final String query)
+	void performQuery(final WebDriver driver, final String query)
 			throws SearchException {
 		driver.get("https://www.google.ca");
 
@@ -52,62 +32,8 @@ public class GoogleSearchService implements SearchService {
 		queryEl.submit();
 	}
 
-	/**
-	 * Scrapes any results available for relevant links.
-	 * If the current page does not have enough links, we will navigate to the
-	 * next page, if it exists.
-	 *
-	 * @param driver
-	 * @param resultsLimit
-	 * @param blacklist
-	 * @return
-	 */
-	private Collection<String> getSearchResults(
-			final WebDriver driver,
-			final int resultsLimit,
-			final Collection<String> blacklist
-	) throws SearchException {
-		final Collection<String> links = new ArrayList<>();
-		final Collection<String> hosts = new HashSet<>();
-
-		// Could have a while (true) here
-		// Using for to be safe
-		// Expecting at least one result per page
-		for (int i = 0; i < resultsLimit; ++i) {
-			this.getSearchResultsOnPage(
-					driver, links, hosts, resultsLimit, blacklist);
-
-			try {
-				// If we need more results and there is a next page to look at...
-				if (links.size() < resultsLimit && this.hasNextPage(driver)) {
-					this.goToNextPage(driver);
-				} else {
-					break;
-				}
-			} catch (DomReadException e) {
-				// Failed to find or click next-page button.
-				break;
-			}
-		}
-
-		return links;
-	}
-
-	/**
-	 * Scrapes the current search results page for any links that we can use.
-	 *
-	 * @param driver
-	 * @param links
-	 * @param hosts
-	 * @param resultsLimit
-	 * @param blacklist
-	 */
-	private void getSearchResultsOnPage(
-			final WebDriver driver,
-			final Collection<String> links,
-			final Collection<String> hosts,
-			final int resultsLimit,
-			final Collection<String> blacklist
+	Collection<String> getSearchResultsOnPage(
+			final WebDriver driver
 	) throws SearchException {
 		// May contain junk like "People also search".
 		// Filter them out by searching for this class.
@@ -138,8 +64,10 @@ public class GoogleSearchService implements SearchService {
 		}
 
 		if (results.size() == 0) {
-			throw new SearchException("Could not find any search results.");
+			throw new SearchException("Could not find any search results on page.");
 		}
+
+		final Collection<String> out = new ArrayList<>();
 
 		for (final WebElement result : results) {
 			final WebElement anchor;
@@ -148,43 +76,21 @@ public class GoogleSearchService implements SearchService {
 			try {
 				anchor = result.findElement(By.tagName("a"));
 				href = anchor.getAttribute("href");
+
+				out.add(href);
 			} catch (StaleElementReferenceException e) {
 				continue;
 			}
-
-			final String host;
-
-			try {
-				host = AisUrlUtils.extractHostname(href);
-			} catch (UrlParseException e) {
-				// Bad href value; skip
-				continue;
-			}
-
-			if (blacklist.contains(host)) {
-				// The host is in the blacklist and is not allowed to be scraped.
-				continue;
-			}
-
-			if (!hosts.add(host)) {
-				// The host was already in the collection of hosts from previous
-				// links; skip
-				continue;
-			}
-
-			links.add(href);
-
-			if (links.size() >= resultsLimit) {
-				break;
-			}
 		}
+
+		return out;
 	}
 
-	private boolean hasNextPage(final WebDriver driver) throws DomReadException {
+	boolean hasNextPage(final WebDriver driver) throws DomReadException {
 		return this.findNextButton(driver) != null;
 	}
 
-	private void goToNextPage(final WebDriver driver) throws DomReadException {
+	void goToNextPage(final WebDriver driver) throws DomReadException {
 		final WebElement nextBtn = this.findNextButton(driver);
 		nextBtn.click();
 	}

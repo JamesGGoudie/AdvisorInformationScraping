@@ -8,7 +8,7 @@ import ca.goudie.advisorinformationscraping.services.BlacklistService;
 import ca.goudie.advisorinformationscraping.services.dihelpers.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.dihelpers.WebDriverSelector;
 import ca.goudie.advisorinformationscraping.services.scrapers.ScraperFacade;
-import ca.goudie.advisorinformationscraping.services.search.SearchService;
+import ca.goudie.advisorinformationscraping.services.search.ISearchService;
 import ca.goudie.advisorinformationscraping.utils.AisCountryUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
@@ -38,7 +38,7 @@ public class RunController {
 	public ScrapeResult run()
 			throws SearchException {
 		final WebDriver webDriver = this.webDriverSelector.selectWebDriver();
-		final SearchService	searcher =
+		final ISearchService searcher =
 				this.searchServiceSelector.selectSearchService();
 
 		/*
