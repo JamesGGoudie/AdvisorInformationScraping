@@ -3,12 +3,14 @@ package ca.goudie.advisorinformationscraping.services.search;
 import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
+import ca.goudie.advisorinformationscraping.services.BlacklistService;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,13 +21,19 @@ import java.util.List;
 @Service
 public class GoogleSearchService implements SearchService {
 
+	@Autowired
+	private BlacklistService blacklistService;
+
 	@Override
 	public Collection<String> search(
-			final WebDriver driver, final String query, final int resultsLimit
+			final WebDriver driver,
+			final String query,
+			final int resultsLimit,
+			final Collection<String> blacklist
 	) throws SearchException {
 		this.performQuery(driver, query);
 
-		return this.getSearchResults(driver, resultsLimit);
+		return this.getSearchResults(driver, resultsLimit, blacklist);
 	}
 
 	private void performQuery(final WebDriver driver, final String query)
@@ -51,10 +59,13 @@ public class GoogleSearchService implements SearchService {
 	 *
 	 * @param driver
 	 * @param resultsLimit
+	 * @param blacklist
 	 * @return
 	 */
 	private Collection<String> getSearchResults(
-			final WebDriver driver, final int resultsLimit
+			final WebDriver driver,
+			final int resultsLimit,
+			final Collection<String> blacklist
 	) throws SearchException {
 		final Collection<String> links = new ArrayList<>();
 		final Collection<String> hosts = new HashSet<>();
@@ -63,7 +74,8 @@ public class GoogleSearchService implements SearchService {
 		// Using for to be safe
 		// Expecting at least one result per page
 		for (int i = 0; i < resultsLimit; ++i) {
-			this.getSearchResultsOnPage(driver, links, hosts, resultsLimit);
+			this.getSearchResultsOnPage(
+					driver, links, hosts, resultsLimit, blacklist);
 
 			try {
 				// If we need more results and there is a next page to look at...
@@ -88,12 +100,14 @@ public class GoogleSearchService implements SearchService {
 	 * @param links
 	 * @param hosts
 	 * @param resultsLimit
+	 * @param blacklist
 	 */
 	private void getSearchResultsOnPage(
 			final WebDriver driver,
 			final Collection<String> links,
 			final Collection<String> hosts,
-			final int resultsLimit
+			final int resultsLimit,
+			final Collection<String> blacklist
 	) throws SearchException {
 		// May contain junk like "People also search".
 		// Filter them out by searching for this class.
@@ -144,6 +158,11 @@ public class GoogleSearchService implements SearchService {
 				host = AisUrlUtils.extractHostname(href);
 			} catch (UrlParseException e) {
 				// Bad href value; skip
+				continue;
+			}
+
+			if (blacklist.contains(host)) {
+				// The host is in the blacklist and is not allowed to be scraped.
 				continue;
 			}
 

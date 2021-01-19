@@ -4,6 +4,7 @@ import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
 import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
+import ca.goudie.advisorinformationscraping.services.BlacklistService;
 import ca.goudie.advisorinformationscraping.services.dihelpers.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.dihelpers.WebDriverSelector;
 import ca.goudie.advisorinformationscraping.services.scrapers.ScraperFacade;
@@ -20,6 +21,9 @@ import java.util.Collection;
 
 @RestController
 public class RunController {
+
+	@Autowired
+	private BlacklistService blacklistService;
 
 	@Autowired
 	private ScraperFacade scraper;
@@ -65,9 +69,11 @@ public class RunController {
 
 		int resultsLimit = 1;
 
+		final Collection<String> blacklist = this.blacklistService.getBlacklist();
 		final Collection<String> links = searcher.search(webDriver,
 				query,
-				resultsLimit);
+				resultsLimit,
+				blacklist);
 		final ScrapeResult out = new ScrapeResult();
 		final Collection<Firm> results = new ArrayList<>();
 
