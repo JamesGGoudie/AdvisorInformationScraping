@@ -58,8 +58,10 @@ public class GenericEmployeesPageHelper {
 			employeeBlocks.addAll(this.findEmployeePageBlocksByAnchors(driver));
 		}
 
+		final String currentUrl = driver.getCurrentUrl();
+
 		for (final WebElement employeeBlock : employeeBlocks) {
-			this.processEmployeeBlock(employeeBlock, firm, driver.getCurrentUrl());
+			this.processEmployeeBlock(employeeBlock, firm, currentUrl);
 		}
 
 		for (final Employee employee : firm.getEmployees()) {
