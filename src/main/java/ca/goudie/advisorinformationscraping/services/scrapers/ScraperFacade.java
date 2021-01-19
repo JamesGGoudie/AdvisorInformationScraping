@@ -2,7 +2,7 @@ package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.models.common.Firm;
-import ca.goudie.advisorinformationscraping.services.dihelpers.ScraperSelector;
+import ca.goudie.advisorinformationscraping.services.selectors.ScraperSelector;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
