@@ -2,8 +2,8 @@ package ca.goudie.advisorinformationscraping.controllers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
-import ca.goudie.advisorinformationscraping.models.common.Firm;
-import ca.goudie.advisorinformationscraping.models.common.ScrapeResult;
+import ca.goudie.advisorinformationscraping.dto.Firm;
+import ca.goudie.advisorinformationscraping.dto.ScrapeResult;
 import ca.goudie.advisorinformationscraping.services.BlacklistService;
 import ca.goudie.advisorinformationscraping.services.selectors.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.selectors.WebDriverSelector;

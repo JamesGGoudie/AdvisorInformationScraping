@@ -2,8 +2,8 @@ package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
 import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
-import ca.goudie.advisorinformationscraping.models.common.Employee;
-import ca.goudie.advisorinformationscraping.models.common.Firm;
+import ca.goudie.advisorinformationscraping.dto.Employee;
+import ca.goudie.advisorinformationscraping.dto.Firm;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import org.apache.commons.lang3.StringUtils;

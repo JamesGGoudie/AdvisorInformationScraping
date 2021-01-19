@@ -1,7 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
-import ca.goudie.advisorinformationscraping.models.common.Firm;
+import ca.goudie.advisorinformationscraping.dto.Firm;
 import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;

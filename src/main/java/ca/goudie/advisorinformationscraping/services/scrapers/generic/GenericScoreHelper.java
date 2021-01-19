@@ -1,8 +1,8 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
 import ca.goudie.advisorinformationscraping.constants.GenericConstants;
-import ca.goudie.advisorinformationscraping.models.common.Employee;
-import ca.goudie.advisorinformationscraping.models.common.Firm;
+import ca.goudie.advisorinformationscraping.dto.Employee;
+import ca.goudie.advisorinformationscraping.dto.Firm;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

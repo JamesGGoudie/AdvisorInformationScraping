@@ -1,8 +1,8 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
-import ca.goudie.advisorinformationscraping.models.common.Employee;
-import ca.goudie.advisorinformationscraping.models.common.Firm;
+import ca.goudie.advisorinformationscraping.dto.Employee;
+import ca.goudie.advisorinformationscraping.dto.Firm;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
