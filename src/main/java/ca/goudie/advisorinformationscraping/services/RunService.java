@@ -20,7 +20,13 @@ import ca.goudie.advisorinformationscraping.entities.ids.FirmEmailId;
 import ca.goudie.advisorinformationscraping.entities.ids.FirmPhoneId;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
+import ca.goudie.advisorinformationscraping.repositories.EmployeeAddressRepository;
+import ca.goudie.advisorinformationscraping.repositories.EmployeeEmailRepository;
+import ca.goudie.advisorinformationscraping.repositories.EmployeePhoneRepository;
 import ca.goudie.advisorinformationscraping.repositories.EmployeeRepository;
+import ca.goudie.advisorinformationscraping.repositories.FirmAddressRepository;
+import ca.goudie.advisorinformationscraping.repositories.FirmEmailRepository;
+import ca.goudie.advisorinformationscraping.repositories.FirmPhoneRepository;
 import ca.goudie.advisorinformationscraping.repositories.FirmRepository;
 import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
 import ca.goudie.advisorinformationscraping.services.searchers.ISearcher;
@@ -49,7 +55,25 @@ public class RunService {
 	private EmployeeRepository employeeRepo;
 
 	@Autowired
+	private EmployeeAddressRepository employeeAddressRepository;
+
+	@Autowired
+	private EmployeeEmailRepository employeeEmailRepository;
+
+	@Autowired
+	private EmployeePhoneRepository employeePhoneRepository;
+
+	@Autowired
 	private FirmRepository firmRepo;
+
+	@Autowired
+	private FirmAddressRepository firmAddressRepository;
+
+	@Autowired
+	private FirmEmailRepository firmEmailRepository;
+
+	@Autowired
+	private FirmPhoneRepository firmPhoneRepository;
 
 	@Autowired
 	private BlacklistService blacklistService;
@@ -156,14 +180,18 @@ public class RunService {
 			final FirmResult firm,
 			final String firmId) {
 		// Check if the DB already has an entry for this firm-source combo.
-		final Optional<Long> internalIdOpt =
+		final Optional<Long> internalFirmIdOpt =
 				this.firmRepo.findIdBySemarchyIdAndFirmSource(firmId, firm.getSource());
 		final Long internalFirmId;
 
-		if (internalIdOpt.isPresent()) {
-			internalFirmId = internalIdOpt.get();
+		if (internalFirmIdOpt.isPresent()) {
+			internalFirmId = internalFirmIdOpt.get();
 			// If it does, set all employees for this combo to out-of-date.
 			this.employeeRepo.updateIsCurrent(internalFirmId);
+
+			this.firmAddressRepository.deleteByIdFirmId(internalFirmId);
+			this.firmEmailRepository.deleteByIdFirmId(internalFirmId);
+			this.firmPhoneRepository.deleteByIdFirmId(internalFirmId);
 		} else {
 			internalFirmId = null;
 		}
@@ -219,9 +247,19 @@ public class RunService {
 		final EmployeeEntity employeeEntity = new EmployeeEntity();
 
 		if (internalFirmId != null) {
-			final Long internalEmployeeId = this.employeeRepo.findIdByFirmIdAndName(
-					internalFirmId, employee.getName());
-			employeeEntity.setId(internalEmployeeId);
+			final Optional<Long> internalEmployeeIdOpt =
+					this.employeeRepo.findIdByFirmIdAndName(
+							internalFirmId, employee.getName());
+
+			if (internalEmployeeIdOpt.isPresent()) {
+				final Long internalEmployeeId = internalEmployeeIdOpt.get();
+
+				employeeEntity.setId(internalEmployeeId);
+
+				this.employeeAddressRepository.deleteByIdEmployeeId(internalEmployeeId);
+				this.employeeEmailRepository.deleteByIdEmployeeId(internalEmployeeId);
+				this.employeePhoneRepository.deleteByIdEmployeeId(internalEmployeeId);
+			}
 		}
 
 		final Collection<EmployeeAddress> addresses = new ArrayList<>();
