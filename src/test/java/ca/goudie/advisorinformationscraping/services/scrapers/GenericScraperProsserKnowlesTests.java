@@ -1,8 +1,8 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
-import ca.goudie.advisorinformationscraping.dto.Employee;
-import ca.goudie.advisorinformationscraping.dto.Firm;
+import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
+import ca.goudie.advisorinformationscraping.dto.FirmResult;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
@@ -31,7 +31,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		WebDriver mockDriver = spy(this.chromeWebDriver);
 
-		final Firm aFirm = this.genericScraper.scrapeWebsite(mockDriver,
+		final FirmResult aFirm = this.genericScraper.scrapeWebsite(mockDriver,
 				landingPageUrl,
 				countryCode);
 
@@ -54,16 +54,16 @@ public class GenericScraperProsserKnowlesTests {
 		verify(mockDriver).get("https://www.prosserknowles.co.uk/about-us/our-team/consultants/callum-pye/");
 		verify(mockDriver).get("https://www.prosserknowles.co.uk/about-us/our-team/consultants/rachel-robb/");
 
-		final Firm eFirm = new Firm();
+		final FirmResult eFirm = new FirmResult();
 
 		eFirm.setFirmUrl("www.prosserknowles.co.uk");
 		eFirm.setSource("www.prosserknowles.co.uk");
 		eFirm.getPhones().add("01562 829 222");
 		eFirm.getEmails().add("enquiries@prosserknowles.co.uk");
 
-		Employee eEmployee;
+		EmployeeResult eEmployee;
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Nick Aston");
 		eEmployee.setTitle("Managing Director & Chartered Financial Planner");
@@ -75,7 +75,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Nick Broughton");
 		eEmployee.setTitle("Director, Financial Planning & Trust Specialist");
@@ -87,7 +87,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Dale Gough");
 		eEmployee.setTitle("Director & Financial Planning Consultant");
@@ -98,7 +98,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Leighton Parkes");
 		eEmployee.setTitle("Director & Financial Planning Consultant");
@@ -109,7 +109,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Andrew Prosser");
 		eEmployee.setTitle("Chairman & Financial Planning Consultant");
@@ -120,7 +120,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Philip Batson");
 		eEmployee.setTitle("Financial Planning Consultant");
@@ -132,7 +132,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Jonathan Bissett");
 		eEmployee.setTitle("Financial Planning Consultant");
@@ -144,7 +144,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Vanessa Coates");
 		eEmployee.setTitle("Financial Planning Consultant");
@@ -156,7 +156,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Aaron Dakin");
 		eEmployee.setTitle("Financial Planning Consultant");
@@ -168,7 +168,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Laura Evans");
 		eEmployee.setTitle("Financial Planning Consultant");
@@ -180,7 +180,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Jack La Fave");
 		eEmployee.setTitle("Financial Planning Consultant");
@@ -191,7 +191,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Anna Lawrence");
 		eEmployee.setTitle("Chartered Financial Planner");
@@ -203,7 +203,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Goss Lumsden");
 		eEmployee.setTitle("Financial Planning Consultant");
@@ -215,7 +215,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Daniel Morris");
 		eEmployee.setTitle("Financial Planning Consultant");
@@ -227,7 +227,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Callum Pye");
 		eEmployee.setTitle("Financial Planning Consultant");
@@ -239,7 +239,7 @@ public class GenericScraperProsserKnowlesTests {
 
 		eFirm.getEmployees().add(eEmployee);
 
-		eEmployee = new Employee();
+		eEmployee = new EmployeeResult();
 
 		eEmployee.setName("Rachel Robb");
 		eEmployee.setTitle("Financial Planning Consultant");

@@ -1,7 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
-import ca.goudie.advisorinformationscraping.dto.Firm;
+import ca.goudie.advisorinformationscraping.dto.FirmResult;
 import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.By;
@@ -38,14 +38,14 @@ public class GenericScraper implements IScraper {
 	@Autowired
 	private GenericSourceHelper sourceHelper;
 
-	public Firm scrapeWebsite(
+	public FirmResult scrapeWebsite(
 			final WebDriver driver,
 			final String url,
 			final String countryCode
 	) throws ScrapeException {
 		log.info("Beginning Generic Scrape of: " + url);
 
-		final Firm firm = this.scrapeLandingPage(driver, url, countryCode);
+		final FirmResult firm = this.scrapeLandingPage(driver, url, countryCode);
 		this.scrapeEmployeePages(driver, firm, countryCode);
 		this.scoreHelper.calculateScores(firm);
 
@@ -63,14 +63,14 @@ public class GenericScraper implements IScraper {
 	 * @param countryCode
 	 * @return
 	 */
-	private Firm scrapeLandingPage(
+	private FirmResult scrapeLandingPage(
 			final WebDriver driver,
 			final String url,
 			final String countryCode
 	) {
 		driver.get(url);
 
-		final Firm firm = new Firm();
+		final FirmResult firm = new FirmResult();
 
 		firm.getEmails().addAll(this.emailHelper.findEmailsByAnchor(driver));
 		firm.getPhones().addAll(this.phoneHelper.findPhones(driver, countryCode));
@@ -90,7 +90,7 @@ public class GenericScraper implements IScraper {
 	 */
 	private void scrapeEmployeePages(
 			final WebDriver driver,
-			final Firm firm,
+			final FirmResult firm,
 			final String countryCode
 	) {
 		final Collection<String> employeePageLinks =

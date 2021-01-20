@@ -1,8 +1,8 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
 import ca.goudie.advisorinformationscraping.constants.GenericConstants;
-import ca.goudie.advisorinformationscraping.dto.Employee;
-import ca.goudie.advisorinformationscraping.dto.Firm;
+import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
+import ca.goudie.advisorinformationscraping.dto.FirmResult;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class GenericScoreHelper {
 	 *
 	 * @param firm
 	 */
-	void calculateScores(final Firm firm) {
+	void calculateScores(final FirmResult firm) {
 		log.info("Calculating Firm Scores");
 
 		this.compareFirmsEmployeesToFirm(firm);
@@ -36,8 +36,8 @@ public class GenericScoreHelper {
 	 *
 	 * @param firm
 	 */
-	private void compareFirmsEmployeesToFirm(final Firm firm) {
-		for (final Employee employee : firm.getEmployees()) {
+	private void compareFirmsEmployeesToFirm(final FirmResult firm) {
+		for (final EmployeeResult employee : firm.getEmployees()) {
 			this.compareValuesToFirm(firm.getAddresses(),
 					employee.getAddresses());
 			this.compareValuesToFirm(firm.getEmails(),
@@ -76,12 +76,12 @@ public class GenericScoreHelper {
 	 *
 	 * @param firm
 	 */
-	private void compareFirmsEmployeesToEachOther(final Firm firm) {
+	private void compareFirmsEmployeesToEachOther(final FirmResult firm) {
 		final Collection<Map<String, Float>> addressScores = new ArrayList<>();
 		final Collection<Map<String, Float>> emailScores = new ArrayList<>();
 		final Collection<Map<String, Float>> phoneScores = new ArrayList<>();
 
-		for (final Employee employee : firm.getEmployees()) {
+		for (final EmployeeResult employee : firm.getEmployees()) {
 			addressScores.add(employee.getAddresses());
 			emailScores.add(employee.getEmails());
 			phoneScores.add(employee.getPhones());

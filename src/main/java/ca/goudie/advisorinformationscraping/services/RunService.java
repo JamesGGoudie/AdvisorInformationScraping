@@ -1,6 +1,6 @@
 package ca.goudie.advisorinformationscraping.services;
 
-import ca.goudie.advisorinformationscraping.dto.Firm;
+import ca.goudie.advisorinformationscraping.dto.FirmResult;
 import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
 import ca.goudie.advisorinformationscraping.dto.ScrapeResult;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
@@ -11,7 +11,6 @@ import ca.goudie.advisorinformationscraping.services.selectors.ScraperSelector;
 import ca.goudie.advisorinformationscraping.services.selectors.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.selectors.WebDriverSelector;
 import ca.goudie.advisorinformationscraping.utils.AisCountryUtils;
-import ca.goudie.advisorinformationscraping.utils.csv.models.FirmInfo;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
@@ -75,7 +74,7 @@ public class RunService {
 					resultsLimit,
 					blacklist);
 
-		final Collection<Firm> firms = new ArrayList<>();
+		final Collection<FirmResult> firms = new ArrayList<>();
 
 		for (final String link : links) {
 			final IScraper scraper = this.scraperSelector.selectScraper(link);

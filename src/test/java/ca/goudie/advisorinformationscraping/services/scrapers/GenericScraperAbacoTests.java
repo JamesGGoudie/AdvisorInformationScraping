@@ -1,7 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
-import ca.goudie.advisorinformationscraping.dto.Firm;
+import ca.goudie.advisorinformationscraping.dto.FirmResult;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
@@ -30,13 +30,13 @@ public class GenericScraperAbacoTests {
 
 		WebDriver mockDriver = spy(this.chromeWebDriver);
 
-		final Firm aFirm = this.genericScraper.scrapeWebsite(mockDriver,
+		final FirmResult aFirm = this.genericScraper.scrapeWebsite(mockDriver,
 				landingPageUrl,
 				countryCode);
 
 		verify(mockDriver).get(landingPageUrl);
 
-		final Firm eFirm = new Firm();
+		final FirmResult eFirm = new FirmResult();
 		eFirm.setFirmUrl("www.abacoam.com");
 		eFirm.setSource("www.abacoam.com");
 		eFirm.getPhones().add("+44 20 3031 9184");

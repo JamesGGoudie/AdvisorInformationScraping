@@ -10,7 +10,7 @@ import java.util.HashSet;
  * A collection of data about a firm collection from a website.
  */
 @Data
-public class Firm {
+public class FirmResult {
 
 	private String firmUrl;
 	private final Collection<String> phones = new HashSet<>();
@@ -18,6 +18,6 @@ public class Firm {
 	private final Collection<String> addresses = new HashSet<>();
 	private String source;
 
-	private final Collection<Employee> employees = new ArrayList<>();
+	private final Collection<EmployeeResult> employees = new ArrayList<>();
 
 }

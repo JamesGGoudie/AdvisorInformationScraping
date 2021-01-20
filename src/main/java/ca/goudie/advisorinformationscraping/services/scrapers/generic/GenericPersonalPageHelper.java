@@ -3,8 +3,8 @@ package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 import ca.goudie.advisorinformationscraping.constants.GenericConstants;
 import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
-import ca.goudie.advisorinformationscraping.dto.Employee;
-import ca.goudie.advisorinformationscraping.dto.Firm;
+import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
+import ca.goudie.advisorinformationscraping.dto.FirmResult;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import lombok.extern.log4j.Log4j2;
@@ -53,8 +53,8 @@ public class GenericPersonalPageHelper {
 	 */
 	void scrapePersonalPage(
 			final WebDriver driver,
-			final Firm firm,
-			final Employee employee,
+			final FirmResult firm,
+			final EmployeeResult employee,
 			final String countryCode
 	) {
 		log.info("Scraping Personal Page");
@@ -153,7 +153,7 @@ public class GenericPersonalPageHelper {
 	 */
 	private WebElement findPersonalPageBlockByEmailAnchor(
 			final SearchContext context,
-			final Firm firm
+			final FirmResult firm
 	) {
 		log.info("Searching for Personal Page Block by Email Anchor");
 

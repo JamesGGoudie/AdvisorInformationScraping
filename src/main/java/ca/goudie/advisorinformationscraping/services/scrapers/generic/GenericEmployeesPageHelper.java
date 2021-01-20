@@ -2,8 +2,8 @@ package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
 import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
-import ca.goudie.advisorinformationscraping.dto.Employee;
-import ca.goudie.advisorinformationscraping.dto.Firm;
+import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
+import ca.goudie.advisorinformationscraping.dto.FirmResult;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 import lombok.extern.log4j.Log4j2;
@@ -49,7 +49,7 @@ public class GenericEmployeesPageHelper {
 	 */
 	void scrapeEmployeePages(
 			final WebDriver driver,
-			final Firm firm,
+			final FirmResult firm,
 			final Collection<String> employeePageLinks,
 			final String countryCode
 	) {
@@ -68,7 +68,7 @@ public class GenericEmployeesPageHelper {
 			this.processEmployeeBlock(employeeBlock, firm, currentUrl);
 		}
 
-		for (final Employee employee : firm.getEmployees()) {
+		for (final EmployeeResult employee : firm.getEmployees()) {
 			this.personalPageHelper.scrapePersonalPage(
 					driver, firm, employee, countryCode);
 		}
@@ -213,12 +213,12 @@ public class GenericEmployeesPageHelper {
 	 */
 	private void processEmployeeBlock(
 			final WebElement employeeBlock,
-			final Firm firm,
+			final FirmResult firm,
 			final String currentUrl
 	) {
 		log.info("Processing Employee Block");
 
-		final Employee employee = new Employee();
+		final EmployeeResult employee = new EmployeeResult();
 
 		employee.setTitle(this.titleHelper.findEmployeeTitleInBlock(employeeBlock));
 

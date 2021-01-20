@@ -3,10 +3,8 @@ package ca.goudie.advisorinformationscraping.services.scrapers;
 import ca.goudie.advisorinformationscraping.dto.specialized.bloomberg.IBloombergEmployee;
 import ca.goudie.advisorinformationscraping.dto.specialized.bloomberg.IBloombergOrganization;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
-import ca.goudie.advisorinformationscraping.utils.json.specialized.bloomberg.BloombergEmployee;
-import ca.goudie.advisorinformationscraping.utils.json.specialized.bloomberg.BloombergOrganization;
-import ca.goudie.advisorinformationscraping.dto.Firm;
-import ca.goudie.advisorinformationscraping.dto.Employee;
+import ca.goudie.advisorinformationscraping.dto.FirmResult;
+import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
 import ca.goudie.advisorinformationscraping.utils.json.AisJsonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -40,7 +38,7 @@ public class BloombergScraper implements IScraper {
 	private static final int POST_COOKIE_WAIT_TIME = 2;
 
 	@Override
-	public Firm scrapeWebsite(
+	public FirmResult scrapeWebsite(
 			final WebDriver driver, final String url, final String countryCode
 	) throws ScrapeException {
 		driver.get(url);
@@ -154,8 +152,8 @@ public class BloombergScraper implements IScraper {
 		throw new ScrapeException(BloombergScraper.JSON_NOT_FOUND_MSG);
 	}
 
-	private Firm buildFirmResult(final IBloombergOrganization org) {
-		final Firm firm = new Firm();
+	private FirmResult buildFirmResult(final IBloombergOrganization org) {
+		final FirmResult firm = new FirmResult();
 
 		firm.getAddresses().add(this.cleanAddress(org.getAddress()));
 		firm.setFirmUrl(org.getUrl());
@@ -167,13 +165,13 @@ public class BloombergScraper implements IScraper {
 		return firm;
 	}
 
-	private Collection<Employee> buildEmployees(
+	private Collection<EmployeeResult> buildEmployees(
 			final IBloombergOrganization org
 	) {
-		final Collection<Employee> employees = new ArrayList<>();
+		final Collection<EmployeeResult> employees = new ArrayList<>();
 
 		for (final IBloombergEmployee bloombergEmployee : org.getEmployees()) {
-			final Employee employee = new Employee();
+			final EmployeeResult employee = new EmployeeResult();
 
 			employee.setName(bloombergEmployee.getName());
 			employee.setTitle(bloombergEmployee.getTitle());

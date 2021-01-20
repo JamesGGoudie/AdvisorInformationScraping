@@ -9,7 +9,7 @@ import java.util.Map;
  * A collection of data about an employee from a website.
  */
 @Data
-public class Employee {
+public class EmployeeResult {
 
 	private String name;
 	private String title;
