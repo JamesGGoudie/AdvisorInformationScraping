@@ -30,5 +30,6 @@ public class SqlConstants {
 	public static final String EMPLOYEE_PHONE_COLUMN = "phone";
 	public static final String EMPLOYEE_PHONE_SCORE_COLUMN = "score";
 	public static final String EMPLOYEE_SOURCE_COLUMN = "source";
+	public static final String EMPLOYEE_IS_CURRENT_COLUMN = "is_current";
 
 }

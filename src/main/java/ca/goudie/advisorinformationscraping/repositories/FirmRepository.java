@@ -7,15 +7,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface FirmRepository extends JpaRepository<FirmEntity, Long> {
 
 	@Query(
-			value ="SELECT " + SqlConstants.FIRM_ID_COLUMN +
+			value = "SELECT " + SqlConstants.FIRM_ID_COLUMN +
 					" FROM " + SqlConstants.FIRM_TABLE +
-					" WHERE :semarchyId = " + SqlConstants.FIRM_SEMARCHY_ID_COLUMN +
-					" AND :firmSource = " + SqlConstants.FIRM_SOURCE_COLUMN,
+					" WHERE " + SqlConstants.FIRM_SEMARCHY_ID_COLUMN + " = :semarchyId" +
+					" AND " + SqlConstants.FIRM_SOURCE_COLUMN + " = :firmSource",
 			nativeQuery = true)
-	Long findIdBySemarchyIdAndFirmSource(
+	Optional<Long> findIdBySemarchyIdAndFirmSource(
 			@Param("semarchyId")
 			final String semarchyId,
 			@Param("firmSource")

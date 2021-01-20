@@ -2,13 +2,7 @@ package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -22,15 +16,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import java.util.ArrayList;
 import java.util.Collection;
 
-@AllArgsConstructor
-@Builder
-@EqualsAndHashCode
-@Getter
-@NoArgsConstructor
-@Setter
-@ToString
+@Data
 @Entity
 @Table(
 		name = SqlConstants.EMPLOYEE_TABLE,
@@ -49,7 +38,9 @@ public class EmployeeEntity {
 	@Id
 	private Long id;
 
-	@Column(name = SqlConstants.EMPLOYEE_NAME_COLUMN)
+	@Column(
+			name = SqlConstants.EMPLOYEE_NAME_COLUMN,
+			nullable = false)
 	private String name;
 
 	@Column(name = SqlConstants.EMPLOYEE_TITLE_COLUMN)
@@ -58,10 +49,12 @@ public class EmployeeEntity {
 	@Column(name = SqlConstants.EMPLOYEE_SOURCE_COLUMN)
 	private String source;
 
+	@Column(name = SqlConstants.EMPLOYEE_IS_CURRENT_COLUMN)
+	private Boolean isCurrent;
+
 	@JoinColumn(
 			name = SqlConstants.FIRM_ID_COLUMN,
-			insertable = false,
-			updatable = false)
+			nullable = false)
 	@ManyToOne(fetch = FetchType.LAZY)
 	private FirmEntity firm;
 
@@ -70,20 +63,44 @@ public class EmployeeEntity {
 			fetch = FetchType.LAZY,
 			mappedBy = EmployeeAddress.EMPLOYEE_FIELD,
 			orphanRemoval = true)
-	private Collection<EmployeeAddress> addresses;
+	private final Collection<EmployeeAddress> addresses = new ArrayList<>();
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY,
 			mappedBy = EmployeeEmail.EMPLOYEE_FIELD,
 			orphanRemoval = true)
-	private Collection<EmployeeEmail> emails;
+	private final Collection<EmployeeEmail> emails = new ArrayList<>();
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY,
 			mappedBy = EmployeePhone.EMPLOYEE_FIELD,
 			orphanRemoval = true)
-	private Collection<EmployeePhone> phone;
+	private final Collection<EmployeePhone> phones = new ArrayList<>();
+
+	public void addAddresses(final Collection<EmployeeAddress> addresses) {
+		this.addresses.addAll(addresses);
+
+		for (final EmployeeAddress address : addresses) {
+			address.setEmployee(this);
+		}
+	}
+
+	public void addEmails(final Collection<EmployeeEmail> emails) {
+		this.emails.addAll(emails);
+
+		for (final EmployeeEmail address : emails) {
+			address.setEmployee(this);
+		}
+	}
+
+	public void addPhones(final Collection<EmployeePhone> phones) {
+		this.phones.addAll(phones);
+
+		for (final EmployeePhone address : phones) {
+			address.setEmployee(this);
+		}
+	}
 
 }

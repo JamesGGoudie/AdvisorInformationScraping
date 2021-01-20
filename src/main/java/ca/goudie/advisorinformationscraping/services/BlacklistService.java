@@ -43,7 +43,8 @@ public class BlacklistService {
 		final Collection<BlacklistItem> parsed = new ArrayList<>();
 
 		for (final String host : hosts) {
-			parsed.add(BlacklistItem.builder().host(host).build());
+			final BlacklistItem item = BlacklistItem.builder().host(host).build();
+			parsed.add(item);
 		}
 
 		return parsed;
