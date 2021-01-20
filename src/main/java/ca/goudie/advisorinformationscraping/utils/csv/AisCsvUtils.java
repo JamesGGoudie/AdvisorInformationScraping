@@ -2,8 +2,10 @@ package ca.goudie.advisorinformationscraping.utils.csv;
 
 import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
 import ca.goudie.advisorinformationscraping.utils.csv.models.FirmInfo;
+
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

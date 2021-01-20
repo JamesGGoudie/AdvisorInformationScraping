@@ -1,7 +1,9 @@
 package ca.goudie.advisorinformationscraping.services.selectors;
 
 import ca.goudie.advisorinformationscraping.logging.LoggingWebDriver;
+
 import org.openqa.selenium.WebDriver;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

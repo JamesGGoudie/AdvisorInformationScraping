@@ -2,11 +2,13 @@ package ca.goudie.advisorinformationscraping.services.searchers;
 
 import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

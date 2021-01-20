@@ -1,10 +1,12 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
-import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.dto.FirmResult;
+import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
+
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;

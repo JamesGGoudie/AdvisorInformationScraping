@@ -1,7 +1,8 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
-import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.dto.FirmResult;
+import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
+
 import org.openqa.selenium.WebDriver;
 
 public interface IScraper {

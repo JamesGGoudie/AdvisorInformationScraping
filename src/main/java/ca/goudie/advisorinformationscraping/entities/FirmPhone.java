@@ -2,6 +2,7 @@ package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
 import ca.goudie.advisorinformationscraping.entities.ids.FirmPhoneId;
+
 import lombok.Data;
 
 import javax.persistence.EmbeddedId;

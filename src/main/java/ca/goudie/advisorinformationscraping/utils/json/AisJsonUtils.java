@@ -3,6 +3,7 @@ package ca.goudie.advisorinformationscraping.utils.json;
 import ca.goudie.advisorinformationscraping.dto.specialized.bloomberg.IBloombergOrganization;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.utils.json.specialized.bloomberg.BloombergOrganization;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -4,6 +4,7 @@ import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
+
 import org.openqa.selenium.WebDriver;
 
 import java.util.ArrayList;

@@ -1,7 +1,9 @@
 package ca.goudie.advisorinformationscraping.utils.csv.models;
 
 import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
+
 import com.opencsv.bean.CsvBindByPosition;
+
 import lombok.Data;
 
 @Data

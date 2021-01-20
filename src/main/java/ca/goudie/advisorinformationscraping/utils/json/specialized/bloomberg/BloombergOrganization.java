@@ -1,7 +1,9 @@
 package ca.goudie.advisorinformationscraping.utils.json.specialized.bloomberg;
 
 import ca.goudie.advisorinformationscraping.dto.specialized.bloomberg.IBloombergOrganization;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 
 import java.util.Collection;

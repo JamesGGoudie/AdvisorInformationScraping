@@ -1,9 +1,11 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
-import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.dto.FirmResult;
+import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

@@ -11,9 +11,11 @@ import ca.goudie.advisorinformationscraping.services.selectors.ScraperSelector;
 import ca.goudie.advisorinformationscraping.services.selectors.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.selectors.WebDriverSelector;
 import ca.goudie.advisorinformationscraping.utils.AisCountryUtils;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

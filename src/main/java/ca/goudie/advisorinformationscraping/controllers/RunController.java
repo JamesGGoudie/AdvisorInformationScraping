@@ -4,7 +4,7 @@ import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
 import ca.goudie.advisorinformationscraping.dto.ScrapeResult;
 import ca.goudie.advisorinformationscraping.services.RunService;
 import ca.goudie.advisorinformationscraping.utils.csv.AisCsvUtils;
-import ca.goudie.advisorinformationscraping.utils.csv.models.FirmInfo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

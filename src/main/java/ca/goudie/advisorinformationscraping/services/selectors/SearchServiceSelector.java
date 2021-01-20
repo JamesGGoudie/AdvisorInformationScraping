@@ -2,6 +2,7 @@ package ca.goudie.advisorinformationscraping.services.selectors;
 
 import ca.goudie.advisorinformationscraping.services.searchers.GoogleSearcher;
 import ca.goudie.advisorinformationscraping.services.searchers.ISearcher;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

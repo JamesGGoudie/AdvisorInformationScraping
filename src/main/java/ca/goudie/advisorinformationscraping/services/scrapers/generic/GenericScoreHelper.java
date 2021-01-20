@@ -3,7 +3,9 @@ package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 import ca.goudie.advisorinformationscraping.constants.GenericConstants;
 import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
 import ca.goudie.advisorinformationscraping.dto.FirmResult;
+
 import lombok.extern.log4j.Log4j2;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

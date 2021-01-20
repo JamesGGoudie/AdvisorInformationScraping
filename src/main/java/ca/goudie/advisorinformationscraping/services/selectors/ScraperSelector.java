@@ -2,9 +2,10 @@ package ca.goudie.advisorinformationscraping.services.selectors;
 
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.services.scrapers.BloombergScraper;
-import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
 import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
+import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

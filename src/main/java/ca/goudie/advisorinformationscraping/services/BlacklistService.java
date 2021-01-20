@@ -2,6 +2,7 @@ package ca.goudie.advisorinformationscraping.services;
 
 import ca.goudie.advisorinformationscraping.entities.BlacklistItem;
 import ca.goudie.advisorinformationscraping.repositories.BlacklistItemRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;

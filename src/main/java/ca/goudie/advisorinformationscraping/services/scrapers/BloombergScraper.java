@@ -1,16 +1,18 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
+import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
+import ca.goudie.advisorinformationscraping.dto.FirmResult;
 import ca.goudie.advisorinformationscraping.dto.specialized.bloomberg.IBloombergEmployee;
 import ca.goudie.advisorinformationscraping.dto.specialized.bloomberg.IBloombergOrganization;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
-import ca.goudie.advisorinformationscraping.dto.FirmResult;
-import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
 import ca.goudie.advisorinformationscraping.utils.json.AisJsonUtils;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

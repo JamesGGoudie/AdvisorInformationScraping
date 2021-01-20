@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.entities.ids;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
+
 import lombok.Data;
 
 import javax.persistence.Column;

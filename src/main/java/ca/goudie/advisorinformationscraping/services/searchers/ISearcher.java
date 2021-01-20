@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.searchers;
 
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
+
 import org.openqa.selenium.WebDriver;
 
 import java.util.Collection;
