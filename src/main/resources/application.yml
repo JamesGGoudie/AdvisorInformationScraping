@@ -10,3 +10,6 @@ spring:
 
     hibernate:
       ddl-auto: none
+
+selenium:
+  chrome-driver-location: C:/Program Files (x86)/Selenium/chromedriver.exe
