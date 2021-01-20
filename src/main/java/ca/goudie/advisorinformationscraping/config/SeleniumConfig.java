@@ -13,7 +13,7 @@ public class SeleniumConfig {
 	public WebDriver chromeWebDriver() {
 		// Need to tell Selenium where the chromedriver file is.
 		System.setProperty("webdriver.chrome.driver",
-				"C:/Program Files/Selenium/chromedriver.exe");
+				"C:/Program Files (x86)/Selenium/chromedriver.exe");
 
 		final ChromeOptions options = new ChromeOptions();
 		// By setting Chrome to headless, we don't need GPU resources.

@@ -11,13 +11,10 @@ import java.io.Serializable;
 @Embeddable
 public class FirmAddressId implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	@Column(name = SqlConstants.FIRM_ID_COLUMN)
-	private String firmId;
-
-	@Column(name = SqlConstants.FIRM_SOURCE_COLUMN)
-	private String firmSource;
+	private long firmId;
 
 	@Column(name = SqlConstants.FIRM_ADDRESS_COLUMN)
 	private String address;

@@ -11,16 +11,10 @@ import java.io.Serializable;
 @Embeddable
 public class EmployeePhoneId implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
-	@Column(name = SqlConstants.FIRM_ID_COLUMN)
-	private String firmId;
-
-	@Column(name = SqlConstants.FIRM_SOURCE_COLUMN)
-	private String firmSource;
-
-	@Column(name = SqlConstants.EMPLOYEE_NAME_COLUMN)
-	private String employeeName;
+	@Column(name = SqlConstants.EMPLOYEE_ID_COLUMN)
+	private long employeeId;
 
 	@Column(name = SqlConstants.EMPLOYEE_PHONE_COLUMN)
 	private String phone;

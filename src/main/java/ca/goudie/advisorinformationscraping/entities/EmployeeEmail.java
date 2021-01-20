@@ -8,7 +8,6 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 
 @Data
@@ -24,20 +23,10 @@ public class EmployeeEmail {
 	private Float score;
 
 	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(
-					name = SqlConstants.FIRM_ID_COLUMN,
-					insertable = false,
-					updatable = false),
-			@JoinColumn(
-					name = SqlConstants.FIRM_SOURCE_COLUMN,
-					insertable = false,
-					updatable = false),
-			@JoinColumn(
-					name = SqlConstants.EMPLOYEE_NAME_COLUMN,
-					insertable = false,
-					updatable = false)
-	})
+	@JoinColumn(
+			name = SqlConstants.EMPLOYEE_ID_COLUMN,
+			insertable = false,
+			updatable = false)
 	private EmployeeEntity employee;
 
 }

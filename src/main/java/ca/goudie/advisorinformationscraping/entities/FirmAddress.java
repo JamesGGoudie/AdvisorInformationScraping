@@ -7,7 +7,6 @@ import lombok.Data;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 
 @Data
@@ -19,17 +18,11 @@ public class FirmAddress {
 	@EmbeddedId
 	private FirmAddressId id;
 
+	@JoinColumn(
+			name = SqlConstants.FIRM_ID_COLUMN,
+			insertable = false,
+			updatable = false)
 	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(
-					name = SqlConstants.FIRM_ID_COLUMN,
-					insertable = false,
-					updatable = false),
-			@JoinColumn(
-					name = SqlConstants.FIRM_SOURCE_COLUMN,
-					insertable = false,
-					updatable = false)
-	})
 	private FirmEntity firm;
 
 }
