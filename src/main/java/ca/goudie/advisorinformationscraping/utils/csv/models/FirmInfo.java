@@ -10,7 +10,7 @@ import lombok.Data;
 public class FirmInfo implements IFirmInfo {
 
 	@CsvBindByPosition(position = 0, required = true)
-	private String id;
+	private String semarchyId;
 	@CsvBindByPosition(position = 1, required = true)
 	private String name;
 	@CsvBindByPosition(position = 2)

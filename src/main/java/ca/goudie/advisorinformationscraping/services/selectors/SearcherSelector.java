@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SearchServiceSelector {
+public class SearcherSelector {
 
 	private static final String GOOGLE_KEY = "G";
 

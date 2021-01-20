@@ -2,7 +2,7 @@ package ca.goudie.advisorinformationscraping.dto;
 
 public interface IFirmInfo {
 
-	String getId();
+	String getSemarchyId();
 	String getName();
 	String getCity();
 	String getRegion();
