@@ -13,6 +13,7 @@ import lombok.ToString;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -55,24 +56,28 @@ public class FirmEntity {
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
 			mappedBy = EmployeeEntity.FIRM_FIELD,
 			orphanRemoval = true)
 	private Collection<EmployeeEntity> employees;
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
 			mappedBy = FirmAddress.FIRM_FIELD,
 			orphanRemoval = true)
 	private Collection<FirmAddress> addresses;
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
 			mappedBy = FirmEmail.FIRM_FIELD,
 			orphanRemoval = true)
 	private Collection<FirmEmail> emails;
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
 			mappedBy = FirmPhone.FIRM_FIELD,
 			orphanRemoval = true)
 	private Collection<FirmPhone> phone;

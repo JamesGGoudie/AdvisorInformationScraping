@@ -13,6 +13,7 @@ import lombok.ToString;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -61,23 +62,26 @@ public class EmployeeEntity {
 			name = SqlConstants.FIRM_ID_COLUMN,
 			insertable = false,
 			updatable = false)
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private FirmEntity firm;
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
 			mappedBy = EmployeeAddress.EMPLOYEE_FIELD,
 			orphanRemoval = true)
 	private Collection<EmployeeAddress> addresses;
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
 			mappedBy = EmployeeEmail.EMPLOYEE_FIELD,
 			orphanRemoval = true)
 	private Collection<EmployeeEmail> emails;
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
 			mappedBy = EmployeePhone.EMPLOYEE_FIELD,
 			orphanRemoval = true)
 	private Collection<EmployeePhone> phone;

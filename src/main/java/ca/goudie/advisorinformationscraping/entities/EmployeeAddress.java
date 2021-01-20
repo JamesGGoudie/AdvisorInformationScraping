@@ -14,6 +14,9 @@ import lombok.ToString;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -26,22 +29,28 @@ import javax.persistence.Table;
 @Setter
 @ToString
 @Entity
+@IdClass(EmployeeAddressId.class)
 @Table(name = SqlConstants.EMPLOYEE_ADDRESS_TABLE)
 public class EmployeeAddress {
 
 	public static final String EMPLOYEE_FIELD = "employee";
 
-	@EmbeddedId
-	private EmployeeAddressId id;
+	@Column(
+			name = SqlConstants.EMPLOYEE_ID_COLUMN,
+			insertable = false,
+			updatable = false)
+	@Id
+	private Long employeeId;
+
+	@Column(name = SqlConstants.EMPLOYEE_ADDRESS_COLUMN)
+	@Id
+	private String address;
 
 	@Column(name = SqlConstants.EMPLOYEE_ADDRESS_SCORE_COLUMN)
 	private Float score;
 
-	@ManyToOne
-	@JoinColumn(
-			name = SqlConstants.EMPLOYEE_ID_COLUMN,
-			insertable = false,
-			updatable = false)
+	@JoinColumn(name = SqlConstants.EMPLOYEE_ID_COLUMN)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private EmployeeEntity employee;
 
 }

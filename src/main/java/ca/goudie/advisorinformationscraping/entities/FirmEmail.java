@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
+import ca.goudie.advisorinformationscraping.entities.ids.FirmAddressId;
 import ca.goudie.advisorinformationscraping.entities.ids.FirmEmailId;
 
 import lombok.AllArgsConstructor;
@@ -14,6 +15,9 @@ import lombok.ToString;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -26,19 +30,25 @@ import javax.persistence.Table;
 @Setter
 @ToString
 @Entity
+@IdClass(FirmEmailId.class)
 @Table(name = SqlConstants.FIRM_EMAIL_TABLE)
 public class FirmEmail {
 
 	public static final String FIRM_FIELD = "firm";
 
-	@EmbeddedId
-	private FirmEmailId id;
-
-	@JoinColumn(
+	@Column(
 			name = SqlConstants.FIRM_ID_COLUMN,
 			insertable = false,
 			updatable = false)
-	@ManyToOne
+	@Id
+	private long firmId;
+
+	@Column(name = SqlConstants.FIRM_EMAIL_COLUMN)
+	@Id
+	private String email;
+
+	@JoinColumn(name = SqlConstants.FIRM_ID_COLUMN)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private FirmEntity firm;
 
 }

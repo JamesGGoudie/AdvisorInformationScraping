@@ -144,30 +144,21 @@ public class RunService {
 		for (final String value : firm.getAddresses()) {
 			firmAddresses.add(
 					FirmAddress.builder()
-							.id(
-									FirmAddressId.builder()
-											.address(value)
-											.build())
+							.address(value)
 							.build());
 		}
 
 		for (final String value : firm.getEmails()) {
 			firmEmails.add(
 					FirmEmail.builder()
-							.id(
-									FirmEmailId.builder()
-											.email(value)
-											.build())
+							.email(value)
 							.build());
 		}
 
 		for (final String value : firm.getPhones()) {
 			firmPhones.add(
 					FirmPhone.builder()
-							.id(
-									FirmPhoneId.builder()
-											.phone(value)
-											.build())
+							.phone(value)
 							.build());
 		}
 
