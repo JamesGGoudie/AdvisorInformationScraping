@@ -2,7 +2,13 @@ package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,22 +23,30 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.util.Collection;
 
-@Data
-@Entity(name = SqlConstants.EMPLOYEE_TABLE)
-@Table(uniqueConstraints = {
-		@UniqueConstraint(columnNames = {
-				SqlConstants.FIRM_ID_COLUMN,
-				SqlConstants.EMPLOYEE_NAME_COLUMN
-		})
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode
+@Getter
+@NoArgsConstructor
+@Setter
+@ToString
+@Entity
+@Table(
+		name = SqlConstants.EMPLOYEE_TABLE,
+		uniqueConstraints = {
+				@UniqueConstraint(columnNames = {
+						SqlConstants.FIRM_ID_COLUMN,
+						SqlConstants.EMPLOYEE_NAME_COLUMN
+				})
 })
 public class EmployeeEntity {
 
 	public static final String FIRM_FIELD = "firm";
 
 	@Column(name = SqlConstants.EMPLOYEE_ID_COLUMN)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
-	private long id;
+	private Long id;
 
 	@Column(name = SqlConstants.EMPLOYEE_NAME_COLUMN)
 	private String name;
