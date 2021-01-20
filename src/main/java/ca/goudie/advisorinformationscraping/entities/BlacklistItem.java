@@ -6,12 +6,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-@Entity(name = "blacklist_item")
 @Data
+@Entity(name = "blacklist_item")
 public class BlacklistItem {
 
-	@Id
 	@Column(name = "host")
+	@Id
 	private String host;
 
 }
