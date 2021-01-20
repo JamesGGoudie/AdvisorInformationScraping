@@ -3,8 +3,10 @@ package ca.goudie.advisorinformationscraping.entities;
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
 import ca.goudie.advisorinformationscraping.entities.ids.EmployeePhoneId;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -15,8 +17,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
 
+@AllArgsConstructor
 @Builder
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name = SqlConstants.EMPLOYEE_PHONE_TABLE)
 public class EmployeePhone {
