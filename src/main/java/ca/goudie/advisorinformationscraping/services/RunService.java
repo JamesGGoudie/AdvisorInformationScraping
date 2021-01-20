@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.services;
 
 import ca.goudie.advisorinformationscraping.dto.Firm;
+import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
 import ca.goudie.advisorinformationscraping.dto.ScrapeResult;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
@@ -10,7 +11,7 @@ import ca.goudie.advisorinformationscraping.services.selectors.ScraperSelector;
 import ca.goudie.advisorinformationscraping.services.selectors.SearchServiceSelector;
 import ca.goudie.advisorinformationscraping.services.selectors.WebDriverSelector;
 import ca.goudie.advisorinformationscraping.utils.AisCountryUtils;
-import ca.goudie.advisorinformationscraping.utils.csv.models.QueryInfo;
+import ca.goudie.advisorinformationscraping.utils.csv.models.FirmInfo;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
@@ -36,9 +37,8 @@ public class RunService {
 	private WebDriverSelector webDriverSelector;
 
 	public Collection<ScrapeResult> run(
-			final Collection<QueryInfo> allQueryInfo
+			final Collection<IFirmInfo> allFirmInfo
 	) {
-
 		final WebDriver webDriver = this.webDriverSelector.selectWebDriver();
 		final ISearcher searcher = this.searchServiceSelector.selectSearcher();
 		final Collection<String> blacklist = this.blacklistService.getBlacklist();
@@ -47,10 +47,11 @@ public class RunService {
 
 		final Collection<ScrapeResult> out = new ArrayList<>();
 
-		for (final QueryInfo queryInfo : allQueryInfo) {
+		for (final IFirmInfo firmInfo : allFirmInfo) {
 			try {
-				out.add(this.processQuery(
-						queryInfo, webDriver, searcher, blacklist, resultsLimit));
+				out.add(
+						this.processQuery(
+								firmInfo, webDriver, searcher, blacklist, resultsLimit));
 			} catch (SearchException e) {
 				continue;
 			}
@@ -60,7 +61,7 @@ public class RunService {
 	}
 
 	private ScrapeResult processQuery(
-			final QueryInfo info,
+			final IFirmInfo info,
 			final WebDriver webDriver,
 			final ISearcher searcher,
 			final Collection<String> blacklist,
@@ -92,8 +93,8 @@ public class RunService {
 		return out;
 	}
 
-	private String buildQuery(final QueryInfo info) {
-		String query = info.getFirmName();
+	private String buildQuery(final IFirmInfo info) {
+		String query = info.getName();
 
 		if (StringUtils.isNotBlank(info.getCity())) {
 			if (StringUtils.isNotBlank(info.getRegion())) {
@@ -108,7 +109,7 @@ public class RunService {
 		return query;
 	}
 
-	private String determineCountryCode(final QueryInfo info) {
+	private String determineCountryCode(final IFirmInfo info) {
 		if (BooleanUtils.isTrue(info.getIsUsa())) {
 			return AisCountryUtils.findUsaCode();
 		}

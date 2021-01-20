@@ -1,8 +1,10 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
+import ca.goudie.advisorinformationscraping.dto.specialized.bloomberg.IBloombergEmployee;
+import ca.goudie.advisorinformationscraping.dto.specialized.bloomberg.IBloombergOrganization;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
-import ca.goudie.advisorinformationscraping.utils.json.bloomberg.BloombergEmployee;
-import ca.goudie.advisorinformationscraping.utils.json.bloomberg.BloombergOrganization;
+import ca.goudie.advisorinformationscraping.utils.json.specialized.bloomberg.BloombergEmployee;
+import ca.goudie.advisorinformationscraping.utils.json.specialized.bloomberg.BloombergOrganization;
 import ca.goudie.advisorinformationscraping.dto.Firm;
 import ca.goudie.advisorinformationscraping.dto.Employee;
 import ca.goudie.advisorinformationscraping.utils.json.AisJsonUtils;
@@ -44,7 +46,7 @@ public class BloombergScraper implements IScraper {
 		driver.get(url);
 
 		this.checkAndCircumventCaptcha(driver, url);
-		BloombergOrganization org = this.extractOrganizationData(driver);
+		IBloombergOrganization org = this.extractOrganizationData(driver);
 
 		return this.buildFirmResult(org);
 	}
@@ -112,7 +114,7 @@ public class BloombergScraper implements IScraper {
 	 * @return
 	 * @throws ScrapeException
 	 */
-	private BloombergOrganization extractOrganizationData(
+	private IBloombergOrganization extractOrganizationData(
 			final WebDriver driver
 	) throws ScrapeException {
 		final List<WebElement> scripts;
@@ -152,7 +154,7 @@ public class BloombergScraper implements IScraper {
 		throw new ScrapeException(BloombergScraper.JSON_NOT_FOUND_MSG);
 	}
 
-	private Firm buildFirmResult(final BloombergOrganization org) {
+	private Firm buildFirmResult(final IBloombergOrganization org) {
 		final Firm firm = new Firm();
 
 		firm.getAddresses().add(this.cleanAddress(org.getAddress()));
@@ -166,11 +168,11 @@ public class BloombergScraper implements IScraper {
 	}
 
 	private Collection<Employee> buildEmployees(
-			final BloombergOrganization org
+			final IBloombergOrganization org
 	) {
 		final Collection<Employee> employees = new ArrayList<>();
 
-		for (final BloombergEmployee bloombergEmployee : org.getEmployees()) {
+		for (final IBloombergEmployee bloombergEmployee : org.getEmployees()) {
 			final Employee employee = new Employee();
 
 			employee.setName(bloombergEmployee.getName());

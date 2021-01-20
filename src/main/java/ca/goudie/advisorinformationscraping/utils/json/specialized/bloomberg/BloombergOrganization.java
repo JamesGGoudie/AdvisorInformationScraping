@@ -1,12 +1,13 @@
-package ca.goudie.advisorinformationscraping.utils.json.bloomberg;
+package ca.goudie.advisorinformationscraping.utils.json.specialized.bloomberg;
 
+import ca.goudie.advisorinformationscraping.dto.specialized.bloomberg.IBloombergOrganization;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Collection;
 
 @Data
-public class BloombergOrganization {
+public class BloombergOrganization implements IBloombergOrganization {
 
 	@JsonProperty("@type")
 	private String type;
@@ -33,6 +34,6 @@ public class BloombergOrganization {
 	private Integer numberOfEmployees;
 
 	@JsonProperty
-	private List<BloombergEmployee> employees;
+	private Collection<BloombergEmployee> employees;
 
 }

@@ -1,9 +1,10 @@
 package ca.goudie.advisorinformationscraping.controllers;
 
+import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
 import ca.goudie.advisorinformationscraping.dto.ScrapeResult;
 import ca.goudie.advisorinformationscraping.services.RunService;
 import ca.goudie.advisorinformationscraping.utils.csv.AisCsvUtils;
-import ca.goudie.advisorinformationscraping.utils.csv.models.QueryInfo;
+import ca.goudie.advisorinformationscraping.utils.csv.models.FirmInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,10 +27,10 @@ public class RunController {
 			@RequestParam("file")
 			final MultipartFile file
 	) throws IOException {
-		final Collection<QueryInfo> allQueryInfo =
+		final Collection<IFirmInfo> allFirmInfo =
 				AisCsvUtils.parseRunRequest(file);
 
-		return this.runService.run(allQueryInfo);
+		return this.runService.run(allFirmInfo);
 	}
 
 }

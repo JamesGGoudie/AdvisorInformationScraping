@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.utils.csv;
 
-import ca.goudie.advisorinformationscraping.utils.csv.models.QueryInfo;
+import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
+import ca.goudie.advisorinformationscraping.utils.csv.models.FirmInfo;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,14 +14,14 @@ import java.util.Collection;
 
 public class AisCsvUtils {
 
-	public static Collection<QueryInfo> parseRunRequest(
+	public static Collection<IFirmInfo> parseRunRequest(
 			final MultipartFile file
 	) throws IOException {
 		final InputStream is = file.getInputStream();
 		final Reader reader = new InputStreamReader(is);
 
-		final CsvToBean<QueryInfo> csvToBean =
-				new CsvToBeanBuilder(reader).withType(QueryInfo.class).build();
+		final CsvToBean<IFirmInfo> csvToBean =
+				new CsvToBeanBuilder(reader).withType(FirmInfo.class).build();
 
 		return csvToBean.parse();
 	}
