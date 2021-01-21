@@ -181,6 +181,9 @@ public class RunService {
 		final String query = this.buildQuery(info);
 		final String countryCode = this.determineCountryCode(info);
 
+		log.info("Built Query: '" + query + "'");
+		log.info("Using Country Code: '" + countryCode + "'");
+
 		final Collection<String> links = searcher.search(webDriver,
 					query,
 					resultsLimit,
