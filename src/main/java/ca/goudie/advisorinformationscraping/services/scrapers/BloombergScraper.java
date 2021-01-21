@@ -13,6 +13,8 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import lombok.extern.log4j.Log4j2;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * https://www.bloomberg.com
  */
+@Log4j2
 @Service
 public class BloombergScraper implements IScraper {
 
@@ -72,6 +75,8 @@ public class BloombergScraper implements IScraper {
 	) throws ScrapeException {
 		// Check the title to see if we were stopped by the captcha.
 		if (driver.getTitle().equals(BloombergScraper.CAPTCHA_TITLE)) {
+			log.info("Bloomberg - Blocked by Captcha");
+
 			// To bypass the captcha, we need a cookie from a pending request.
 			// Wait until we have the cookie or until a enough time has passed.
 			for (int i = 0; i < BloombergScraper.MAX_COOKIE_WAIT_TIME; ++i) {
@@ -100,9 +105,13 @@ public class BloombergScraper implements IScraper {
 			driver.get(url);
 
 			if (driver.getTitle().equals(BloombergScraper.CAPTCHA_TITLE)) {
+				log.info("Bloomberg - Blocked by Captcha Again");
+
 				// Got caught by the Captcha again.
 				throw new ScrapeException("Could not beat Bloomberg Captcha");
 			}
+
+			log.info("Bloomberg - Circumvented Captcha");
 		}
 	}
 
@@ -194,7 +203,7 @@ public class BloombergScraper implements IScraper {
 	 * @return
 	 */
 	private String cleanAddress(final String address) {
-		return address.replace("\n", " - ");
+		return address.replace("\n", " ");
 	}
 
 }

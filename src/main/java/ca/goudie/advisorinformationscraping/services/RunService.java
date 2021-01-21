@@ -79,7 +79,13 @@ public class RunService {
 					this.searcherSelector.selectSearcher(searchEngineKey);
 			final Collection<String> blacklist = this.blacklistService.getBlacklist();
 
+			int i = 0;
+
 			for (final IFirmInfo firmInfo : givenFirmInfo) {
+				++i;
+
+				log.info("Processing Firm " + i + " of " + givenFirmInfo.size());
+
 				try {
 					if (!this.threadService.getIsAllowedToRun()) {
 						throw new RunCancelException(ExceptionMessages.APP_CANCELLED);
@@ -193,7 +199,13 @@ public class RunService {
 
 		final Collection<FirmResult> firms = new ArrayList<>();
 
+		int i = 0;
+
 		for (final String link : links) {
+			++i;
+
+			log.info("Processing Search Result " + i + " of " + resultsLimit);
+
 			try {
 				if (!this.threadService.getIsAllowedToRun()) {
 					throw new RunCancelException(ExceptionMessages.APP_CANCELLED);

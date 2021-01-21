@@ -104,7 +104,7 @@ public class GenericEmailHelper {
 			final String innerEmail = AisRegexUtils.findFirstEmail(innerText);
 
 			if (StringUtils.isNotBlank(innerEmail)) {
-				out.add(innerEmail);
+				out.add(innerEmail.toLowerCase());
 
 				continue;
 			}
@@ -116,7 +116,7 @@ public class GenericEmailHelper {
 			final String hrefEmail = AisRegexUtils.findFirstEmail(hrefText);
 
 			if (StringUtils.isNotBlank(hrefEmail)) {
-				out.add(hrefEmail);
+				out.add(hrefEmail.toLowerCase());
 			}
 		}
 
