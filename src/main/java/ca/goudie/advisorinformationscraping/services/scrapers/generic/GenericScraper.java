@@ -147,9 +147,12 @@ public class GenericScraper implements IScraper {
 			}
 
 			if (this.employeesPageHelper.isAnchorEmployeesPage(anchor)) {
+				log.info("Found Employee Page: " + href);
 				out.add(href);
 			}
 		}
+
+		log.info("Found " + out.size() + " Employee Pages");
 
 		return this.hrefHelper.cleanLinks(out, currentUrl);
 	}

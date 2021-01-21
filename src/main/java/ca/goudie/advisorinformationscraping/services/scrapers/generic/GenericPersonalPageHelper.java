@@ -264,6 +264,8 @@ public class GenericPersonalPageHelper {
 				currentNode = parentNode;
 			} while (!currentNode.getTagName().equalsIgnoreCase("body"));
 
+			log.info("Found Personal Page Block with Email Anchor: " + href);
+
 			return currentNode;
 		}
 

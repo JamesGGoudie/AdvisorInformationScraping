@@ -65,8 +65,8 @@ public class GenericEmployeesPageHelper {
 	) throws RunCancelException {
 		log.info("Scraping Employee Pages");
 
-		final Collection<WebElement> employeeBlocks = new ArrayList<>();
 		final Collection<String> badHrefs = new HashSet<>();
+		final String currentUrl = driver.getCurrentUrl();
 
 		for (final String employeePageLink : employeePageLinks) {
 			if (!this.threadService.getIsAllowedToRun()) {
@@ -74,14 +74,15 @@ public class GenericEmployeesPageHelper {
 			}
 
 			driver.get(employeePageLink);
-			employeeBlocks.addAll(
-					this.findEmployeePageBlocksByAnchors(driver, badHrefs));
-		}
 
-		final String currentUrl = driver.getCurrentUrl();
+			final Collection<WebElement> employeeBlocks =
+					this.findEmployeePageBlocksByAnchors(driver, badHrefs);
 
-		for (final WebElement employeeBlock : employeeBlocks) {
-			this.processEmployeeBlock(employeeBlock, firm, currentUrl, badHrefs);
+			log.info("Found " + employeeBlocks.size() + " Employee Blocks");
+
+			for (final WebElement employeeBlock : employeeBlocks) {
+				this.processEmployeeBlock(employeeBlock, firm, currentUrl, badHrefs);
+			}
 		}
 
 		for (final EmployeeResult employee : firm.getEmployees()) {
@@ -142,6 +143,19 @@ public class GenericEmployeesPageHelper {
 
 				currentNode = parentNode;
 			} while (!currentNode.getTagName().equalsIgnoreCase("body"));
+
+			final String href;
+
+			try {
+				href = anchor.getAttribute("href");
+			} catch (StaleElementReferenceException e) {
+				// Couldn't find anchor; try the next
+				log.error(e);
+
+				continue;
+			}
+
+			log.info("Found Employee Page Block with Anchor: " + href);
 
 			employeeBlocks.add(currentNode);
 		}
@@ -283,6 +297,8 @@ public class GenericEmployeesPageHelper {
 
 				continue;
 			}
+
+			log.info("Found Personal Page: " + href);
 
 			final String cleanHref =
 					this.hrefHelper.cleanLink(href, currentUrl);
