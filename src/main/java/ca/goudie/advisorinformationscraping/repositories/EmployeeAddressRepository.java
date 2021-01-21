@@ -6,8 +6,4 @@ import ca.goudie.advisorinformationscraping.entities.ids.EmployeeAddressId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EmployeeAddressRepository
-		extends JpaRepository<EmployeeAddress, EmployeeAddressId> {
-
-	void deleteByIdEmployeeId(Long employeeId);
-
-}
+		extends JpaRepository<EmployeeAddress, EmployeeAddressId> {}
