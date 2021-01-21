@@ -123,6 +123,19 @@ public class GenericPersonalPageHelper {
 			return false;
 		}
 
+		try {
+			if (this.emailHelper.isEmailAnchor(anchor) ||
+					this.phoneHelper.isPhoneAnchor(anchor)) {
+				badHrefs.add(href);
+
+				return false;
+			}
+		} catch (DomReadException e) {
+			log.error(e);
+
+			return false;
+		}
+
 		final String path;
 
 		try {
