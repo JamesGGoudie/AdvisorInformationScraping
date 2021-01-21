@@ -18,8 +18,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 @AllArgsConstructor
 @Data
@@ -67,21 +67,21 @@ public class EmployeeEntity {
 			fetch = FetchType.LAZY,
 			mappedBy = EmployeeAddress.EMPLOYEE_FIELD,
 			orphanRemoval = true)
-	private final Collection<EmployeeAddress> addresses = new ArrayList<>();
+	private final Collection<EmployeeAddress> addresses = new HashSet<>();
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY,
 			mappedBy = EmployeeEmail.EMPLOYEE_FIELD,
 			orphanRemoval = true)
-	private final Collection<EmployeeEmail> emails = new ArrayList<>();
+	private final Collection<EmployeeEmail> emails = new HashSet<>();
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY,
 			mappedBy = EmployeePhone.EMPLOYEE_FIELD,
 			orphanRemoval = true)
-	private final Collection<EmployeePhone> phones = new ArrayList<>();
+	private final Collection<EmployeePhone> phones = new HashSet<>();
 
 	public void addAddresses(final Collection<EmployeeAddress> addresses) {
 		this.addresses.addAll(addresses);

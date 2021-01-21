@@ -16,8 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 @AllArgsConstructor
 @Data
@@ -56,28 +56,28 @@ public class FirmEntity {
 			fetch = FetchType.LAZY,
 			mappedBy = EmployeeEntity.FIRM_FIELD,
 			orphanRemoval = true)
-	private final Collection<EmployeeEntity> employees = new ArrayList<>();
+	private final Collection<EmployeeEntity> employees = new HashSet<>();
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY,
 			mappedBy = FirmAddress.FIRM_FIELD,
 			orphanRemoval = true)
-	private final Collection<FirmAddress> addresses = new ArrayList<>();
+	private final Collection<FirmAddress> addresses = new HashSet<>();
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY,
 			mappedBy = FirmEmail.FIRM_FIELD,
 			orphanRemoval = true)
-	private final Collection<FirmEmail> emails = new ArrayList<>();
+	private final Collection<FirmEmail> emails = new HashSet<>();
 
 	@OneToMany(
 			cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY,
 			mappedBy = FirmPhone.FIRM_FIELD,
 			orphanRemoval = true)
-	private final Collection<FirmPhone> phones = new ArrayList<>();
+	private final Collection<FirmPhone> phones = new HashSet<>();
 
 	public void addAddresses(final Collection<FirmAddress> addresses) {
 		this.addresses.addAll(addresses);

@@ -16,13 +16,19 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
 
+import lombok.extern.log4j.Log4j2;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Future;
 
+@Log4j2
 @Service
 @Transactional
 public class RunService {
@@ -42,18 +48,35 @@ public class RunService {
 	@Autowired
 	private WebDriverSelector webDriverSelector;
 
-	public Collection<ScrapeResult> run(
+	public void run(
 			final Collection<IFirmInfo> allFirmInfo
 	) {
 		final WebDriver webDriver = this.webDriverSelector.selectWebDriver();
 		final ISearcher searcher = this.searcherSelector.selectSearcher();
 		final Collection<String> blacklist = this.blacklistService.getBlacklist();
 
-		final int resultsLimit = 1;
+		final int resultsLimit = 5;
 
 		final Collection<ScrapeResult> out = new ArrayList<>();
 
 		for (final IFirmInfo firmInfo : allFirmInfo) {
+			if (Thread.currentThread().isInterrupted()) {
+				log.info("====================");
+				log.info("====================");
+				log.info("====================");
+				log.info("====================");
+				log.info("Thread Interrupted - B");
+				log.info("====================");
+				log.info("====================");
+				log.info("====================");
+				log.info("====================");
+				break;
+			} else {
+				log.info("====================");
+				log.info(firmInfo.getName());
+				log.info("====================");
+			}
+
 			try {
 				out.add(
 						this.processQuery(
@@ -63,7 +86,7 @@ public class RunService {
 			}
 		}
 
-		return out;
+		// return new AsyncResult<>(null);
 	}
 
 	private ScrapeResult processQuery(
@@ -81,20 +104,69 @@ public class RunService {
 					resultsLimit,
 					blacklist);
 
+
+		log.info("====================");
+		log.info("====================");
+		log.info("====================");
+		log.info("====================");
+		log.info(links.size());
+		log.info("====================");
+		log.info("====================");
+		log.info("====================");
+		log.info("====================");
+
 		final Collection<FirmResult> firms = new ArrayList<>();
 
+		int i = 0;
+
 		for (final String link : links) {
+			log.info("--------------------");
+			log.info(link);
+			log.info("--------------------");
+
+			System.out.println("A - " + i);
+			if (Thread.currentThread().isInterrupted()) {
+				log.info("====================");
+				log.info("====================");
+				log.info("====================");
+				log.info("====================");
+				log.info("Thread Interrupted - A");
+				log.info("====================");
+				log.info("====================");
+				log.info("====================");
+				log.info("====================");
+				break;
+			} else {
+				log.info("====================");
+				log.info(link);
+				log.info("====================");
+			}
+
+			System.out.println("B - " + i);
+
 			final IScraper scraper = this.scraperSelector.selectScraper(link);
 			final FirmResult firm;
 
+			System.out.println("C - " + i);
+
 			try {
 				firm = scraper.scrapeWebsite(webDriver, link, countryCode);
+				System.out.println("D.1 - " + i);
+
 			} catch (ScrapeException e) {
+				System.out.println("D.2 - " + i);
+
 				continue;
 			}
 
+			System.out.println("E - " + i);
+
 			firms.add(firm);
 			this.storageService.storeFirmResult(firm, info.getSemarchyId());
+
+			System.out.println("F - " + i);
+
+			++i;
 		}
 
 		final ScrapeResult out = new ScrapeResult();

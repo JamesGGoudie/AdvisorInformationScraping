@@ -68,59 +68,45 @@ public class StorageService {
 	private FirmEntity buildFirmEntity(
 			final FirmResult firm,
 			final String semarchyId) {
+		final FirmEntity firmEntity = new FirmEntity();
+
 		// Check if the DB already has an entry for this firm-source combo.
 		final Optional<Long> internalFirmIdOpt =
 				this.firmRepo.findIdBySemarchyIdAndFirmSource(
 						semarchyId, firm.getSource());
 		final Long internalFirmId;
 
-		// If the firm is already present...
 		if (internalFirmIdOpt.isPresent()) {
 			internalFirmId = internalFirmIdOpt.get();
 			// Set all of the employees to out-of-date
 			this.employeeRepo.updateIsCurrent(internalFirmId);
-
-			// Delete all of the firm data.
-			this.firmAddressRepository.deleteByIdFirmId(internalFirmId);
-			this.firmEmailRepository.deleteByIdFirmId(internalFirmId);
-			this.firmPhoneRepository.deleteByIdFirmId(internalFirmId);
 		} else {
 			internalFirmId = null;
 		}
+
+		firmEntity.setId(internalFirmId);
 
 		final Collection<FirmAddress> firmAddresses = new ArrayList<>();
 		final Collection<FirmEmail> firmEmails = new ArrayList<>();
 		final Collection<FirmPhone> firmPhones = new ArrayList<>();
 		final Collection<EmployeeEntity> employees = new ArrayList<>();
 
-		for (final String value : firm.getAddresses()) {
-			firmAddresses.add(
-					FirmAddress.builder()
-							.id(FirmAddressId.builder().address(value).build())
-							.build());
+		for (final String address : firm.getAddresses()) {
+			firmAddresses.add(this.buildFirmAddress(address, internalFirmId));
 		}
 
-		for (final String value : firm.getEmails()) {
-			firmEmails.add(
-					FirmEmail.builder()
-							.id(FirmEmailId.builder().email(value).build())
-							.build());
+		for (final String email : firm.getEmails()) {
+			firmEmails.add(this.buildFirmEmail(email, internalFirmId));
 		}
 
-		for (final String value : firm.getPhones()) {
-			firmPhones.add(
-					FirmPhone.builder()
-							.id(FirmPhoneId.builder().phone(value).build())
-							.build());
+		for (final String phone : firm.getPhones()) {
+			firmPhones.add(this.buildFirmPhone(phone, internalFirmId));
 		}
 
 		for (final EmployeeResult employee : firm.getEmployees()) {
 			employees.add(this.buildEmployeeEntity(employee, internalFirmId));
 		}
 
-		final FirmEntity firmEntity = new FirmEntity();
-		// Will be null if firm doesn't already exist.
-		firmEntity.setId(internalFirmId);
 		firmEntity.setSemarchyId(semarchyId);
 		firmEntity.setFirmSource(firm.getSource());
 		firmEntity.setUrl(firm.getFirmUrl());
@@ -133,11 +119,78 @@ public class StorageService {
 		return firmEntity;
 	}
 
+	private FirmAddress buildFirmAddress(
+			final String address,
+			final Long internalFirmId
+	) {
+		if (internalFirmId == null) {
+			return FirmAddress.builder()
+					.id(FirmAddressId.builder()
+							.address(address)
+							.build())
+					.build();
+		}
+
+		final FirmAddressId id = FirmAddressId.builder()
+				.firmId(internalFirmId)
+				.address(address)
+				.build();
+		final Optional<FirmAddress> opt = this.firmAddressRepository.findById(id);
+
+		return opt.orElseGet(() -> FirmAddress.builder().id(id).build());
+
+	}
+
+	private FirmEmail buildFirmEmail(
+			final String email,
+			final Long internalFirmId
+	) {
+		if (internalFirmId == null) {
+			return FirmEmail.builder()
+					.id(FirmEmailId.builder()
+							.email(email)
+							.build())
+					.build();
+		}
+
+		final FirmEmailId id = FirmEmailId.builder()
+				.firmId(internalFirmId)
+				.email(email)
+				.build();
+		final Optional<FirmEmail> opt = this.firmEmailRepository.findById(id);
+
+		return opt.orElseGet(() -> FirmEmail.builder().id(id).build());
+
+	}
+
+	private FirmPhone buildFirmPhone(
+			final String phone,
+			final Long internalFirmId
+	) {
+		if (internalFirmId == null) {
+			return FirmPhone.builder()
+					.id(FirmPhoneId.builder()
+							.phone(phone)
+							.build())
+					.build();
+		}
+
+		final FirmPhoneId id = FirmPhoneId.builder()
+				.firmId(internalFirmId)
+				.phone(phone)
+				.build();
+		final Optional<FirmPhone> opt = this.firmPhoneRepository.findById(id);
+
+		return opt.orElseGet(() -> FirmPhone.builder().id(id).build());
+
+	}
+
 	private EmployeeEntity buildEmployeeEntity(
 			final EmployeeResult employee,
 			final Long internalFirmId
 	) {
-		final EmployeeEntity employeeEntity = new EmployeeEntity();
+		final EmployeeEntity employeeEntity;
+		final Long internalEmployeeId;
 
 		// If the firm already exists...
 		if (internalFirmId != null) {
@@ -148,44 +201,43 @@ public class StorageService {
 
 			// If it does...
 			if (internalEmployeeIdOpt.isPresent()) {
-				final Long internalEmployeeId = internalEmployeeIdOpt.get();
-
-				// Set the ID of the employee so we don't make a new entry.
-				employeeEntity.setId(internalEmployeeId);
-
-				// Delete the employee's data.
-				this.employeeAddressRepository.deleteByIdEmployeeId(internalEmployeeId);
-				this.employeeEmailRepository.deleteByIdEmployeeId(internalEmployeeId);
-				this.employeePhoneRepository.deleteByIdEmployeeId(internalEmployeeId);
+				internalEmployeeId = internalEmployeeIdOpt.get();
+				employeeEntity = this.employeeRepo.findById(internalEmployeeId).get();
+			} else {
+				internalEmployeeId = null;
+				employeeEntity = new EmployeeEntity();
 			}
+		} else {
+			internalEmployeeId = null;
+			employeeEntity = new EmployeeEntity();
 		}
 
 		final Collection<EmployeeAddress> addresses = new ArrayList<>();
 		final Collection<EmployeeEmail> emails = new ArrayList<>();
 		final Collection<EmployeePhone> phones = new ArrayList<>();
 
-		for (final String key : employee.getAddresses().keySet()) {
+		for (final String address : employee.getAddresses().keySet()) {
 			addresses.add(
-					EmployeeAddress.builder()
-							.id(EmployeeAddressId.builder().address(key).build())
-							.score(employee.getAddresses().get(key))
-							.build());
+					this.buildEmployeeAddress(
+							address,
+							internalEmployeeId,
+							employee.getAddresses().get(address)));
 		}
 
-		for (final String key : employee.getEmails().keySet()) {
+		for (final String email : employee.getEmails().keySet()) {
 			emails.add(
-					EmployeeEmail.builder()
-							.id(EmployeeEmailId.builder().email(key).build())
-							.score(employee.getEmails().get(key))
-							.build());
+					this.buildEmployeeEmail(
+							email,
+							internalEmployeeId,
+							employee.getAddresses().get(email)));
 		}
 
-		for (final String key : employee.getPhones().keySet()) {
+		for (final String phone : employee.getPhones().keySet()) {
 			phones.add(
-					EmployeePhone.builder()
-							.id(EmployeePhoneId.builder().phone(key).build())
-							.score(employee.getPhones().get(key))
-							.build());
+					this.buildEmployeePhone(
+							phone,
+							internalEmployeeId,
+							employee.getAddresses().get(phone)));
 		}
 
 		employeeEntity.setIsCurrent(true);
@@ -198,6 +250,84 @@ public class StorageService {
 		employeeEntity.addPhones(phones);
 
 		return employeeEntity;
+	}
+
+	private EmployeeAddress buildEmployeeAddress(
+			final String address,
+			final Long internalEmployeeId,
+			final Float score
+	) {
+		if (internalEmployeeId == null) {
+			return EmployeeAddress.builder()
+					.id(EmployeeAddressId.builder()
+							.address(address)
+							.build())
+					.build();
+		}
+
+		final EmployeeAddressId id = EmployeeAddressId.builder()
+				.employeeId(internalEmployeeId)
+				.address(address)
+				.build();
+		final Optional<EmployeeAddress> opt =
+				this.employeeAddressRepository.findById(id);
+
+		return opt.orElseGet(() -> EmployeeAddress.builder()
+				.id(id)
+				.score(score)
+				.build());
+	}
+
+	private EmployeeEmail buildEmployeeEmail(
+			final String email,
+			final Long internalEmployeeId,
+			final Float score
+	) {
+		if (internalEmployeeId == null) {
+			return EmployeeEmail.builder()
+					.id(EmployeeEmailId.builder()
+							.email(email)
+							.build())
+					.build();
+		}
+
+		final EmployeeEmailId id = EmployeeEmailId.builder()
+				.employeeId(internalEmployeeId)
+				.email(email)
+				.build();
+		final Optional<EmployeeEmail> opt =
+				this.employeeEmailRepository.findById(id);
+
+		return opt.orElseGet(() -> EmployeeEmail.builder()
+				.id(id)
+				.score(score)
+				.build());
+	}
+
+	private EmployeePhone buildEmployeePhone(
+			final String phone,
+			final Long internalEmployeeId,
+			final Float score
+	) {
+		if (internalEmployeeId == null) {
+			return EmployeePhone.builder()
+					.id(EmployeePhoneId.builder()
+							.phone(phone)
+							.build())
+					.build();
+		}
+
+		final EmployeePhoneId id = EmployeePhoneId.builder()
+				.employeeId(internalEmployeeId)
+				.phone(phone)
+				.build();
+		final Optional<EmployeePhone> opt =
+				this.employeePhoneRepository.findById(id);
+
+		return opt.orElseGet(() -> EmployeePhone.builder()
+				.id(id)
+				.score(score)
+				.build());
 	}
 
 }

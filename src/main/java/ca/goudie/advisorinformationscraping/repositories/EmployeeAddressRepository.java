@@ -1,12 +1,12 @@
 package ca.goudie.advisorinformationscraping.repositories;
 
-import ca.goudie.advisorinformationscraping.entities.EmployeePhone;
-import ca.goudie.advisorinformationscraping.entities.ids.EmployeePhoneId;
+import ca.goudie.advisorinformationscraping.entities.EmployeeAddress;
+import ca.goudie.advisorinformationscraping.entities.ids.EmployeeAddressId;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EmployeeAddressRepository
-		extends JpaRepository<EmployeePhone, EmployeePhoneId> {
+		extends JpaRepository<EmployeeAddress, EmployeeAddressId> {
 
 	void deleteByIdEmployeeId(Long employeeId);
 
