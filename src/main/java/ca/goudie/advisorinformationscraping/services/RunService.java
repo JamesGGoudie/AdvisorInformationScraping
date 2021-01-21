@@ -1,7 +1,6 @@
 package ca.goudie.advisorinformationscraping.services;
 
 import ca.goudie.advisorinformationscraping.constants.ExceptionMessages;
-import ca.goudie.advisorinformationscraping.controllers.RunController;
 import ca.goudie.advisorinformationscraping.dto.FirmResult;
 import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
 import ca.goudie.advisorinformationscraping.dto.ScrapeResult;
@@ -24,14 +23,11 @@ import lombok.extern.log4j.Log4j2;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 @Log4j2
@@ -59,19 +55,20 @@ public class RunService {
 
 	@Async
 	public void run(
-			final Collection<IFirmInfo> allFirmInfo
+			final Collection<IFirmInfo> allFirmInfo,
+			Integer resultsLimit,
+			String webBrowserKey,
+			String searchEngineKey
 	) throws RunFailureException {
 		this.prepareThreadManager();
 
 		WebDriver webDriver = null;
 
 		try {
-			webDriver = this.webDriverSelector.selectWebDriver();
-
-			final ISearcher searcher = this.searcherSelector.selectSearcher();
+			webDriver = this.webDriverSelector.selectWebDriver(webBrowserKey);
+			final ISearcher searcher =
+					this.searcherSelector.selectSearcher(searchEngineKey);
 			final Collection<String> blacklist = this.blacklistService.getBlacklist();
-
-			final int resultsLimit = 5;
 
 			final Collection<ScrapeResult> out = new ArrayList<>();
 
