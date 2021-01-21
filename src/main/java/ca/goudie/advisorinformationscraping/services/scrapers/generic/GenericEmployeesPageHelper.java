@@ -1,9 +1,12 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
+import ca.goudie.advisorinformationscraping.constants.ExceptionMessages;
 import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
 import ca.goudie.advisorinformationscraping.dto.FirmResult;
 import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
+import ca.goudie.advisorinformationscraping.exceptions.RunCancelException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
+import ca.goudie.advisorinformationscraping.services.ThreadService;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 
@@ -42,6 +45,9 @@ public class GenericEmployeesPageHelper {
 	@Autowired
 	private GenericTitleHelper titleHelper;
 
+	@Autowired
+	private ThreadService threadService;
+
 	/**
 	 * Searches for and scrapes employee pages.
 	 *
@@ -55,12 +61,16 @@ public class GenericEmployeesPageHelper {
 			final FirmResult firm,
 			final Collection<String> employeePageLinks,
 			final String countryCode
-	) {
+	) throws RunCancelException {
 		log.info("Scraping Employee Pages");
 
 		final Collection<WebElement> employeeBlocks = new ArrayList<>();
 
 		for (final String employeePageLink : employeePageLinks) {
+			if (!this.threadService.getIsAllowedToRun()) {
+				throw new RunCancelException(ExceptionMessages.APP_CANCELLED);
+			}
+
 			driver.get(employeePageLink);
 			employeeBlocks.addAll(this.findEmployeePageBlocksByAnchors(driver));
 		}
@@ -72,6 +82,10 @@ public class GenericEmployeesPageHelper {
 		}
 
 		for (final EmployeeResult employee : firm.getEmployees()) {
+			if (!this.threadService.getIsAllowedToRun()) {
+				throw new RunCancelException(ExceptionMessages.APP_CANCELLED);
+			}
+
 			this.personalPageHelper.scrapePersonalPage(
 					driver, firm, employee, countryCode);
 		}

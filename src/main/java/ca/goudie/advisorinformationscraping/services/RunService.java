@@ -1,8 +1,12 @@
 package ca.goudie.advisorinformationscraping.services;
 
+import ca.goudie.advisorinformationscraping.constants.ExceptionMessages;
+import ca.goudie.advisorinformationscraping.controllers.RunController;
 import ca.goudie.advisorinformationscraping.dto.FirmResult;
 import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
 import ca.goudie.advisorinformationscraping.dto.ScrapeResult;
+import ca.goudie.advisorinformationscraping.exceptions.RunCancelException;
+import ca.goudie.advisorinformationscraping.exceptions.RunFailureException;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
 import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
@@ -26,7 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @Log4j2
 @Service
@@ -48,45 +54,103 @@ public class RunService {
 	@Autowired
 	private WebDriverSelector webDriverSelector;
 
+	@Autowired
+	private ThreadService threadService;
+
+	@Async
 	public void run(
 			final Collection<IFirmInfo> allFirmInfo
-	) {
-		final WebDriver webDriver = this.webDriverSelector.selectWebDriver();
-		final ISearcher searcher = this.searcherSelector.selectSearcher();
-		final Collection<String> blacklist = this.blacklistService.getBlacklist();
+	) throws RunFailureException {
+		this.prepareThreadManager();
 
-		final int resultsLimit = 5;
+		WebDriver webDriver = null;
 
-		final Collection<ScrapeResult> out = new ArrayList<>();
+		try {
+			webDriver = this.webDriverSelector.selectWebDriver();
 
-		for (final IFirmInfo firmInfo : allFirmInfo) {
-			if (Thread.currentThread().isInterrupted()) {
-				log.info("====================");
-				log.info("====================");
-				log.info("====================");
-				log.info("====================");
-				log.info("Thread Interrupted - B");
-				log.info("====================");
-				log.info("====================");
-				log.info("====================");
-				log.info("====================");
-				break;
-			} else {
-				log.info("====================");
-				log.info(firmInfo.getName());
-				log.info("====================");
+			final ISearcher searcher = this.searcherSelector.selectSearcher();
+			final Collection<String> blacklist = this.blacklistService.getBlacklist();
+
+			final int resultsLimit = 5;
+
+			final Collection<ScrapeResult> out = new ArrayList<>();
+
+			for (final IFirmInfo firmInfo : allFirmInfo) {
+				try {
+					if (!this.threadService.getIsAllowedToRun()) {
+						throw new RunCancelException(ExceptionMessages.APP_CANCELLED);
+					}
+
+					try {
+						out.add(this.processQuery(firmInfo,
+								webDriver,
+								searcher,
+								blacklist,
+								resultsLimit));
+					} catch (SearchException e) {
+						continue;
+					}
+				} catch (RunCancelException e) {
+					throw e;
+				} catch (Exception e) {
+					// Unknown exception
+					log.error(e);
+
+					continue;
+				}
+			}
+		} catch (RunCancelException e) {
+			log.info("Run Stopped");
+		} catch (Exception e) {
+			// Unknown Exception
+			log.error(e);
+		} finally {
+			this.threadService.setIsRunning(false);
+			this.threadService.setIsAllowedToRun(true);
+
+			if (webDriver != null) {
+				webDriver.quit();
+			}
+		}
+	}
+
+	public void cancel() {
+		if (this.threadService.getIsRunning()) {
+			this.threadService.setIsAllowedToRun(false);
+		}
+	}
+
+	public boolean isRunning() {
+		return this.threadService.getIsRunning();
+	}
+
+	private void prepareThreadManager() throws RunFailureException {
+		if (this.isRunning()) {
+			log.info("Application is Running; Shutting Down Old Run");
+			this.cancel();
+		}
+
+		int i = 0;
+
+		while (this.isRunning()) {
+			try {
+				TimeUnit.SECONDS.sleep(1);
+			} catch (InterruptedException e) {
+				log.error(e);
+			} finally {
+				++i;
 			}
 
-			try {
-				out.add(
-						this.processQuery(
-								firmInfo, webDriver, searcher, blacklist, resultsLimit));
-			} catch (SearchException e) {
-				continue;
+			if (this.isRunning()) {
+				log.info("Waiting for Shutdown: " + i);
+			}
+
+			if (i >= 30) {
+				throw new RunFailureException("Shutdown Took too Long");
 			}
 		}
 
-		// return new AsyncResult<>(null);
+		this.threadService.setIsRunning(true);
 	}
 
 	private ScrapeResult processQuery(
@@ -95,7 +159,7 @@ public class RunService {
 			final ISearcher searcher,
 			final Collection<String> blacklist,
 			final int resultsLimit
-	) throws SearchException {
+	) throws SearchException, RunCancelException {
 		final String query = this.buildQuery(info);
 		final String countryCode = this.determineCountryCode(info);
 
@@ -104,69 +168,33 @@ public class RunService {
 					resultsLimit,
 					blacklist);
 
-
-		log.info("====================");
-		log.info("====================");
-		log.info("====================");
-		log.info("====================");
-		log.info(links.size());
-		log.info("====================");
-		log.info("====================");
-		log.info("====================");
-		log.info("====================");
-
 		final Collection<FirmResult> firms = new ArrayList<>();
 
-		int i = 0;
-
 		for (final String link : links) {
-			log.info("--------------------");
-			log.info(link);
-			log.info("--------------------");
-
-			System.out.println("A - " + i);
-			if (Thread.currentThread().isInterrupted()) {
-				log.info("====================");
-				log.info("====================");
-				log.info("====================");
-				log.info("====================");
-				log.info("Thread Interrupted - A");
-				log.info("====================");
-				log.info("====================");
-				log.info("====================");
-				log.info("====================");
-				break;
-			} else {
-				log.info("====================");
-				log.info(link);
-				log.info("====================");
-			}
-
-			System.out.println("B - " + i);
-
-			final IScraper scraper = this.scraperSelector.selectScraper(link);
-			final FirmResult firm;
-
-			System.out.println("C - " + i);
-
 			try {
-				firm = scraper.scrapeWebsite(webDriver, link, countryCode);
-				System.out.println("D.1 - " + i);
+				if (!this.threadService.getIsAllowedToRun()) {
+					throw new RunCancelException(ExceptionMessages.APP_CANCELLED);
+				}
 
-			} catch (ScrapeException e) {
-				System.out.println("D.2 - " + i);
+				final IScraper scraper = this.scraperSelector.selectScraper(link);
+				final FirmResult firm;
+
+				try {
+					firm = scraper.scrapeWebsite(webDriver, link, countryCode);
+				} catch (ScrapeException e) {
+					continue;
+				}
+
+				firms.add(firm);
+				this.storageService.storeFirmResult(firm, info.getSemarchyId());
+			} catch (RunCancelException e) {
+				throw e;
+			}	catch (Exception e) {
+				// Unknown exception
+				log.error(e);
 
 				continue;
 			}
-
-			System.out.println("E - " + i);
-
-			firms.add(firm);
-			this.storageService.storeFirmResult(firm, info.getSemarchyId());
-
-			System.out.println("F - " + i);
-
-			++i;
 		}
 
 		final ScrapeResult out = new ScrapeResult();

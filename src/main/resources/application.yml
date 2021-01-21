@@ -6,10 +6,10 @@ spring:
 
   jpa:
     generate-ddl: true
-    show-sql: true
+    show-sql: false
 
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
 
 selenium:
   chrome-driver-location: C:/Program Files (x86)/Selenium/chromedriver.exe

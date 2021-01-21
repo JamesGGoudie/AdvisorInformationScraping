@@ -1,7 +1,9 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
 import ca.goudie.advisorinformationscraping.dto.FirmResult;
+import ca.goudie.advisorinformationscraping.exceptions.RunCancelException;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
+import ca.goudie.advisorinformationscraping.services.ThreadService;
 import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
 
 import org.openqa.selenium.By;
@@ -41,11 +43,14 @@ public class GenericScraper implements IScraper {
 	@Autowired
 	private GenericSourceHelper sourceHelper;
 
+	@Autowired
+	private ThreadService threadService;
+
 	public FirmResult scrapeWebsite(
 			final WebDriver driver,
 			final String url,
 			final String countryCode
-	) throws ScrapeException {
+	) throws ScrapeException, RunCancelException {
 		log.info("Beginning Generic Scrape of: " + url);
 
 		final FirmResult firm = this.scrapeLandingPage(driver, url, countryCode);
@@ -95,7 +100,7 @@ public class GenericScraper implements IScraper {
 			final WebDriver driver,
 			final FirmResult firm,
 			final String countryCode
-	) {
+	) throws RunCancelException {
 		final Collection<String> employeePageLinks =
 				this.findEmployeePageLinks(driver, driver.getCurrentUrl());
 		this.employeesPageHelper.scrapeEmployeePages(

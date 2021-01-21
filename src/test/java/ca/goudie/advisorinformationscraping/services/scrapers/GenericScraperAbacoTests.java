@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.dto.FirmResult;
+import ca.goudie.advisorinformationscraping.exceptions.RunCancelException;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
 
@@ -26,7 +27,7 @@ public class GenericScraperAbacoTests {
 	private WebDriver chromeWebDriver;
 
 	@Test
-	public void shouldScrapeAbaco() throws ScrapeException {
+	public void shouldScrapeAbaco() throws ScrapeException, RunCancelException {
 		final String landingPageUrl = "http://www.abacoam.com/";
 		final String countryCode = "GB";
 

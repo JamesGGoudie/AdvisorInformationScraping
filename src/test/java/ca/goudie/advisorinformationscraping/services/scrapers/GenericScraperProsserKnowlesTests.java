@@ -2,6 +2,7 @@ package ca.goudie.advisorinformationscraping.services.scrapers;
 
 import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
 import ca.goudie.advisorinformationscraping.dto.FirmResult;
+import ca.goudie.advisorinformationscraping.exceptions.RunCancelException;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
 
@@ -27,7 +28,8 @@ public class GenericScraperProsserKnowlesTests {
 	private WebDriver chromeWebDriver;
 
 	@Test
-	public void shouldScrapeProsserKnowles() throws ScrapeException {
+	public void shouldScrapeProsserKnowles()
+			throws ScrapeException, RunCancelException {
 		final String landingPageUrl = "https://www.prosserknowles.co.uk/";
 		final String countryCode = "GB";
 
