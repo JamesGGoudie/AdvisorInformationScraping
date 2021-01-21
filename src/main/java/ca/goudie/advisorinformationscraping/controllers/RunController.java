@@ -10,7 +10,6 @@ import ca.goudie.advisorinformationscraping.utils.csv.AisCsvUtils;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,23 +54,24 @@ public class RunController {
 		log.info("Chosen Web Browser: " + webBrowserKey);
 		log.info("Chosen Search Engine: " + searchEngineKey);
 
-		this.runService.run(
+		this.runService.prepareThreadManager();
+		this.runService.runThread(
 				allFirmInfo,
 				resultsLimit,
 				webBrowserKey,
 				searchEngineKey);
 	}
 
-	@GetMapping
+	@GetMapping("/active")
 	public Boolean checkIfAppIsRunning() {
 		log.info("REQ: Checking if App is Running");
 		return this.runService.isRunning();
 	}
 
-	@DeleteMapping
-	public void cancelRunningApp() {
-		log.info("REQ: Stopping App if Running");
-		this.runService.cancel();
+	@PostMapping("/reset")
+	public void resetApp() {
+		log.info("REQ: Stop if Running or Reset if Stopped");
+		this.runService.reset();
 	}
 
 }

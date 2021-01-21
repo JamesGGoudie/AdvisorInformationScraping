@@ -53,15 +53,24 @@ public class RunService {
 	@Autowired
 	private ThreadService threadService;
 
+	/**
+	 * Searches the internet and scrapes websites for information about the given
+	 * firms.
+	 *
+	 * This method uses async and can be split into separate threads.
+	 *
+	 * @param givenFirmInfo
+	 * @param resultsLimit
+	 * @param webBrowserKey
+	 * @param searchEngineKey
+	 */
 	@Async
-	public void run(
-			final Collection<IFirmInfo> allFirmInfo,
-			Integer resultsLimit,
-			String webBrowserKey,
-			String searchEngineKey
-	) throws RunFailureException {
-		this.prepareThreadManager();
-
+	public void runThread(
+			final Collection<IFirmInfo> givenFirmInfo,
+			final Integer resultsLimit,
+			final String webBrowserKey,
+			final String searchEngineKey
+	) {
 		WebDriver webDriver = null;
 
 		try {
@@ -70,30 +79,26 @@ public class RunService {
 					this.searcherSelector.selectSearcher(searchEngineKey);
 			final Collection<String> blacklist = this.blacklistService.getBlacklist();
 
-			final Collection<ScrapeResult> out = new ArrayList<>();
-
-			for (final IFirmInfo firmInfo : allFirmInfo) {
+			for (final IFirmInfo firmInfo : givenFirmInfo) {
 				try {
 					if (!this.threadService.getIsAllowedToRun()) {
 						throw new RunCancelException(ExceptionMessages.APP_CANCELLED);
 					}
 
 					try {
-						out.add(this.processQuery(firmInfo,
+						this.processQuery(firmInfo,
 								webDriver,
 								searcher,
 								blacklist,
-								resultsLimit));
+								resultsLimit);
 					} catch (SearchException e) {
-						continue;
+						log.error(e);
 					}
 				} catch (RunCancelException e) {
 					throw e;
 				} catch (Exception e) {
 					// Unknown exception
 					log.error(e);
-
-					continue;
 				}
 			}
 		} catch (RunCancelException e) {
@@ -108,23 +113,44 @@ public class RunService {
 			if (webDriver != null) {
 				webDriver.quit();
 			}
+
+			log.info("App Finished");
 		}
 	}
 
-	public void cancel() {
-		if (this.threadService.getIsRunning()) {
-			this.threadService.setIsAllowedToRun(false);
-		}
+	/**
+	 * If the app is currently running, then this method will shut it down.
+	 *
+	 * If the app is currently stopped, then this method will ensure that the app
+	 * is able to run again.
+	 *
+	 */
+	public void reset() {
+		this.threadService.setIsAllowedToRun(!this.threadService.getIsRunning());
 	}
 
 	public boolean isRunning() {
 		return this.threadService.getIsRunning();
 	}
 
-	private void prepareThreadManager() throws RunFailureException {
+	/**
+	 * Stops the app if it is currently running.
+	 *
+	 * This is done by changing a boolean called "allowed-to-run" that is checked
+	 * periodically throughout the scraping process.
+	 *
+	 * This value will be set back to true once the app has fully shut down,
+	 * allowing a new app to run.
+	 *
+	 * @throws RunFailureException
+	 */
+	public void prepareThreadManager() throws RunFailureException {
 		if (this.isRunning()) {
-			log.info("Application is Running; Shutting Down Old Run");
-			this.cancel();
+			log.info("App is Running; Shutting Down Old Run");
+			this.reset();
+		} else if (!this.threadService.getIsAllowedToRun()) {
+			log.info("App is Not Running and is Not Allowed to Run; Fixing");
+			this.reset();
 		}
 
 		int i = 0;
