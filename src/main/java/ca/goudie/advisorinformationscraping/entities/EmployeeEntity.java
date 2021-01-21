@@ -4,6 +4,7 @@ import ca.goudie.advisorinformationscraping.constants.SqlConstants;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
@@ -67,6 +68,7 @@ public class EmployeeEntity {
 			fetch = FetchType.LAZY,
 			mappedBy = EmployeeAddress.EMPLOYEE_FIELD,
 			orphanRemoval = true)
+	@EqualsAndHashCode.Exclude
 	private final Collection<EmployeeAddress> addresses = new HashSet<>();
 
 	@OneToMany(
@@ -74,6 +76,7 @@ public class EmployeeEntity {
 			fetch = FetchType.LAZY,
 			mappedBy = EmployeeEmail.EMPLOYEE_FIELD,
 			orphanRemoval = true)
+	@EqualsAndHashCode.Exclude
 	private final Collection<EmployeeEmail> emails = new HashSet<>();
 
 	@OneToMany(
@@ -81,6 +84,7 @@ public class EmployeeEntity {
 			fetch = FetchType.LAZY,
 			mappedBy = EmployeePhone.EMPLOYEE_FIELD,
 			orphanRemoval = true)
+	@EqualsAndHashCode.Exclude
 	private final Collection<EmployeePhone> phones = new HashSet<>();
 
 	public void addAddresses(final Collection<EmployeeAddress> addresses) {

@@ -202,7 +202,10 @@ public class StorageService {
 			// If it does...
 			if (internalEmployeeIdOpt.isPresent()) {
 				internalEmployeeId = internalEmployeeIdOpt.get();
-				employeeEntity = this.employeeRepo.findById(internalEmployeeId).get();
+				final Optional<EmployeeEntity> employeeOpt =
+						this.employeeRepo.findById(internalEmployeeId);
+
+				employeeEntity = employeeOpt.orElseGet(EmployeeEntity::new);
 			} else {
 				internalEmployeeId = null;
 				employeeEntity = new EmployeeEntity();
@@ -262,6 +265,7 @@ public class StorageService {
 					.id(EmployeeAddressId.builder()
 							.address(address)
 							.build())
+					.score(score)
 					.build();
 		}
 
@@ -288,6 +292,7 @@ public class StorageService {
 					.id(EmployeeEmailId.builder()
 							.email(email)
 							.build())
+					.score(score)
 					.build();
 		}
 
@@ -314,6 +319,7 @@ public class StorageService {
 					.id(EmployeePhoneId.builder()
 							.phone(phone)
 							.build())
+					.score(score)
 					.build();
 		}
 
