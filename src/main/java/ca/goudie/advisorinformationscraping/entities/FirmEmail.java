@@ -33,7 +33,7 @@ public class FirmEmail {
 			name = SqlConstants.FIRM_ID_COLUMN,
 			nullable = false)
 	@ManyToOne(fetch = FetchType.LAZY)
-	@MapsId("firmId")
+	@MapsId(FirmEmailId.FIRM_ID_FIELD)
 	private FirmEntity firm;
 
 }

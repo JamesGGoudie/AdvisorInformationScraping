@@ -37,7 +37,7 @@ public class EmployeeAddress {
 			name = SqlConstants.EMPLOYEE_ID_COLUMN,
 			nullable = false)
 	@ManyToOne(fetch = FetchType.LAZY)
-	@MapsId("employeeId")
+	@MapsId(EmployeeAddressId.EMPLOYEE_ID_FIELD)
 	private EmployeeEntity employee;
 
 }

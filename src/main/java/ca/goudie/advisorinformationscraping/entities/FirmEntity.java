@@ -22,7 +22,7 @@ import java.util.HashSet;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
-@Entity()
+@Entity
 @Table(
 		name = SqlConstants.FIRM_TABLE,
 		uniqueConstraints = {

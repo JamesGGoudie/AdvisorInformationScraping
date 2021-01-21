@@ -18,6 +18,8 @@ import java.io.Serializable;
 @Embeddable
 public class EmployeeAddressId implements Serializable {
 
+	public static final String EMPLOYEE_ID_FIELD = "employeeId";
+
 	private static final Long serialVersionUID = 1L;
 
 	@Column(name = SqlConstants.EMPLOYEE_ID_COLUMN)
