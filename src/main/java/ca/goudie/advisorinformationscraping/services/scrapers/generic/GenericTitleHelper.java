@@ -76,6 +76,9 @@ public class GenericTitleHelper {
 		try {
 			els = context.findElements(By.tagName(tag));
 		} catch (StaleElementReferenceException e) {
+			// Tag is stale; return null
+			log.error(e);
+
 			return null;
 		}
 
@@ -85,7 +88,10 @@ public class GenericTitleHelper {
 			try {
 				children = el.findElements(By.xpath("./*"));
 			} catch (StaleElementReferenceException e) {
-				break;
+				// Element is stale; try next one
+				log.error(e);
+
+				continue;
 			}
 
 			// We only want to check for titles in leaf tags since searching any
@@ -99,6 +105,9 @@ public class GenericTitleHelper {
 			try {
 				innerText = el.getAttribute("innerText");
 			} catch (StaleElementReferenceException e) {
+				// Element is stale; try next one
+				log.error(e);
+
 				continue;
 			}
 

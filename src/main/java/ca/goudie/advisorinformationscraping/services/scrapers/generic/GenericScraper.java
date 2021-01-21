@@ -128,6 +128,9 @@ public class GenericScraper implements IScraper {
 		try {
 			anchors = context.findElements(By.cssSelector("a"));
 		} catch (StaleElementReferenceException e) {
+			// Context is stale, return empty collection.
+			log.error(e);
+
 			return out;
 		}
 
@@ -137,6 +140,9 @@ public class GenericScraper implements IScraper {
 			try {
 				href = anchor.getAttribute("href");
 			} catch (StaleElementReferenceException e) {
+				// Anchor is stale; try next one
+				log.error(e);
+
 				continue;
 			}
 

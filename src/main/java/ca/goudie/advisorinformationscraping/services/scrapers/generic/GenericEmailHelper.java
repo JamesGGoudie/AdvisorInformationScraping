@@ -56,6 +56,9 @@ public class GenericEmailHelper {
 		try {
 			anchors = context.findElements(By.tagName("a"));
 		} catch (StaleElementReferenceException e) {
+			// Couldn't process anchor; return empty collection.
+			log.error(e);
+
 			return out;
 		}
 
@@ -65,6 +68,9 @@ public class GenericEmailHelper {
 					out.add(anchor);
 				}
 			} catch (DomReadException e) {
+				// Couldn't read DOM, try next anchor.
+				log.error(e);
+
 				continue;
 			}
 		}
@@ -98,6 +104,9 @@ public class GenericEmailHelper {
 				// Check the innerText for an email that is displayed to the user.
 				innerText = anchor.getAttribute("innerText");
 			} catch (StaleElementReferenceException e) {
+				// Couldn't find anchor; try next one
+				log.error(e);
+
 				continue;
 			}
 

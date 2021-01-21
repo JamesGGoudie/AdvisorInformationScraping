@@ -122,6 +122,9 @@ public class GenericEmployeesPageHelper {
 				try {
 					parentNode = currentNode.findElement(By.xpath(".."));
 				} catch (StaleElementReferenceException e) {
+					// Could not access currentNode; move on to next anchor
+					log.error(e);
+
 					break;
 				}
 
@@ -156,6 +159,9 @@ public class GenericEmployeesPageHelper {
 		try {
 			anchors = context.findElements(By.tagName("a"));
 		} catch (StaleElementReferenceException e) {
+			// Failed; return an empty collection instead.
+			log.error(e);
+
 			return out;
 		}
 
@@ -181,6 +187,9 @@ public class GenericEmployeesPageHelper {
 				return false;
 			}
 		} catch (DomReadException e) {
+			// Could not read DOM; assume fail
+			log.error(e);
+
 			return false;
 		}
 
@@ -189,6 +198,9 @@ public class GenericEmployeesPageHelper {
 		try {
 			href = anchor.getAttribute("href");
 		} catch (StaleElementReferenceException e) {
+			// Could not access anchor; assume fail
+			log.error(e);
+
 			return false;
 		}
 
@@ -197,6 +209,9 @@ public class GenericEmployeesPageHelper {
 		try {
 			path = AisUrlUtils.extractPath(href);
 		} catch (UrlParseException e) {
+			// Could not extract path; assume fail
+			log.error(e);
+
 			return false;
 		}
 
@@ -254,6 +269,9 @@ public class GenericEmployeesPageHelper {
 			try {
 				href = anchor.getAttribute("href");
 			} catch (StaleElementReferenceException e) {
+				// Could not process anchor; try the next one
+				log.error(e);
+
 				continue;
 			}
 

@@ -6,10 +6,13 @@ import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.extern.log4j.Log4j2;
+
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 
+@Log4j2
 @Service
 public class GenericSourceHelper {
 
@@ -25,6 +28,8 @@ public class GenericSourceHelper {
 		} catch (UrlParseException e) {
 			// Formatting the source failed.
 			// Use the unchanged url as the source.
+			log.error(e);
+
 			return url;
 		}
 	}
@@ -61,6 +66,8 @@ public class GenericSourceHelper {
 				sourceHost = AisUrlUtils.extractHostname(url);
 			} catch (UrlParseException e) {
 				// Parsing failed, but there are other urls to try.
+				log.error(e);
+
 				continue;
 			}
 

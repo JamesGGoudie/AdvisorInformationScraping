@@ -42,6 +42,7 @@ public class GenericPhoneHelper {
 			out.addAll(AisPhoneUtils.findPhones(innerHtml, countryCode));
 		} catch (StaleElementReferenceException e) {
 			// Couldn't get innerHTML, but we may have still gotten anchor phones.
+			log.error(e);
 		}
 
 		return out;
@@ -69,6 +70,7 @@ public class GenericPhoneHelper {
 			out.addAll(AisPhoneUtils.findPhones(innerHtml, countryCode));
 		} catch (StaleElementReferenceException e) {
 			// Couldn't get innerHTML, but we may have still gotten anchor phones.
+			log.error(e);
 		}
 
 		return out;
@@ -121,6 +123,9 @@ public class GenericPhoneHelper {
 			try {
 				href = anchor.getAttribute("href");
 			} catch (StaleElementReferenceException e) {
+				// Anchor is stale; try next one
+				log.error(e);
+
 				continue;
 			}
 
@@ -146,6 +151,9 @@ public class GenericPhoneHelper {
 			try {
 				innerText = anchor.getAttribute("innerText");
 			} catch (StaleElementReferenceException e) {
+				// Anchor is stale; try next one
+				log.error(e);
+
 				continue;
 			}
 
@@ -182,6 +190,9 @@ public class GenericPhoneHelper {
 		try {
 			anchors = context.findElements(By.tagName("a"));
 		} catch (StaleElementReferenceException e) {
+			// Anchor is stale; try next one
+			log.error(e);
+
 			return out;
 		}
 
@@ -191,6 +202,9 @@ public class GenericPhoneHelper {
 					out.add(anchor);
 				}
 			} catch (DomReadException e) {
+				// Couldn't read DOM; try next anchor
+				log.error(e);
+
 				continue;
 			}
 		}

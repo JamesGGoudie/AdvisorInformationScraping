@@ -141,6 +141,8 @@ public class BloombergScraper implements IScraper {
 				type = script.getAttribute("type");
 			} catch (StaleElementReferenceException e) {
 				// The element is not present in the DOM; continue
+				log.error(e);
+
 				continue;
 			}
 
@@ -151,6 +153,9 @@ public class BloombergScraper implements IScraper {
 				try {
 					jsonStr = script.getAttribute("innerText");
 				} catch (StaleElementReferenceException e) {
+					// Couldn't process script; try the next one
+					log.error(e);
+
 					continue;
 				}
 

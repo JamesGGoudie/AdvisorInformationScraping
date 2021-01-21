@@ -6,9 +6,12 @@ import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 
+import lombok.extern.log4j.Log4j2;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Log4j2
 @Service
 public class ScraperSelector {
 
@@ -37,6 +40,9 @@ public class ScraperSelector {
 		try {
 			host = AisUrlUtils.extractHostname(link);
 		} catch (UrlParseException e) {
+			// Couldn't parse link; use generic scraper
+			log.error(e);
+
 			return this.genericScraper;
 		}
 

@@ -82,33 +82,24 @@ public class RunService {
 			int i = 0;
 
 			for (final IFirmInfo firmInfo : givenFirmInfo) {
-				++i;
+				log.info("Processing Firm " + (++i) + " of " + givenFirmInfo.size());
 
-				log.info("Processing Firm " + i + " of " + givenFirmInfo.size());
-
-				try {
-					if (!this.threadService.getIsAllowedToRun()) {
-						throw new RunCancelException(ExceptionMessages.APP_CANCELLED);
-					}
-
-					try {
-						this.processQuery(firmInfo,
-								webDriver,
-								searcher,
-								blacklist,
-								resultsLimit);
-					} catch (SearchException e) {
-						log.error(e);
-					}
-				} catch (RunCancelException e) {
-					throw e;
-				} catch (Exception e) {
-					// Unknown exception
-					log.error(e);
+				if (!this.threadService.getIsAllowedToRun()) {
+					throw new RunCancelException(ExceptionMessages.APP_CANCELLED);
 				}
+
+				this.processQuery(firmInfo,
+						webDriver,
+						searcher,
+						blacklist,
+						resultsLimit);
 			}
 		} catch (RunCancelException e) {
-			log.info("Run Stopped");
+			// This exception was thrown to stop the application.
+			log.info("Thread Stopped");
+		} catch (SearchException e) {
+			// Searching failed; likely that the search engine impl is rubbish.
+			log.error(e);
 		} catch (Exception e) {
 			// Unknown Exception
 			log.error(e);
@@ -120,7 +111,7 @@ public class RunService {
 				webDriver.quit();
 			}
 
-			log.info("App Finished");
+			log.info("Thread Finished");
 		}
 	}
 
@@ -166,12 +157,10 @@ public class RunService {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {
 				log.error(e);
-			} finally {
-				++i;
 			}
 
 			if (this.isRunning()) {
-				log.info("Waiting for Shutdown: " + i);
+				log.info("Waiting for Shutdown: " + ++i);
 			}
 
 			if (i >= 30) {
@@ -202,34 +191,26 @@ public class RunService {
 		int i = 0;
 
 		for (final String link : links) {
-			++i;
+			log.info("Processing Search Result " + (++i) + " of " + resultsLimit);
 
-			log.info("Processing Search Result " + i + " of " + resultsLimit);
+			if (!this.threadService.getIsAllowedToRun()) {
+				throw new RunCancelException(ExceptionMessages.APP_CANCELLED);
+			}
+
+			final IScraper scraper = this.scraperSelector.selectScraper(link);
+			final FirmResult firm;
 
 			try {
-				if (!this.threadService.getIsAllowedToRun()) {
-					throw new RunCancelException(ExceptionMessages.APP_CANCELLED);
-				}
-
-				final IScraper scraper = this.scraperSelector.selectScraper(link);
-				final FirmResult firm;
-
-				try {
-					firm = scraper.scrapeWebsite(webDriver, link, countryCode);
-				} catch (ScrapeException e) {
-					continue;
-				}
-
-				firms.add(firm);
-				this.storageService.storeFirmResult(firm, info.getSemarchyId());
-			} catch (RunCancelException e) {
-				throw e;
-			}	catch (Exception e) {
-				// Unknown exception
+				firm = scraper.scrapeWebsite(webDriver, link, countryCode);
+			} catch (ScrapeException e) {
+				// Scraping failed, but may succeed for other links; continue
 				log.error(e);
 
 				continue;
 			}
+
+			firms.add(firm);
+			this.storageService.storeFirmResult(firm, info.getSemarchyId());
 		}
 
 		final ScrapeResult out = new ScrapeResult();

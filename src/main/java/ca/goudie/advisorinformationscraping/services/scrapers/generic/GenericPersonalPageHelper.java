@@ -95,6 +95,9 @@ public class GenericPersonalPageHelper {
 				return false;
 			}
 		} catch (DomReadException e) {
+			// Couldn't read DOM; assume false
+			log.error(e);
+
 			return false;
 		}
 
@@ -103,6 +106,9 @@ public class GenericPersonalPageHelper {
 		try {
 			 href = anchor.getAttribute("href");
 		} catch (StaleElementReferenceException e) {
+			// Couldn't find anchor; assume false
+			log.error(e);
+
 			return false;
 		}
 
@@ -111,6 +117,9 @@ public class GenericPersonalPageHelper {
 		try {
 			path = AisUrlUtils.extractPath(href);
 		} catch (UrlParseException e) {
+			// Couldn't parse HREF; assume false
+			log.error(e);
+
 			return false;
 		}
 
@@ -169,6 +178,9 @@ public class GenericPersonalPageHelper {
 			try {
 				href = anchor.getAttribute("href").substring(7);
 			} catch (StaleElementReferenceException e) {
+				// Couldn't find anchor; try the next
+				log.error(e);
+
 				continue;
 			}
 
@@ -188,6 +200,9 @@ public class GenericPersonalPageHelper {
 					parentNode = currentNode.findElement(By.xpath(".."));
 					localAnchors = parentNode.findElements(By.tagName("a"));
 				} catch (StaleElementReferenceException e) {
+					// Current node is missing; try the next anchor
+					log.error(e);
+
 					break;
 				}
 
@@ -202,6 +217,8 @@ public class GenericPersonalPageHelper {
 						}
 					} catch (DomReadException e) {
 						// Still other anchors to check.
+						log.error(e);
+
 						continue;
 					}
 				}

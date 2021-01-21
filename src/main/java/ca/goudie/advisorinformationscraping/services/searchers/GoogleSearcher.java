@@ -9,14 +9,20 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import lombok.extern.log4j.Log4j2;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Log4j2
 @Service
 public class GoogleSearcher extends ASearcher {
+
+	private static final String NO_SEARCH_RESULTS_MESSAGE =
+			"Could not find any search results on page.";
 
 	void performQuery(final WebDriver driver, final String query)
 			throws SearchException {
@@ -44,7 +50,7 @@ public class GoogleSearcher extends ASearcher {
 		try {
 			resultGroups = driver.findElements(By.className("hlcw0c"));
 		} catch (StaleElementReferenceException e) {
-			resultGroups = new ArrayList<>();
+			throw new SearchException(GoogleSearcher.NO_SEARCH_RESULTS_MESSAGE);
 		}
 
 		final List<WebElement> results = new ArrayList<>();
@@ -54,6 +60,9 @@ public class GoogleSearcher extends ASearcher {
 				try {
 					results.addAll(this.findResultItems(resultGroup));
 				} catch (DomReadException e) {
+					// Couldn't read DOM; move to next result-group
+					log.error(e);
+
 					continue;
 				}
 			}
@@ -62,11 +71,9 @@ public class GoogleSearcher extends ASearcher {
 			// Search the whole page for results instead.
 			try {
 				results.addAll(this.findResultItems(driver));
-			} catch (DomReadException e) {}
-		}
-
-		if (results.size() == 0) {
-			throw new SearchException("Could not find any search results on page.");
+			} catch (DomReadException e) {
+				throw new SearchException(GoogleSearcher.NO_SEARCH_RESULTS_MESSAGE);
+			}
 		}
 
 		final Collection<String> out = new ArrayList<>();
@@ -81,7 +88,8 @@ public class GoogleSearcher extends ASearcher {
 
 				out.add(href);
 			} catch (StaleElementReferenceException e) {
-				continue;
+				// Some element is stale; try next result
+				log.error(e);
 			}
 		}
 

@@ -32,6 +32,9 @@ public class GenericNameHelper {
 		try {
 			path = AisUrlUtils.extractPath(url);
 		} catch (UrlParseException e) {
+			// Couldn't parse URL; return null.
+			log.error(e);
+
 			return null;
 		}
 

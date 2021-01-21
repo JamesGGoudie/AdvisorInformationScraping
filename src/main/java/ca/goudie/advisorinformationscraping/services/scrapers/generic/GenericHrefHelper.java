@@ -59,6 +59,9 @@ public class GenericHrefHelper {
 		try {
 			pageAuthority = AisUrlUtils.removePath(pageUrl);
 		} catch (UrlParseException e) {
+			// Couldn't clean links; return uncleaned links
+			log.error(e);
+
 			return links;
 		}
 
@@ -75,6 +78,7 @@ public class GenericHrefHelper {
 					fixedLinks.add(link);
 				}
 			} catch (UrlParseException e) {
+				log.error(e);
 				// Parsing failed, but let's keep the link just in case.
 				fixedLinks.add(link);
 			}
@@ -98,6 +102,9 @@ public class GenericHrefHelper {
 		try {
 			pageAuthority = AisUrlUtils.removePath(pageUrl);
 		} catch (UrlParseException e) {
+			// Couldn't parse the given link; return it instead.
+			log.error(e);
+
 			return link;
 		}
 
@@ -110,6 +117,9 @@ public class GenericHrefHelper {
 				return link;
 			}
 		} catch (UrlParseException e) {
+			// Couldn't parse the given link; return it instead.
+			log.error(e);
+
 			return link;
 		}
 	}

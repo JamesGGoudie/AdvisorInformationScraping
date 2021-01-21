@@ -7,10 +7,13 @@ import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 
 import org.openqa.selenium.WebDriver;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+@Log4j2
 public abstract class ASearcher implements ISearcher {
 
 	@Override
@@ -65,6 +68,8 @@ public abstract class ASearcher implements ISearcher {
 				}
 			} catch (DomReadException e) {
 				// Failed to find or click next-page button.
+				log.error(e);
+
 				break;
 			}
 		}
@@ -87,6 +92,8 @@ public abstract class ASearcher implements ISearcher {
 				host = AisUrlUtils.extractHostname(href);
 			} catch (UrlParseException e) {
 				// Bad href value; skip
+				log.error(e);
+
 				continue;
 			}
 
