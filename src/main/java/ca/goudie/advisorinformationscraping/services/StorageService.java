@@ -232,7 +232,7 @@ public class StorageService {
 					this.buildEmployeeEmail(
 							email,
 							internalEmployeeId,
-							employee.getAddresses().get(email)));
+							employee.getEmails().get(email)));
 		}
 
 		for (final String phone : employee.getPhones().keySet()) {
@@ -240,7 +240,7 @@ public class StorageService {
 					this.buildEmployeePhone(
 							phone,
 							internalEmployeeId,
-							employee.getAddresses().get(phone)));
+							employee.getPhones().get(phone)));
 		}
 
 		employeeEntity.setIsCurrent(true);
@@ -276,10 +276,17 @@ public class StorageService {
 		final Optional<EmployeeAddress> opt =
 				this.employeeAddressRepository.findById(id);
 
-		return opt.orElseGet(() -> EmployeeAddress.builder()
+		if (opt.isPresent()) {
+			final EmployeeAddress employeeAddress = opt.get();
+			employeeAddress.setScore(score);
+
+			return employeeAddress;
+		}
+
+		return EmployeeAddress.builder()
 				.id(id)
 				.score(score)
-				.build());
+				.build();
 	}
 
 	private EmployeeEmail buildEmployeeEmail(
@@ -303,10 +310,17 @@ public class StorageService {
 		final Optional<EmployeeEmail> opt =
 				this.employeeEmailRepository.findById(id);
 
-		return opt.orElseGet(() -> EmployeeEmail.builder()
+		if (opt.isPresent()) {
+			final EmployeeEmail employeeEmail = opt.get();
+			employeeEmail.setScore(score);
+
+			return employeeEmail;
+		}
+
+		return EmployeeEmail.builder()
 				.id(id)
 				.score(score)
-				.build());
+				.build();
 	}
 
 	private EmployeePhone buildEmployeePhone(
@@ -330,10 +344,17 @@ public class StorageService {
 		final Optional<EmployeePhone> opt =
 				this.employeePhoneRepository.findById(id);
 
-		return opt.orElseGet(() -> EmployeePhone.builder()
+		if (opt.isPresent()) {
+			final EmployeePhone employeePhone = opt.get();
+			employeePhone.setScore(score);
+
+			return employeePhone;
+		}
+
+		return EmployeePhone.builder()
 				.id(id)
 				.score(score)
-				.build());
+				.build();
 	}
 
 }
