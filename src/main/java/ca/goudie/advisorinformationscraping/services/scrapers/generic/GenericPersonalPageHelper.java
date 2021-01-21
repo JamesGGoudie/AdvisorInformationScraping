@@ -86,10 +86,17 @@ public class GenericPersonalPageHelper {
 	/**
 	 * Returns true if the anchor given likely represents a personal page.
 	 *
+	 * Uses a collection of known non-personal page anchors to speed up the
+	 * process.
+	 *
 	 * @param anchor
+	 * @param badHrefs
 	 * @return
 	 */
-	boolean isAnchorPersonalPage(final WebElement anchor) {
+	boolean isAnchorPersonalPage(
+			final WebElement anchor,
+			final Collection<String> badHrefs
+	) {
 		try {
 			if (!this.hrefHelper.doesHrefExist(anchor)) {
 				return false;
@@ -112,6 +119,10 @@ public class GenericPersonalPageHelper {
 			return false;
 		}
 
+		if (badHrefs.contains(href)) {
+			return false;
+		}
+
 		final String path;
 
 		try {
@@ -124,12 +135,16 @@ public class GenericPersonalPageHelper {
 		}
 
 		if (StringUtils.isBlank(path)) {
+			badHrefs.add(href);
+
 			return false;
 		}
 
 		final List<String> segments = AisRegexUtils.findPathSegments(path);
 
 		if (segments.size() == 0) {
+			badHrefs.add(href);
+
 			return false;
 		}
 
@@ -137,6 +152,8 @@ public class GenericPersonalPageHelper {
 
 		// Ensure that the anchor isn't for an employee page.
 		if (this.pathsHelper.isEmployeePageSegment(finalSegment)) {
+			badHrefs.add(href);
+
 			return false;
 		}
 
@@ -145,6 +162,8 @@ public class GenericPersonalPageHelper {
 				return true;
 			}
 		}
+
+		badHrefs.add(href);
 
 		return false;
 	}
@@ -218,8 +237,6 @@ public class GenericPersonalPageHelper {
 					} catch (DomReadException e) {
 						// Still other anchors to check.
 						log.error(e);
-
-						continue;
 					}
 				}
 

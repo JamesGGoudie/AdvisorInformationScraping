@@ -28,6 +28,13 @@ public class AisRegexUtils {
 	 */
 	private static final String NAME_REGEX = "^[A-Za-z- ]+$";
 
+	private static final Pattern EMAIL_PATTERN =
+			Pattern.compile(AisRegexUtils.EMAIL_REGEX);
+	private static final Pattern URL_PATH_PATTERN =
+			Pattern.compile(AisRegexUtils.URL_PATH_REGEX);
+	private static final Pattern NAME_PATTERN =
+			Pattern.compile(AisRegexUtils.NAME_REGEX);
+
 	/**
 	 * Returns the first email found in the given text.
 	 *
@@ -37,8 +44,7 @@ public class AisRegexUtils {
 	 * @return
 	 */
 	public static String findFirstEmail(final String text) {
-		final Pattern pattern = Pattern.compile(AisRegexUtils.EMAIL_REGEX);
-		final Matcher matcher = pattern.matcher(text);
+		final Matcher matcher = AisRegexUtils.EMAIL_PATTERN.matcher(text);
 
 		if (matcher.find()) {
 			return matcher.group();
@@ -48,8 +54,7 @@ public class AisRegexUtils {
 	}
 
 	public static List<String> findPathSegments(final String path) {
-		final Pattern pattern = Pattern.compile(AisRegexUtils.URL_PATH_REGEX);
-		final Matcher matcher = pattern.matcher(path);
+		final Matcher matcher = AisRegexUtils.URL_PATH_PATTERN.matcher(path);
 
 		final List<String> out = new ArrayList<>();
 
@@ -61,8 +66,7 @@ public class AisRegexUtils {
 	}
 
 	public static boolean isPossiblyName(final String pathSegment) {
-		final Pattern pattern = Pattern.compile(AisRegexUtils.NAME_REGEX);
-		final Matcher matcher = pattern.matcher(pathSegment);
+		final Matcher matcher = AisRegexUtils.NAME_PATTERN.matcher(pathSegment);
 
 		return matcher.find();
 	}

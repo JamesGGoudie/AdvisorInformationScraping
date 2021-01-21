@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 @Log4j2
@@ -65,6 +66,7 @@ public class GenericEmployeesPageHelper {
 		log.info("Scraping Employee Pages");
 
 		final Collection<WebElement> employeeBlocks = new ArrayList<>();
+		final Collection<String> badHrefs = new HashSet<>();
 
 		for (final String employeePageLink : employeePageLinks) {
 			if (!this.threadService.getIsAllowedToRun()) {
@@ -72,13 +74,14 @@ public class GenericEmployeesPageHelper {
 			}
 
 			driver.get(employeePageLink);
-			employeeBlocks.addAll(this.findEmployeePageBlocksByAnchors(driver));
+			employeeBlocks.addAll(
+					this.findEmployeePageBlocksByAnchors(driver, badHrefs));
 		}
 
 		final String currentUrl = driver.getCurrentUrl();
 
 		for (final WebElement employeeBlock : employeeBlocks) {
-			this.processEmployeeBlock(employeeBlock, firm, currentUrl);
+			this.processEmployeeBlock(employeeBlock, firm, currentUrl, badHrefs);
 		}
 
 		for (final EmployeeResult employee : firm.getEmployees()) {
@@ -98,16 +101,18 @@ public class GenericEmployeesPageHelper {
 	 * This is done by searching for anchors of the employees' personal pages.
 	 *
 	 * @param context
+	 * @param badHrefs
 	 * @return
 	 */
 	Collection<WebElement> findEmployeePageBlocksByAnchors(
-			final SearchContext context
+			final SearchContext context,
+			final Collection<String> badHrefs
 	) {
 		log.info("Searching for Employee Page Blocks by Anchors");
 
 		final Collection<WebElement> employeeBlocks = new ArrayList<>();
 		final Collection<WebElement> anchors =
-				this.findPersonalPageAnchors(context);
+				this.findPersonalPageAnchors(context, badHrefs);
 
 		for (final WebElement anchor : anchors) {
 			WebElement currentNode = anchor;
@@ -129,7 +134,7 @@ public class GenericEmployeesPageHelper {
 				}
 
 				final Collection<WebElement> localAnchors =
-						this.findPersonalPageAnchors(parentNode);
+						this.findPersonalPageAnchors(parentNode, badHrefs);
 
 				if (localAnchors.size() > 1) {
 					break;
@@ -148,10 +153,12 @@ public class GenericEmployeesPageHelper {
 	 * Searches for anchors that are likely for personal employee pages.
 	 *
 	 * @param context
+	 * @param badHrefs
 	 * @return
 	 */
 	Collection<WebElement> findPersonalPageAnchors(
-			final SearchContext context
+			final SearchContext context,
+			final Collection<String> badHrefs
 	) {
 		final Collection<WebElement> out = new ArrayList<>();
 		final List<WebElement> anchors;
@@ -166,7 +173,7 @@ public class GenericEmployeesPageHelper {
 		}
 
 		for (final WebElement anchor : anchors) {
-			if (this.personalPageHelper.isAnchorPersonalPage(anchor)) {
+			if (this.personalPageHelper.isAnchorPersonalPage(anchor, badHrefs)) {
 				out.add(anchor);
 			}
 		}
@@ -242,11 +249,13 @@ public class GenericEmployeesPageHelper {
 	 * @param employeeBlock
 	 * @param firm
 	 * @param currentUrl
+	 * @param badHrefs
 	 */
 	private void processEmployeeBlock(
 			final WebElement employeeBlock,
 			final FirmResult firm,
-			final String currentUrl
+			final String currentUrl,
+			final Collection<String> badHrefs
 	) {
 		log.info("Processing Employee Block");
 
@@ -261,7 +270,7 @@ public class GenericEmployeesPageHelper {
 		}
 
 		final Collection<WebElement> personalPageAnchors =
-				this.findPersonalPageAnchors(employeeBlock);
+				this.findPersonalPageAnchors(employeeBlock, badHrefs);
 
 		for (final WebElement anchor : personalPageAnchors) {
 			final String href;
