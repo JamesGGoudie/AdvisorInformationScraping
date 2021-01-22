@@ -214,6 +214,8 @@ public class EmployeeEntity {
 		employee.setInternalEmployeeId(this.id);
 		employee.setInternalFirmId(this.firmId);
 
+		employee.setIsCurrent(this.isCurrent);
+
 		employee.setName(this.name);
 		employee.setSource(this.source);
 		employee.setTitle(this.title);

@@ -9,7 +9,9 @@ import java.util.Map;
 public class EmployeeDto {
 
 	private Long internalFirmId;
-	private long internalEmployeeId;
+	private Long internalEmployeeId;
+
+	private Boolean isCurrent;
 
 	private String name;
 	private String title;
