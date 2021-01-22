@@ -72,6 +72,9 @@ public class GenericEmployeesPageHelper {
 		final Collection<String> badHrefs = new HashSet<>();
 		badHrefs.addAll(employeePageLinks);
 
+		// Employees cannot have the same name; use a hash-set to prevent duplicates
+		final Collection<String> employeeNames = new HashSet<>();
+
 		for (final String employeePageLink : employeePageLinks) {
 			if (!this.threadService.getIsAllowedToRun()) {
 				throw new RunCancelException(ExceptionMessages.APP_CANCELLED);
@@ -95,7 +98,8 @@ public class GenericEmployeesPageHelper {
 			log.info("Found " + employeeBlocks.size() + " Employee Blocks");
 
 			for (final WebElement employeeBlock : employeeBlocks) {
-				this.processEmployeeBlock(employeeBlock, firm, currentUrl, badHrefs);
+				this.processEmployeeBlock(
+						employeeBlock, firm, currentUrl, badHrefs, employeeNames);
 			}
 		}
 
@@ -279,12 +283,14 @@ public class GenericEmployeesPageHelper {
 	 * @param firm
 	 * @param currentUrl
 	 * @param badHrefs
+	 * @param employeeNames
 	 */
 	private void processEmployeeBlock(
 			final WebElement employeeBlock,
 			final FirmResult firm,
 			final String currentUrl,
-			final Collection<String> badHrefs
+			final Collection<String> badHrefs,
+			final Collection<String> employeeNames
 	) {
 		log.info("Processing Employee Block");
 
@@ -325,10 +331,14 @@ public class GenericEmployeesPageHelper {
 			break;
 		}
 
-		// Name is part of the primary key, so cannot be blank
-		if (StringUtils.isNotBlank(employee.getName())) {
-			firm.getEmployees().add(employee);
+		// Name is part of the primary key, so cannot be blank or a duplicate
+		if (StringUtils.isBlank(employee.getName()) ||
+				employeeNames.contains(employee.getName())) {
+			return;
 		}
+
+		employeeNames.add(employee.getName());
+		firm.getEmployees().add(employee);
 	}
 
 }
