@@ -2,6 +2,12 @@ package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
 import ca.goudie.advisorinformationscraping.dto.EmployeeDto;
+import ca.goudie.advisorinformationscraping.entities.ids.EmployeeAddressId;
+import ca.goudie.advisorinformationscraping.entities.ids.EmployeeEmailId;
+import ca.goudie.advisorinformationscraping.entities.ids.EmployeePhoneId;
+import ca.goudie.advisorinformationscraping.entities.ids.FirmAddressId;
+import ca.goudie.advisorinformationscraping.entities.ids.FirmEmailId;
+import ca.goudie.advisorinformationscraping.entities.ids.FirmPhoneId;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
 
 import lombok.AllArgsConstructor;
@@ -23,6 +29,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 
 @AllArgsConstructor
 @Data
@@ -96,27 +103,108 @@ public class EmployeeEntity {
 	@EqualsAndHashCode.Exclude
 	private final Collection<EmployeePhone> phones = new HashSet<>();
 
-	public void addAddresses(final Collection<EmployeeAddress> addresses) {
-		this.addresses.addAll(addresses);
+	public void updateAddresses(final Map<String, Float> foundValues) {
+		final Collection<String> knownKeys = new HashSet<>();
 
-		for (final EmployeeAddress address : addresses) {
-			address.setEmployee(this);
+		for (final EmployeeAddress storedValue : this.addresses) {
+			final String key = storedValue.getId().getAddress();
+
+			// If we did not find the stored value this scrape...
+			if (!foundValues.containsKey(key)) {
+				// Chuck it
+				this.addresses.remove(storedValue);
+			} else {
+				// Otherwise, mark that the stored value is known
+				knownKeys.add(key);
+				// Update the score
+				storedValue.setScore(foundValues.get(key));
+			}
+		}
+
+		for (final String foundKey : foundValues.keySet()) {
+			final Float foundValue = foundValues.get(foundKey);
+			// If the value found from the scrape hasn't been found yet...
+			if (!knownKeys.contains(foundKey)) {
+				// Create a new tuple
+				this.addresses.add(EmployeeAddress.builder()
+						.id(EmployeeAddressId.builder()
+								.address(foundKey)
+								.employeeId(this.id)
+								.build())
+						.score(foundValue)
+						.employee(this)
+						.build());
+			}
 		}
 	}
 
-	public void addEmails(final Collection<EmployeeEmail> emails) {
-		this.emails.addAll(emails);
+	public void updateEmails(final Map<String, Float> foundValues) {
+		final Collection<String> knownKeys = new HashSet<>();
 
-		for (final EmployeeEmail address : emails) {
-			address.setEmployee(this);
+		for (final EmployeeEmail storedValue : this.emails) {
+			final String key = storedValue.getId().getEmail();
+
+			// If we did not find the stored value this scrape...
+			if (!foundValues.containsKey(key)) {
+				// Chuck it
+				this.emails.remove(storedValue);
+			} else {
+				// Otherwise, mark that the stored value is known
+				knownKeys.add(key);
+				// Update the score
+				storedValue.setScore(foundValues.get(key));
+			}
+		}
+
+		for (final String foundKey : foundValues.keySet()) {
+			final Float foundValue = foundValues.get(foundKey);
+			// If the value found from the scrape hasn't been found yet...
+			if (!knownKeys.contains(foundKey)) {
+				// Create a new tuple
+				this.emails.add(EmployeeEmail.builder()
+						.id(EmployeeEmailId.builder()
+								.email(foundKey)
+								.employeeId(this.id)
+								.build())
+						.score(foundValue)
+						.employee(this)
+						.build());
+			}
 		}
 	}
 
-	public void addPhones(final Collection<EmployeePhone> phones) {
-		this.phones.addAll(phones);
+	public void updatePhones(final Map<String, Float> foundValues) {
+		final Collection<String> knownKeys = new HashSet<>();
 
-		for (final EmployeePhone address : phones) {
-			address.setEmployee(this);
+		for (final EmployeePhone storedValue : this.phones) {
+			final String key = storedValue.getId().getPhone();
+
+			// If we did not find the stored value this scrape...
+			if (!foundValues.containsKey(key)) {
+				// Chuck it
+				this.phones.remove(storedValue);
+			} else {
+				// Otherwise, mark that the stored value is known
+				knownKeys.add(key);
+				// Update the score
+				storedValue.setScore(foundValues.get(key));
+			}
+		}
+
+		for (final String foundKey : foundValues.keySet()) {
+			final Float foundValue = foundValues.get(foundKey);
+			// If the value found from the scrape hasn't been found yet...
+			if (!knownKeys.contains(foundKey)) {
+				// Create a new tuple
+				this.phones.add(EmployeePhone.builder()
+						.id(EmployeePhoneId.builder()
+								.phone(foundKey)
+								.employeeId(this.id)
+								.build())
+						.score(foundValue)
+						.employee(this)
+						.build());
+			}
 		}
 	}
 

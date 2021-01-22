@@ -2,7 +2,10 @@ package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
 import ca.goudie.advisorinformationscraping.dto.FirmDto;
-import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
+import ca.goudie.advisorinformationscraping.entities.ids.FirmAddressId;
+import ca.goudie.advisorinformationscraping.entities.ids.FirmEmailId;
+import ca.goudie.advisorinformationscraping.entities.ids.FirmPhoneId;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -98,35 +101,140 @@ public class FirmEntity {
 	@EqualsAndHashCode.Exclude
 	private final Collection<FirmPhone> phones = new HashSet<>();
 
-	public void addAddresses(final Collection<FirmAddress> addresses) {
-		this.addresses.addAll(addresses);
+	public void updateAddresses(final Collection<String> foundValues) {
+		final Collection<String> knownValues = new HashSet<>();
 
-		for (final FirmAddress address : addresses) {
-			address.setFirm(this);
+		for (final FirmAddress storedValue : this.addresses) {
+			// If we did not find the stored value this scrape...
+			if (!foundValues.contains(storedValue.getId().getAddress())) {
+				// Chuck it
+				this.addresses.remove(storedValue);
+			} else {
+				// Otherwise, mark that the stored value is known
+				knownValues.add(storedValue.getId().getAddress());
+			}
+		}
+
+		for (final String foundValue : foundValues) {
+			// If the value found from the scrape hasn't been found yet...
+			if (!knownValues.contains(foundValue)) {
+				// Create a new tuple
+				this.addresses.add(FirmAddress.builder()
+						.id(FirmAddressId.builder()
+								.address(foundValue)
+								.firmId(this.id)
+								.build())
+						.firm(this)
+						.build());
+			}
 		}
 	}
 
-	public void addEmails(final Collection<FirmEmail> emails) {
-		this.emails.addAll(emails);
+	public void updateEmails(final Collection<String> foundValues) {
+		final Collection<String> knownValues = new HashSet<>();
 
-		for (final FirmEmail address : emails) {
-			address.setFirm(this);
+		for (final FirmEmail storedValue : this.emails) {
+			// If we did not find the stored value this scrape...
+			if (!foundValues.contains(storedValue.getId().getEmail())) {
+				// Chuck it
+				this.emails.remove(storedValue);
+			} else {
+				// Otherwise, mark that the stored value is known
+				knownValues.add(storedValue.getId().getEmail());
+			}
+		}
+
+		for (final String foundValue : foundValues) {
+			// If the value found from the scrape hasn't been found yet...
+			if (!knownValues.contains(foundValue)) {
+				// Create a new tuple
+				this.emails.add(FirmEmail.builder()
+						.id(FirmEmailId.builder()
+								.email(foundValue)
+								.firmId(this.id)
+								.build())
+						.firm(this)
+						.build());
+			}
 		}
 	}
 
-	public void addPhones(final Collection<FirmPhone> phones) {
-		this.phones.addAll(phones);
+	public void updatePhones(final Collection<String> foundValues) {
+		final Collection<String> knownValues = new HashSet<>();
 
-		for (final FirmPhone address : phones) {
-			address.setFirm(this);
+		for (final FirmPhone storedValue : this.phones) {
+			// If we did not find the stored value this scrape...
+			if (!foundValues.contains(storedValue.getId().getPhone())) {
+				// Chuck it
+				this.phones.remove(storedValue);
+			} else {
+				// Otherwise, mark that the stored value is known
+				knownValues.add(storedValue.getId().getPhone());
+			}
+		}
+
+		for (final String foundValue : foundValues) {
+			// If the value found from the scrape hasn't been found yet...
+			if (!knownValues.contains(foundValue)) {
+				// Create a new tuple
+				this.phones.add(FirmPhone.builder()
+						.id(FirmPhoneId.builder()
+								.phone(foundValue)
+								.firmId(this.id)
+								.build())
+						.firm(this)
+						.build());
+			}
 		}
 	}
 
-	public void addEmployees(final Collection<EmployeeEntity> employees) {
-		this.employees.addAll(employees);
+	public void addEmployees(final Collection<EmployeeResult> foundValues) {
+		final Collection<String> knownKeys = new HashSet<>();
 
-		for (final EmployeeEntity address : employees) {
-			address.setFirm(this);
+		for (final EmployeeEntity storedValue : this.employees) {
+			boolean match = false;
+			EmployeeResult corresponding = null;
+
+			for (final EmployeeResult foundValue : foundValues) {
+				if (foundValue.getName().equals(storedValue.getName())) {
+					match = true;
+					corresponding = foundValue;
+
+					break;
+				}
+			}
+
+			// If the employee already exists in the firm...
+			if (match) {
+				// Track the name of the employee.
+				knownKeys.add(storedValue.getName());
+				// Update the employees information.
+				storedValue.updateAddresses(corresponding.getAddresses());
+				storedValue.updateEmails(corresponding.getEmails());
+				storedValue.updatePhones(corresponding.getPhones());
+			} else {
+				// Track that the employee did not appear in the most recent scrape
+				storedValue.setIsCurrent(false);
+			}
+		}
+
+		for (final EmployeeResult foundValue : foundValues) {
+			// If the value found from the scrape hasn't been found yet...
+			if (!knownKeys.contains(foundValue.getName())) {
+				// Create a new tuple
+				final EmployeeEntity newValue = new EmployeeEntity();
+				newValue.setName(foundValue.getName());
+				newValue.setSource(foundValue.getSource());
+				newValue.setTitle(foundValue.getTitle());
+				newValue.setFirm(this);
+				newValue.setIsCurrent(true);
+
+				newValue.updateAddresses(foundValue.getAddresses());
+				newValue.updateEmails(foundValue.getEmails());
+				newValue.updatePhones(foundValue.getPhones());
+
+				this.employees.add(newValue);
+			}
 		}
 	}
 

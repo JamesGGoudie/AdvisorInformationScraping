@@ -52,11 +52,14 @@ public class QueryEntity {
 	private final Collection<FirmEntity> results = new HashSet<>();
 
 	public void addResults(final Collection<FirmEntity> results) {
-		this.results.addAll(results);
-
 		for (final FirmEntity result : results) {
-			result.setQuery(this);
+			this.addResult(result);
 		}
+	}
+
+	public void addResult(final FirmEntity result) {
+		this.results.add(result);
+		result.setQuery(this);
 	}
 
 	public QueryDto toDto() {

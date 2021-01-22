@@ -17,10 +17,14 @@ public interface FirmRepository extends JpaRepository<FirmEntity, Long> {
 					" WHERE " + SqlConstants.QUERY_SEMARCHY_ID_COLUMN + " = :semarchyId" +
 					" AND " + SqlConstants.FIRM_SOURCE_COLUMN + " = :firmSource",
 			nativeQuery = true)
-	Optional<Long> findIdBySemarchyIdAndFirmSource(
+	Optional<Long> findIdBySemarchyIdAndSource(
 			@Param("semarchyId")
 			final String semarchyId,
 			@Param("firmSource")
 			final String firmSource);
+
+	Optional<FirmEntity> findBySemarchyIdAndSource(
+			final String semarchyId,
+			final String source);
 
 }
