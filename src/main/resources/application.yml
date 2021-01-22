@@ -9,7 +9,7 @@ spring:
     show-sql: false
 
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
 
 selenium:
   chrome-driver-location: C:/Program Files (x86)/Selenium/chromedriver.exe

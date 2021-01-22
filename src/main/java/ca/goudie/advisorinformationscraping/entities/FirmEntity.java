@@ -15,6 +15,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -29,21 +31,18 @@ import java.util.HashSet;
 		name = SqlConstants.FIRM_TABLE,
 		uniqueConstraints = {
 				@UniqueConstraint(columnNames = {
-						SqlConstants.FIRM_SEMARCHY_ID_COLUMN,
+						SqlConstants.QUERY_SEMARCHY_ID_COLUMN,
 						SqlConstants.FIRM_SOURCE_COLUMN
 				})
 })
 public class FirmEntity {
 
+	public static final String QUERY_FIELD = "query";
+
 	@Column(name = SqlConstants.FIRM_ID_COLUMN)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	private Long id;
-
-	@Column(
-			name = SqlConstants.FIRM_SEMARCHY_ID_COLUMN,
-			nullable = false)
-	private String semarchyId;
 
 	@Column(
 			name = SqlConstants.FIRM_SOURCE_COLUMN,
@@ -52,6 +51,12 @@ public class FirmEntity {
 
 	@Column(name = SqlConstants.FIRM_URL_COLUMN)
 	private String url;
+
+	@JoinColumn(
+			name = SqlConstants.QUERY_SEMARCHY_ID_COLUMN,
+			nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	private QueryEntity query;
 
 	@OneToMany(
 			cascade = CascadeType.ALL,

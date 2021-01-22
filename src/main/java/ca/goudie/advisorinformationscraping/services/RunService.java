@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.services;
 
 import ca.goudie.advisorinformationscraping.constants.ExceptionMessages;
+import ca.goudie.advisorinformationscraping.entities.QueryEntity;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult;
@@ -171,7 +172,7 @@ public class RunService {
 		this.threadService.setIsRunning(true);
 	}
 
-	private QueryResult processQuery(
+	private void processQuery(
 			final IFirmInfo info,
 			final WebDriver webDriver,
 			final ISearcher searcher,
@@ -188,8 +189,7 @@ public class RunService {
 					query,
 					resultsLimit,
 					blacklist);
-
-		final Collection<FirmResult> firms = new ArrayList<>();
+		final Collection<FirmResult> results = new ArrayList<>();
 
 		int i = 0;
 
@@ -211,15 +211,9 @@ public class RunService {
 
 				continue;
 			}
-
-			firms.add(firm);
-			this.storageService.storeFirmResult(firm, info.getSemarchyId());
 		}
 
-		final QueryResult out = new QueryResult();
-		out.getFirms().addAll(firms);
-
-		return out;
+		this.storageService.storeResults(info, results);
 	}
 
 	private String buildQuery(final IFirmInfo info) {

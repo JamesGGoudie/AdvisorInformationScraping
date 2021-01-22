@@ -2,13 +2,20 @@ package ca.goudie.advisorinformationscraping.constants;
 
 public class SqlConstants {
 
+	public static final String QUERY_TABLE = "query";
+
+	public static final String QUERY_SEMARCHY_ID_COLUMN = "semarchy_id";
+	public static final String QUERY_NAME_COLUMN = "name";
+	public static final String QUERY_CITY_COLUMN = "city";
+	public static final String QUERY_REGION_COLUMN = "region";
+	public static final String QUERY_IS_USA_COLUMN = "is_usa";
+
 	public static final String FIRM_TABLE = "firm";
 	public static final String FIRM_ADDRESS_TABLE = "firm_address";
 	public static final String FIRM_EMAIL_TABLE = "firm_email";
 	public static final String FIRM_PHONE_TABLE = "firm_phone";
 
 	public static final String FIRM_ID_COLUMN = "firm_id";
-	public static final String FIRM_SEMARCHY_ID_COLUMN = "semarchy_id";
 	public static final String FIRM_URL_COLUMN = "url";
 	public static final String FIRM_SOURCE_COLUMN = "source";
 	public static final String FIRM_ADDRESS_COLUMN = "address";

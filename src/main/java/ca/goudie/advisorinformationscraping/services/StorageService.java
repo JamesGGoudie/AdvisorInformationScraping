@@ -1,5 +1,8 @@
 package ca.goudie.advisorinformationscraping.services;
 
+import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
+import ca.goudie.advisorinformationscraping.entities.QueryEntity;
+import ca.goudie.advisorinformationscraping.repositories.QueryRepository;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult;
@@ -27,6 +30,8 @@ import ca.goudie.advisorinformationscraping.repositories.FirmEmailRepository;
 import ca.goudie.advisorinformationscraping.repositories.FirmPhoneRepository;
 import ca.goudie.advisorinformationscraping.repositories.FirmRepository;
 
+import lombok.extern.log4j.Log4j2;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
+@Log4j2
 @Service
 public class StorageService {
 
@@ -61,31 +67,32 @@ public class StorageService {
 	@Autowired
 	private FirmPhoneRepository firmPhoneRepository;
 
-	public void storeFirmResult(
-			final FirmResult firm,
-			final String semarchyId) {
-		this.firmRepo.save(this.buildFirmEntity(firm, semarchyId));
+	@Autowired
+	private QueryRepository queryRepo;
+
+	public QueryEntity storeResults(
+			final IFirmInfo firmInfo,
+			final Collection<FirmResult> results
+	) {
+		log.info("Storing Query Results");
+
+		return this.queryRepo.save(this.buildQueryEntity(firmInfo, results));
 	}
 
 	public Collection<String> getSemarchyIds() {
-		return this.firmRepo.findSemarchyIds();
+		return this.queryRepo.findSemarchyIds();
 	}
 
 	public QueryResult getResultsBySemarchyId(final String id)
 			throws ResultMissingException {
-		final QueryResult out = new QueryResult();
-		final Collection<FirmEntity> firms = this.firmRepo.findBySemarchyId(id);
+		final Optional<QueryEntity> query = this.queryRepo.findById(id);
 
-		if (firms.size() == 0) {
+		if (!query.isPresent()) {
 			throw new ResultMissingException(
-					"Query Result With Semarchy ID (" + id + ") Does Not Exist");
+					"Firm Result With Internal ID (" + id + ") Does Not Exist");
 		}
 
-		for (final FirmEntity firm : firms) {
-			out.getFirms().add(firm.toDto());
-		}
-
-		return out;
+		return query.get().toDto();
 	}
 
 	public FirmResult getFirmById(final Long id) throws ResultMissingException {
@@ -109,6 +116,35 @@ public class StorageService {
 		}
 
 		return employee.get().toDto();
+	}
+
+	private QueryEntity buildQueryEntity(
+			final IFirmInfo firmInfo,
+			final Collection<FirmResult> results
+	) {
+		final QueryEntity queryEntity;
+
+		final Optional<QueryEntity> queryOpt =
+				this.queryRepo.findById(firmInfo.getSemarchyId());
+
+		queryEntity = queryOpt.orElseGet(QueryEntity::new);
+
+		queryEntity.setCity(firmInfo.getCity());
+		queryEntity.setName(firmInfo.getName());
+		queryEntity.setRegion(firmInfo.getRegion());
+		queryEntity.setIsUsa(firmInfo.getIsUsa());
+		queryEntity.setSemarchyId(firmInfo.getSemarchyId());
+
+		final Collection<FirmEntity> resultEntities = new ArrayList<>();
+
+		for (final FirmResult result : results) {
+			resultEntities.add(
+					this.buildFirmEntity(result, firmInfo.getSemarchyId()));
+		}
+
+		queryEntity.addResults(resultEntities);
+
+		return queryEntity;
 	}
 
 	private FirmEntity buildFirmEntity(
@@ -153,7 +189,6 @@ public class StorageService {
 			employees.add(this.buildEmployeeEntity(employee, internalFirmId));
 		}
 
-		firmEntity.setSemarchyId(semarchyId);
 		firmEntity.setSource(firm.getSource());
 		firmEntity.setUrl(firm.getFirmUrl());
 
