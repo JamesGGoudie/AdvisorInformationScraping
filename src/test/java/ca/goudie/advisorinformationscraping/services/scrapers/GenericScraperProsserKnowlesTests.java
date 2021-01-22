@@ -1,10 +1,12 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
+import ca.goudie.advisorinformationscraping.constants.WebBrowserConstants;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.exceptions.RunCancelException;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.services.scrapers.generic.GenericScraper;
+import ca.goudie.advisorinformationscraping.services.selectors.WebDriverSelector;
 
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
@@ -24,8 +26,7 @@ public class GenericScraperProsserKnowlesTests {
 	private GenericScraper genericScraper;
 
 	@Autowired
-	@Qualifier("chromeWebDriver")
-	private WebDriver chromeWebDriver;
+	private WebDriverSelector webDriverSelector;
 
 	@Test
 	public void shouldScrapeProsserKnowles()
@@ -33,7 +34,8 @@ public class GenericScraperProsserKnowlesTests {
 		final String landingPageUrl = "https://www.prosserknowles.co.uk/";
 		final String countryCode = "GB";
 
-		WebDriver mockDriver = spy(this.chromeWebDriver);
+		WebDriver mockDriver = spy(this.webDriverSelector.selectWebDriver(
+				WebBrowserConstants.CHROMIUM));
 
 		final FirmResult aFirm = this.genericScraper.scrapeWebsite(mockDriver,
 				landingPageUrl,
