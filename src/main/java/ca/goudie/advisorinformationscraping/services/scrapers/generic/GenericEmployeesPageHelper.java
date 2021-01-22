@@ -152,7 +152,8 @@ public class GenericEmployeesPageHelper {
 				}
 
 				currentNode = parentNode;
-			} while (!currentNode.getTagName().equalsIgnoreCase("body"));
+			} while (!(currentNode.getTagName().equalsIgnoreCase("body") ||
+					currentNode.getTagName().equalsIgnoreCase("head")));
 
 			final String href;
 

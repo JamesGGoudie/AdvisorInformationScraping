@@ -109,8 +109,10 @@ public class GenericTitleHelper {
 
 		for (final WebElement el : els) {
 			final String leafInnerText;
+			final String tagName;
 
 			try {
+				tagName = el.getTagName();
 				leafInnerText = el.getAttribute("innerText");
 			} catch (StaleElementReferenceException e) {
 				// Element is stale; try next one
@@ -119,8 +121,22 @@ public class GenericTitleHelper {
 				continue;
 			}
 
+			// If the tag does not contain relevant info...
+			if (tagName.equals("script") || tagName.equals("style")) {
+				continue;
+			}
+
+			if (StringUtils.isBlank(leafInnerText)) {
+				continue;
+			}
+
 			// If the leaf does not include a title...
 			if (this.findTitleEnd(leafInnerText) == -1) {
+				continue;
+			}
+
+			if (leafInnerText.split(" ").length > 10) {
+				// Too long ot be a title; skip
 				continue;
 			}
 
@@ -161,7 +177,8 @@ public class GenericTitleHelper {
 				}
 
 				currentNode = parentNode;
-			} while (!currentNode.getTagName().equalsIgnoreCase("body"));
+			} while (!(currentNode.getTagName().equalsIgnoreCase("body") ||
+					currentNode.getTagName().equalsIgnoreCase("head")));
 
 			log.info("Found Employee Page Block with Title: " + leafInnerText);
 
@@ -180,6 +197,10 @@ public class GenericTitleHelper {
 	 * @return
 	 */
 	private int findTitleEnd(final String text) {
+		if (StringUtils.isBlank(text)) {
+			return -1;
+		}
+
 		for (final String title : GenericTitleHelper.EMPLOYEE_TITLES) {
 			final int i = text.toLowerCase().indexOf(title);
 
@@ -192,6 +213,10 @@ public class GenericTitleHelper {
 	}
 
 	private boolean containsTitle(final String text) {
+		if (StringUtils.isBlank(text)) {
+			return false;
+		}
+
 		for (final String title : GenericTitleHelper.EMPLOYEE_TITLES) {
 			if (text.toLowerCase().contains(title)) {
 				return true;
