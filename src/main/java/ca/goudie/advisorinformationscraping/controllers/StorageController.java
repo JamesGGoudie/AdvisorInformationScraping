@@ -1,8 +1,8 @@
 package ca.goudie.advisorinformationscraping.controllers;
 
-import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
-import ca.goudie.advisorinformationscraping.dto.FirmResult;
-import ca.goudie.advisorinformationscraping.dto.ScrapeResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult;
 import ca.goudie.advisorinformationscraping.exceptions.ResultMissingException;
 import ca.goudie.advisorinformationscraping.services.StorageService;
 
@@ -27,7 +27,7 @@ public class StorageController {
 	}
 
 	@GetMapping("/query/{id}")
-	public ScrapeResult getResultsBySemarchyId(
+	public QueryResult getResultsBySemarchyId(
 			@PathVariable("id")
 			final String id
 	) throws ResultMissingException {

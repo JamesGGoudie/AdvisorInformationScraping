@@ -1,8 +1,7 @@
 package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
-import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
-import ca.goudie.advisorinformationscraping.dto.FirmResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

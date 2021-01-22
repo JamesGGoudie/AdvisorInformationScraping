@@ -1,8 +1,8 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
 import ca.goudie.advisorinformationscraping.constants.GenericConstants;
-import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
-import ca.goudie.advisorinformationscraping.dto.FirmResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 
 import lombok.extern.log4j.Log4j2;
 

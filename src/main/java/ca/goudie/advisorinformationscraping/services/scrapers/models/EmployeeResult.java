@@ -1,4 +1,4 @@
-package ca.goudie.advisorinformationscraping.dto;
+package ca.goudie.advisorinformationscraping.services.scrapers.models;
 
 import lombok.Data;
 

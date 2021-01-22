@@ -1,8 +1,8 @@
 package ca.goudie.advisorinformationscraping.services;
 
-import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
-import ca.goudie.advisorinformationscraping.dto.FirmResult;
-import ca.goudie.advisorinformationscraping.dto.ScrapeResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult;
 import ca.goudie.advisorinformationscraping.entities.EmployeeAddress;
 import ca.goudie.advisorinformationscraping.entities.EmployeeEmail;
 import ca.goudie.advisorinformationscraping.entities.EmployeeEntity;
@@ -71,9 +71,9 @@ public class StorageService {
 		return this.firmRepo.findSemarchyIds();
 	}
 
-	public ScrapeResult getResultsBySemarchyId(final String id)
+	public QueryResult getResultsBySemarchyId(final String id)
 			throws ResultMissingException {
-		final ScrapeResult out = new ScrapeResult();
+		final QueryResult out = new QueryResult();
 		final Collection<FirmEntity> firms = this.firmRepo.findBySemarchyId(id);
 
 		if (firms.size() == 0) {

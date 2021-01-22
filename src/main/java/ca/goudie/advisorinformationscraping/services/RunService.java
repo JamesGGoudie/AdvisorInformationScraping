@@ -1,9 +1,9 @@
 package ca.goudie.advisorinformationscraping.services;
 
 import ca.goudie.advisorinformationscraping.constants.ExceptionMessages;
-import ca.goudie.advisorinformationscraping.dto.FirmResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
-import ca.goudie.advisorinformationscraping.dto.ScrapeResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult;
 import ca.goudie.advisorinformationscraping.exceptions.RunCancelException;
 import ca.goudie.advisorinformationscraping.exceptions.RunFailureException;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
@@ -171,7 +171,7 @@ public class RunService {
 		this.threadService.setIsRunning(true);
 	}
 
-	private ScrapeResult processQuery(
+	private QueryResult processQuery(
 			final IFirmInfo info,
 			final WebDriver webDriver,
 			final ISearcher searcher,
@@ -216,7 +216,7 @@ public class RunService {
 			this.storageService.storeFirmResult(firm, info.getSemarchyId());
 		}
 
-		final ScrapeResult out = new ScrapeResult();
+		final QueryResult out = new QueryResult();
 		out.getFirms().addAll(firms);
 
 		return out;
