@@ -16,6 +16,7 @@ import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult
 
 import lombok.extern.log4j.Log4j2;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -133,7 +134,9 @@ public class StorageService {
 		boolean found = false;
 
 		for (final FirmEntity result : queryEntity.getResults()) {
-			if (result.getSemarchyId().equals(semarchyId) &&
+			// A blank semarchy ID means that it is a new firm result
+			if (StringUtils.isNotBlank(result.getSemarchyId()) &&
+					result.getSemarchyId().equals(semarchyId) &&
 					result.getSource().equals(firm.getSource())) {
 				found = true;
 				firmEntity = result;
