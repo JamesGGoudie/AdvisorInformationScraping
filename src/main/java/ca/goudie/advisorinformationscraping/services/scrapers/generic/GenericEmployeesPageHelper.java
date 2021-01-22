@@ -65,8 +65,12 @@ public class GenericEmployeesPageHelper {
 	) throws RunCancelException {
 		log.info("Scraping Employee Pages");
 
-		final Collection<String> badHrefs = new HashSet<>();
 		final String currentUrl = driver.getCurrentUrl();
+
+		// A collection of all hrefs known to not be personal pages.
+		// Initialize with the set of employee pages.
+		final Collection<String> badHrefs = new HashSet<>();
+		badHrefs.addAll(employeePageLinks);
 
 		for (final String employeePageLink : employeePageLinks) {
 			if (!this.threadService.getIsAllowedToRun()) {

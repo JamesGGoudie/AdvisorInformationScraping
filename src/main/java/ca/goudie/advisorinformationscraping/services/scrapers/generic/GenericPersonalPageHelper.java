@@ -123,6 +123,11 @@ public class GenericPersonalPageHelper {
 			return false;
 		}
 
+		if (href.endsWith("/#")) {
+			// An HREF ending with '/#' just points back to the current URL.
+			return false;
+		}
+
 		if (badHrefs.contains(href)) {
 			return false;
 		}
