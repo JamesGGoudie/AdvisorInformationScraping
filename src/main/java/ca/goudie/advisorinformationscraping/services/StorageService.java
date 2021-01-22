@@ -2,6 +2,7 @@ package ca.goudie.advisorinformationscraping.services;
 
 import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
 import ca.goudie.advisorinformationscraping.dto.FirmResult;
+import ca.goudie.advisorinformationscraping.dto.ScrapeResult;
 import ca.goudie.advisorinformationscraping.entities.EmployeeAddress;
 import ca.goudie.advisorinformationscraping.entities.EmployeeEmail;
 import ca.goudie.advisorinformationscraping.entities.EmployeeEntity;
@@ -16,6 +17,7 @@ import ca.goudie.advisorinformationscraping.entities.ids.EmployeePhoneId;
 import ca.goudie.advisorinformationscraping.entities.ids.FirmAddressId;
 import ca.goudie.advisorinformationscraping.entities.ids.FirmEmailId;
 import ca.goudie.advisorinformationscraping.entities.ids.FirmPhoneId;
+import ca.goudie.advisorinformationscraping.exceptions.ResultMissingException;
 import ca.goudie.advisorinformationscraping.repositories.EmployeeAddressRepository;
 import ca.goudie.advisorinformationscraping.repositories.EmployeeEmailRepository;
 import ca.goudie.advisorinformationscraping.repositories.EmployeePhoneRepository;
@@ -65,6 +67,50 @@ public class StorageService {
 		this.firmRepo.save(this.buildFirmEntity(firm, semarchyId));
 	}
 
+	public Collection<String> getSemarchyIds() {
+		return this.firmRepo.findSemarchyIds();
+	}
+
+	public ScrapeResult getResultsBySemarchyId(final String id)
+			throws ResultMissingException {
+		final ScrapeResult out = new ScrapeResult();
+		final Collection<FirmEntity> firms = this.firmRepo.findBySemarchyId(id);
+
+		if (firms.size() == 0) {
+			throw new ResultMissingException(
+					"Query Result With Semarchy ID (" + id + ") Does Not Exist");
+		}
+
+		for (final FirmEntity firm : firms) {
+			out.getFirms().add(firm.toDto());
+		}
+
+		return out;
+	}
+
+	public FirmResult getFirmById(final Long id) throws ResultMissingException {
+		final Optional<FirmEntity> firm = this.firmRepo.findById(id);
+
+		if (!firm.isPresent()) {
+			throw new ResultMissingException(
+					"Firm Result With Internal ID (" + id + ") Does Not Exist");
+		}
+
+		return firm.get().toDto();
+	}
+
+	public EmployeeResult getEmployeeById(final Long id)
+			throws ResultMissingException {
+		final Optional<EmployeeEntity> employee = this.employeeRepo.findById(id);
+
+		if (!employee.isPresent()) {
+			throw new ResultMissingException(
+					"Employee Result With Internal ID (" + id + ") Does Not Exist");
+		}
+
+		return employee.get().toDto();
+	}
+
 	private FirmEntity buildFirmEntity(
 			final FirmResult firm,
 			final String semarchyId) {
@@ -108,7 +154,7 @@ public class StorageService {
 		}
 
 		firmEntity.setSemarchyId(semarchyId);
-		firmEntity.setFirmSource(firm.getSource());
+		firmEntity.setSource(firm.getSource());
 		firmEntity.setUrl(firm.getFirmUrl());
 
 		firmEntity.addAddresses(firmAddresses);

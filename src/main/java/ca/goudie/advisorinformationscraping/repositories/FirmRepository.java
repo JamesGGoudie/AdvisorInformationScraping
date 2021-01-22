@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface FirmRepository extends JpaRepository<FirmEntity, Long> {
@@ -22,5 +23,13 @@ public interface FirmRepository extends JpaRepository<FirmEntity, Long> {
 			final String semarchyId,
 			@Param("firmSource")
 			final String firmSource);
+
+	@Query(
+			value = "SELECT DISTINCT " + SqlConstants.FIRM_SEMARCHY_ID_COLUMN +
+					" FROM " + SqlConstants.FIRM_TABLE,
+			nativeQuery = true)
+	Collection<String> findSemarchyIds();
+
+	Collection<FirmEntity> findBySemarchyId(final String semarchyId);
 
 }

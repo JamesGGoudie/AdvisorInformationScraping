@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
+import ca.goudie.advisorinformationscraping.dto.FirmResult;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,7 +48,7 @@ public class FirmEntity {
 	@Column(
 			name = SqlConstants.FIRM_SOURCE_COLUMN,
 			nullable = false)
-	private String firmSource;
+	private String source;
 
 	@Column(name = SqlConstants.FIRM_URL_COLUMN)
 	private String url;
@@ -114,6 +115,31 @@ public class FirmEntity {
 		for (final EmployeeEntity address : employees) {
 			address.setFirm(this);
 		}
+	}
+
+	public FirmResult toDto() {
+		final FirmResult firm = new FirmResult();
+
+		firm.setSource(this.source);
+		firm.setFirmUrl(this.url);
+
+		for (final FirmAddress address : this.addresses) {
+			firm.getAddresses().add(address.getId().getAddress());
+		}
+
+		for (final FirmEmail email : this.emails) {
+			firm.getEmails().add(email.getId().getEmail());
+		}
+
+		for (final FirmPhone phone : this.phones) {
+			firm.getPhones().add(phone.getId().getPhone());
+		}
+
+		for (final EmployeeEntity employee : this.employees) {
+			firm.getEmployees().add(employee.toDto());
+		}
+
+		return firm;
 	}
 
 }

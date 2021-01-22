@@ -1,6 +1,8 @@
 package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
+import ca.goudie.advisorinformationscraping.dto.EmployeeResult;
+import ca.goudie.advisorinformationscraping.dto.FirmResult;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -109,6 +111,34 @@ public class EmployeeEntity {
 		for (final EmployeePhone address : phones) {
 			address.setEmployee(this);
 		}
+	}
+
+	public EmployeeResult toDto() {
+		final EmployeeResult employee = new EmployeeResult();
+
+		employee.setName(this.name);
+		employee.setSource(this.source);
+		employee.setTitle(this.title);
+
+		for (final EmployeeAddress address : this.addresses) {
+			employee.getAddresses().put(
+					address.getId().getAddress(),
+					address.getScore());
+		}
+
+		for (final EmployeeEmail email : this.emails) {
+			employee.getEmails().put(
+					email.getId().getEmail(),
+					email.getScore());
+		}
+
+		for (final EmployeePhone phone : this.phones) {
+			employee.getPhones().put(
+					phone.getId().getPhone(),
+					phone.getScore());
+		}
+
+		return employee;
 	}
 
 }
