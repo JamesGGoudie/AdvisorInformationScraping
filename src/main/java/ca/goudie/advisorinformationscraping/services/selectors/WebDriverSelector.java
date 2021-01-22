@@ -6,6 +6,8 @@ import ca.goudie.advisorinformationscraping.logging.LoggingWebDriver;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -18,6 +20,12 @@ public class WebDriverSelector {
 
 	@Value("${selenium.chrome-driver-location}")
 	private String chromeDriverLocation;
+
+	@Value("${selenium.chrome-location}")
+	private String chromeLocation;
+
+	@Value("${selenium.firefox-driver-location}")
+	private String firefoxDriverLocation;
 
 	/**
 	 * Selects the default web driver.
@@ -41,6 +49,9 @@ public class WebDriverSelector {
 			case WebBrowserConstants.CHROMIUM: {
 				return this.buildChromeWebDriver();
 			}
+			case WebBrowserConstants.FIREFOX: {
+				return this.buildFirefoxDriver();
+			}
 			default: {
 				log.info("Unknown Web Browser: " + key + "; Using Default");
 				return this.getDefault();
@@ -49,7 +60,18 @@ public class WebDriverSelector {
 	}
 
 	private WebDriver getDefault() {
-		return this.buildChromeWebDriver();
+		return this.buildFirefoxDriver();
+	}
+
+	private WebDriver buildFirefoxDriver() {
+		// Need to tell Selenium where the chromedriver file is.
+		System.setProperty("webdriver.gecko.driver", this.firefoxDriverLocation);
+
+		final FirefoxOptions options = new FirefoxOptions();
+		options.setHeadless(true);
+		// options.setBinary(this.firefoxLocation);
+
+		return new LoggingWebDriver(new FirefoxDriver(options));
 	}
 
 	private WebDriver buildChromeWebDriver() {
@@ -57,8 +79,8 @@ public class WebDriverSelector {
 		System.setProperty("webdriver.chrome.driver", this.chromeDriverLocation);
 
 		final ChromeOptions options = new ChromeOptions();
-		// By setting Chrome to headless, we don't need GPU resources.
 		options.setHeadless(true);
+		options.setBinary(this.chromeLocation);
 
 		return new LoggingWebDriver(new ChromeDriver(options));
 	}

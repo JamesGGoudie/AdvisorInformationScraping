@@ -12,6 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
 
 @Log4j2
 public abstract class ASearcher implements ISearcher {
@@ -24,6 +25,13 @@ public abstract class ASearcher implements ISearcher {
 			final Collection<String> blacklist
 	) throws SearchException {
 		this.performQuery(driver, query);
+
+		try {
+			// Firefox needs a delay
+			TimeUnit.SECONDS.sleep(2);
+		} catch (InterruptedException e) {
+			log.error(e);
+		}
 
 		return this.getSearchResults(driver, resultsLimit, blacklist);
 	}

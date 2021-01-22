@@ -13,3 +13,5 @@ spring:
 
 selenium:
   chrome-driver-location: C:/Program Files (x86)/Selenium/chromedriver.exe
+  chrome-location: C:/Program Files (x86)/Google/Chrome/Application/chrome.exe
+  firefox-driver-location: C:/Program Files (x86)/Selenium/geckodriver.exe

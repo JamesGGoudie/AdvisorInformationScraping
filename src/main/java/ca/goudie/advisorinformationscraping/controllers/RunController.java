@@ -37,7 +37,7 @@ public class RunController {
 			@RequestParam(
 					value = "browser",
 					required = false,
-					defaultValue = WebBrowserConstants.CHROMIUM)
+					defaultValue = WebBrowserConstants.FIREFOX)
 			final String webBrowserKey,
 			@RequestParam(
 					value = "engine",
