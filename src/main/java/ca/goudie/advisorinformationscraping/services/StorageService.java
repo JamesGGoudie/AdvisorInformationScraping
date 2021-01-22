@@ -31,6 +31,7 @@ import ca.goudie.advisorinformationscraping.repositories.FirmAddressRepository;
 import ca.goudie.advisorinformationscraping.repositories.FirmEmailRepository;
 import ca.goudie.advisorinformationscraping.repositories.FirmPhoneRepository;
 import ca.goudie.advisorinformationscraping.repositories.FirmRepository;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -72,13 +73,10 @@ public class StorageService {
 	@Autowired
 	private QueryRepository queryRepo;
 
-	public QueryEntity storeResults(
-			final IFirmInfo firmInfo,
-			final Collection<FirmResult> results
-	) {
+	public QueryEntity storeResults(final QueryResult result) {
 		log.info("Storing Query Results");
 
-		return this.queryRepo.save(this.buildQueryEntity(firmInfo, results));
+		return this.queryRepo.save(this.buildQueryEntity(result));
 	}
 
 	public Collection<String> getSemarchyIds() {
@@ -121,9 +119,10 @@ public class StorageService {
 	}
 
 	private QueryEntity buildQueryEntity(
-			final IFirmInfo firmInfo,
-			final Collection<FirmResult> results
+			final QueryResult queryResult
 	) {
+		final IFirmInfo firmInfo = queryResult.getQueryInfo();
+
 		final QueryEntity queryEntity;
 
 		final Optional<QueryEntity> queryOpt =
@@ -139,9 +138,9 @@ public class StorageService {
 
 		final Collection<FirmEntity> resultEntities = new ArrayList<>();
 
-		for (final FirmResult result : results) {
+		for (final FirmResult firmResult : queryResult.getFirms()) {
 			resultEntities.add(
-					this.buildFirmEntity(result, firmInfo.getSemarchyId()));
+					this.buildFirmEntity(firmResult, firmInfo.getSemarchyId()));
 		}
 
 		queryEntity.addResults(resultEntities);

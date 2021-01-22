@@ -213,7 +213,11 @@ public class RunService {
 			}
 		}
 
-		this.storageService.storeResults(info, results);
+		final QueryResult result = new QueryResult();
+		result.setQueryInfo(info);
+		result.getFirms().addAll(results);
+
+		this.storageService.storeResults(result);
 	}
 
 	private String buildQuery(final IFirmInfo info) {
