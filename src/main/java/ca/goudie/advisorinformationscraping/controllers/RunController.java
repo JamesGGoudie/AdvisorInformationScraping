@@ -70,7 +70,7 @@ public class RunController {
 
 	@PostMapping("/cancel")
 	public void cancelApp() {
-		log.info("REQ: Stopp the App");
+		log.info("REQ: Stop the App");
 		this.runService.reset();
 	}
 
