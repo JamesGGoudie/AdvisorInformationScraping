@@ -1,10 +1,10 @@
 package ca.goudie.advisorinformationscraping.services.scrapers;
 
-import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
-import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.dto.specialized.bloomberg.IBloombergEmployee;
 import ca.goudie.advisorinformationscraping.dto.specialized.bloomberg.IBloombergOrganization;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.utils.json.AisJsonUtils;
 
 import org.apache.commons.lang3.StringUtils;

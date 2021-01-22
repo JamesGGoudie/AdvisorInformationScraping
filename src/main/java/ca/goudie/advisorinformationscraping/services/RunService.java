@@ -1,15 +1,14 @@
 package ca.goudie.advisorinformationscraping.services;
 
 import ca.goudie.advisorinformationscraping.constants.ExceptionMessages;
-import ca.goudie.advisorinformationscraping.entities.QueryEntity;
-import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
-import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult;
 import ca.goudie.advisorinformationscraping.exceptions.RunCancelException;
 import ca.goudie.advisorinformationscraping.exceptions.RunFailureException;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.exceptions.SearchException;
 import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult;
 import ca.goudie.advisorinformationscraping.services.searchers.ISearcher;
 import ca.goudie.advisorinformationscraping.services.selectors.ScraperSelector;
 import ca.goudie.advisorinformationscraping.services.selectors.SearcherSelector;

@@ -5,10 +5,6 @@ import ca.goudie.advisorinformationscraping.dto.EmployeeDto;
 import ca.goudie.advisorinformationscraping.entities.ids.EmployeeAddressId;
 import ca.goudie.advisorinformationscraping.entities.ids.EmployeeEmailId;
 import ca.goudie.advisorinformationscraping.entities.ids.EmployeePhoneId;
-import ca.goudie.advisorinformationscraping.entities.ids.FirmAddressId;
-import ca.goudie.advisorinformationscraping.entities.ids.FirmEmailId;
-import ca.goudie.advisorinformationscraping.entities.ids.FirmPhoneId;
-import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,10 +1,10 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
-import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.exceptions.RunCancelException;
 import ca.goudie.advisorinformationscraping.exceptions.ScrapeException;
 import ca.goudie.advisorinformationscraping.services.ThreadService;
 import ca.goudie.advisorinformationscraping.services.scrapers.IScraper;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;

@@ -4,14 +4,14 @@ import ca.goudie.advisorinformationscraping.dto.EmployeeDto;
 import ca.goudie.advisorinformationscraping.dto.FirmDto;
 import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
 import ca.goudie.advisorinformationscraping.dto.QueryDto;
-import ca.goudie.advisorinformationscraping.entities.QueryEntity;
-import ca.goudie.advisorinformationscraping.repositories.QueryRepository;
-import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.entities.EmployeeEntity;
 import ca.goudie.advisorinformationscraping.entities.FirmEntity;
+import ca.goudie.advisorinformationscraping.entities.QueryEntity;
 import ca.goudie.advisorinformationscraping.exceptions.ResultMissingException;
 import ca.goudie.advisorinformationscraping.repositories.EmployeeRepository;
 import ca.goudie.advisorinformationscraping.repositories.FirmRepository;
+import ca.goudie.advisorinformationscraping.repositories.QueryRepository;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult;
 
 import lombok.extern.log4j.Log4j2;

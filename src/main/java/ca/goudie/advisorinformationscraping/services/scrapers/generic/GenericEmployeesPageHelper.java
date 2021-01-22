@@ -1,12 +1,12 @@
 package ca.goudie.advisorinformationscraping.services.scrapers.generic;
 
 import ca.goudie.advisorinformationscraping.constants.ExceptionMessages;
-import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
-import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.exceptions.DomReadException;
 import ca.goudie.advisorinformationscraping.exceptions.RunCancelException;
 import ca.goudie.advisorinformationscraping.exceptions.UrlParseException;
 import ca.goudie.advisorinformationscraping.services.ThreadService;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
+import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.utils.AisRegexUtils;
 import ca.goudie.advisorinformationscraping.utils.AisUrlUtils;
 
