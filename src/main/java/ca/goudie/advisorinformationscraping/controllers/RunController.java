@@ -68,9 +68,15 @@ public class RunController {
 		return this.runService.isRunning();
 	}
 
+	@PostMapping("/cancel")
+	public void cancelApp() {
+		log.info("REQ: Stopp the App");
+		this.runService.reset();
+	}
+
 	@PostMapping("/reset")
 	public void resetApp() {
-		log.info("REQ: Stop if Running or Reset if Stopped");
+		log.info("REQ: Reset the App");
 		this.runService.reset();
 	}
 
