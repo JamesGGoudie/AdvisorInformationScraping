@@ -211,6 +211,8 @@ public class RunService {
 
 				continue;
 			}
+
+			results.add(firm);
 		}
 
 		final QueryResult result = new QueryResult();

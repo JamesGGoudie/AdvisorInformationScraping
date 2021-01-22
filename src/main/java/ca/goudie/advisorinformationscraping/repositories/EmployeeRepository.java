@@ -31,7 +31,7 @@ public interface EmployeeRepository
 					" SET " + SqlConstants.EMPLOYEE_IS_CURRENT_COLUMN + " = false" +
 					" WHERE " + SqlConstants.FIRM_ID_COLUMN + " = :firmId",
 			nativeQuery = true)
-	void updateIsCurrent(
+	void updateIsCurrentToFalse(
 			@Param("firmId")
 			final Long firmId);
 

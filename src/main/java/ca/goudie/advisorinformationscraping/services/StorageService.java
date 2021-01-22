@@ -128,7 +128,15 @@ public class StorageService {
 		final Optional<QueryEntity> queryOpt =
 				this.queryRepo.findById(firmInfo.getSemarchyId());
 
-		queryEntity = queryOpt.orElseGet(QueryEntity::new);
+		if (queryOpt.isPresent()) {
+			log.info(
+					"Query with ID (" + firmInfo.getSemarchyId() + ") Exists");
+			queryEntity = queryOpt.get();
+		} else {
+			log.info(
+					"Query with ID (" + firmInfo.getSemarchyId() + ") does Not Exist");
+			queryEntity = new QueryEntity();
+		}
 
 		queryEntity.setCity(firmInfo.getCity());
 		queryEntity.setName(firmInfo.getName());
@@ -137,6 +145,8 @@ public class StorageService {
 		queryEntity.setSemarchyId(firmInfo.getSemarchyId());
 
 		final Collection<FirmEntity> resultEntities = new ArrayList<>();
+
+		log.info("Query has " + queryResult.getFirms().size() + " Firm Results");
 
 		for (final FirmResult firmResult : queryResult.getFirms()) {
 			resultEntities.add(
@@ -160,10 +170,17 @@ public class StorageService {
 		final Long internalFirmId;
 
 		if (internalFirmIdOpt.isPresent()) {
+			log.info("Firm with Semarchy ID (" + semarchyId + ")" +
+					" and Source (" + firm.getSource() + ") Exists");
+
 			internalFirmId = internalFirmIdOpt.get();
 			// Set all of the employees to out-of-date
-			this.employeeRepo.updateIsCurrent(internalFirmId);
+			log.info("Setting Employees as Non-Current");
+			this.employeeRepo.updateIsCurrentToFalse(internalFirmId);
 		} else {
+			log.info("Firm with Semarchy ID (" + semarchyId + ")" +
+					" and Source (" + firm.getSource() + ") does not Exist");
+
 			internalFirmId = null;
 		}
 
@@ -185,6 +202,9 @@ public class StorageService {
 		for (final String phone : firm.getPhones()) {
 			firmPhones.add(this.buildFirmPhone(phone, internalFirmId));
 		}
+
+		log.info("Firm (" + internalFirmId + ") has " +
+				firm.getEmployees().size() + " Employee Results");
 
 		for (final EmployeeResult employee : firm.getEmployees()) {
 			employees.add(this.buildEmployeeEntity(employee, internalFirmId));
@@ -283,12 +303,18 @@ public class StorageService {
 
 			// If it does...
 			if (internalEmployeeIdOpt.isPresent()) {
+				log.info("Employee with Internal Firm ID (" + internalFirmId + ")" +
+						" and Name (" + employee.getName() + ") Exists");
+
 				internalEmployeeId = internalEmployeeIdOpt.get();
 				final Optional<EmployeeEntity> employeeOpt =
 						this.employeeRepo.findById(internalEmployeeId);
 
 				employeeEntity = employeeOpt.orElseGet(EmployeeEntity::new);
 			} else {
+				log.info("Employee with Internal Firm ID (" + internalFirmId + ")" +
+						" and Name (" + employee.getName() + ") does not Exist");
+
 				internalEmployeeId = null;
 				employeeEntity = new EmployeeEntity();
 			}
