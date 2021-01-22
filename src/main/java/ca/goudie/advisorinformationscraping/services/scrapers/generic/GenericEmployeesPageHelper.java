@@ -75,8 +75,18 @@ public class GenericEmployeesPageHelper {
 
 			driver.get(employeePageLink);
 
-			final Collection<WebElement> employeeBlocks =
-					this.findEmployeePageBlocksByAnchors(driver, badHrefs);
+			final Collection<WebElement> employeeBlocks;
+
+			try {
+				// employeeBlocks = this.findEmployeePageBlocksByAnchors(driver, badHrefs);
+				employeeBlocks = this.titleHelper.findEmployeeBlocksByTitle(
+						driver.findElement(By.tagName("body")));
+			} catch (StaleElementReferenceException e) {
+				// Could not process page; try the next one
+				log.error(e);
+
+				continue;
+			}
 
 			log.info("Found " + employeeBlocks.size() + " Employee Blocks");
 
@@ -310,7 +320,10 @@ public class GenericEmployeesPageHelper {
 			break;
 		}
 
-		firm.getEmployees().add(employee);
+		// Name is part of the primary key, so cannot be blank
+		if (StringUtils.isNotBlank(employee.getName())) {
+			firm.getEmployees().add(employee);
+		}
 	}
 
 }

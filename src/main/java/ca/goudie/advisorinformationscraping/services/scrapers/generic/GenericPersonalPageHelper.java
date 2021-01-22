@@ -60,6 +60,10 @@ public class GenericPersonalPageHelper {
 			final EmployeeResult employee,
 			final String countryCode
 	) {
+		if (StringUtils.isBlank(employee.getSource())) {
+			return;
+		}
+
 		log.info("Scraping Personal Page");
 
 		driver.get(employee.getSource());

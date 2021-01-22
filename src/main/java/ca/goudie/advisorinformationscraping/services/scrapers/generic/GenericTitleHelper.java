@@ -10,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,10 +29,12 @@ public class GenericTitleHelper {
 
 	public GenericTitleHelper() {
 		Collections.addAll(GenericTitleHelper.EMPLOYEE_TITLES,
-				"chartered financial planner",
+				"financial planner",
 				"financial planning specialist",
 				"trust specialist",
-				"financial planning consultant");
+				"financial planning consultant",
+				"financial adviser",
+				"financial advisor");
 	}
 
 	/**
@@ -42,51 +45,73 @@ public class GenericTitleHelper {
 	 * @param context
 	 * @return
 	 */
-	String findEmployeeTitleInBlock(final SearchContext context) {
-		log.info("Searching for Employee Title");
+	String findEmployeeTitleInBlock(final WebElement context) {
+		final List<WebElement> els;
 
-		final Collection<String> tags = new HashSet<>();
-		Collections.addAll(tags, "span");
+		try {
+			// Find all child elements
+			els = context.findElements(By.xpath("./*"));
+		} catch (StaleElementReferenceException e) {
+			// Context is dead; return null
+			log.error(e);
 
-		for (final String tag : tags) {
-			final String title = this.findEmployeeTitleByTag(context, tag);
+			return null;
+		}
 
-			if (StringUtils.isNotBlank(title)) {
-				return title;
+		if (els.size() == 0) {
+			final String innerText;
+
+			try {
+				innerText = context.getAttribute("innerText");
+			} catch (StaleElementReferenceException e) {
+				// Element is stale; try next one
+				log.error(e);
+
+				return null;
+			}
+
+			if (this.containsTitle(innerText)) {
+				return innerText;
+			}
+
+			return null;
+		}
+
+		for (final WebElement el : els) {
+			final String result = this.findEmployeeTitleInBlock(el);
+
+			if (StringUtils.isNotBlank(result)) {
+				return result;
 			}
 		}
 
 		return null;
 	}
 
-	/**
-	 * Searches for an employee title in the given context by looking exclusively
-	 * at the given tag.
-	 *
-	 * @param context
-	 * @param tag
-	 * @return
-	 */
-	private String findEmployeeTitleByTag(
-			final SearchContext context,
-			final String tag
+	Collection<WebElement> findEmployeeBlocksByTitle(
+			final SearchContext context
 	) {
+		log.info("Searching for Employee Page Blocks by Title");
+
 		final List<WebElement> els;
 
 		try {
-			els = context.findElements(By.tagName(tag));
+			// Find all leaf elements.
+			els = context.findElements(By.xpath("//*[not(*)]"));
 		} catch (StaleElementReferenceException e) {
-			// Tag is stale; return null
+			// Context is dead; return empty collection
 			log.error(e);
 
-			return null;
+			return new ArrayList<>();
 		}
+
+		final Collection<WebElement> employeeBlocks = new ArrayList<>();
 
 		for (final WebElement el : els) {
-			final List<WebElement> children;
+			final String leafInnerText;
 
 			try {
-				children = el.findElements(By.xpath("./*"));
+				leafInnerText = el.getAttribute("innerText");
 			} catch (StaleElementReferenceException e) {
 				// Element is stale; try next one
 				log.error(e);
@@ -94,33 +119,86 @@ public class GenericTitleHelper {
 				continue;
 			}
 
-			// We only want to check for titles in leaf tags since searching any
-			// higher would give us less useful information.
-			if (children.size() > 0) {
+			// If the leaf does not include a title...
+			if (this.findTitleEnd(leafInnerText) == -1) {
 				continue;
 			}
 
-			final String innerText;
+			WebElement currentNode = el;
 
-			try {
-				innerText = el.getAttribute("innerText");
-			} catch (StaleElementReferenceException e) {
-				// Element is stale; try next one
-				log.error(e);
+			do {
+				final WebElement parentNode;
 
-				continue;
-			}
+				try {
+					parentNode = currentNode.findElement(By.xpath(".."));
+				} catch (StaleElementReferenceException e) {
+					// Could not access currentNode; move on to next element
+					log.error(e);
 
-			for (final String title : GenericTitleHelper.EMPLOYEE_TITLES) {
-				if (innerText.toLowerCase().contains(title)) {
-					// Return innerText instead of title because the employee's full title
-					// may contain more than just one role.
-					return innerText;
+					break;
 				}
+
+				final String innerText;
+
+				try {
+					innerText = parentNode.getAttribute("innerText");
+				} catch (StaleElementReferenceException e) {
+					// Element is stale; try next one
+					log.error(e);
+
+					continue;
+				}
+
+				// The string after the first title.
+				// The first title should exist since it was in leaf.
+				final String cutText =
+						innerText.substring(this.findTitleEnd(innerText));
+
+				// If we have found a second title...
+				if (this.findTitleEnd(cutText) != -1) {
+					// ...then the current node is an employee block.
+					break;
+				}
+
+				currentNode = parentNode;
+			} while (!currentNode.getTagName().equalsIgnoreCase("body"));
+
+			log.info("Found Employee Page Block with Title: " + leafInnerText);
+
+			employeeBlocks.add(currentNode);
+		}
+
+		return employeeBlocks;
+	}
+
+	/**
+	 * Searches for the first end point of a title in the given text.
+	 *
+	 * Returns -1 if a title is not found.
+	 *
+	 * @param text
+	 * @return
+	 */
+	private int findTitleEnd(final String text) {
+		for (final String title : GenericTitleHelper.EMPLOYEE_TITLES) {
+			final int i = text.toLowerCase().indexOf(title);
+
+			if (i != -1) {
+				return i + title.length();
 			}
 		}
 
-		return null;
+		return -1;
+	}
+
+	private boolean containsTitle(final String text) {
+		for (final String title : GenericTitleHelper.EMPLOYEE_TITLES) {
+			if (text.toLowerCase().contains(title)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }
