@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class SearcherSelector {
 
-	private static final String GOOGLE_KEY = "G";
-
 	@Autowired
 	private GoogleSearcher googleSearcher;
 
