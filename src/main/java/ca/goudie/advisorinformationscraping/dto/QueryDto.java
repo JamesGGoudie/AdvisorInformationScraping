@@ -2,17 +2,18 @@ package ca.goudie.advisorinformationscraping.dto;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
 public class QueryDto {
 
-	final String semarchyId;
-	final String name;
-	final String city;
-	final String region;
-	final Boolean isUsa;
+	private String semarchyId;
+	private String name;
+	private String city;
+	private String region;
+	private Boolean isUsa;
 
-	final Collection<FirmDto> results;
+	private final Collection<FirmDto> results = new ArrayList<>();
 
 }

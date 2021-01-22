@@ -1,11 +1,13 @@
 package ca.goudie.advisorinformationscraping.services;
 
+import ca.goudie.advisorinformationscraping.dto.EmployeeDto;
+import ca.goudie.advisorinformationscraping.dto.FirmDto;
 import ca.goudie.advisorinformationscraping.dto.IFirmInfo;
+import ca.goudie.advisorinformationscraping.dto.QueryDto;
 import ca.goudie.advisorinformationscraping.entities.QueryEntity;
 import ca.goudie.advisorinformationscraping.repositories.QueryRepository;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
-import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult;
 import ca.goudie.advisorinformationscraping.entities.EmployeeAddress;
 import ca.goudie.advisorinformationscraping.entities.EmployeeEmail;
 import ca.goudie.advisorinformationscraping.entities.EmployeeEntity;
@@ -83,7 +85,7 @@ public class StorageService {
 		return this.queryRepo.findSemarchyIds();
 	}
 
-	public QueryResult getResultsBySemarchyId(final String id)
+	public QueryDto getResultsBySemarchyId(final String id)
 			throws ResultMissingException {
 		final Optional<QueryEntity> query = this.queryRepo.findById(id);
 
@@ -95,7 +97,7 @@ public class StorageService {
 		return query.get().toDto();
 	}
 
-	public FirmResult getFirmById(final Long id) throws ResultMissingException {
+	public FirmDto getFirmById(final Long id) throws ResultMissingException {
 		final Optional<FirmEntity> firm = this.firmRepo.findById(id);
 
 		if (!firm.isPresent()) {
@@ -106,7 +108,7 @@ public class StorageService {
 		return firm.get().toDto();
 	}
 
-	public EmployeeResult getEmployeeById(final Long id)
+	public EmployeeDto getEmployeeById(final Long id)
 			throws ResultMissingException {
 		final Optional<EmployeeEntity> employee = this.employeeRepo.findById(id);
 

@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
+import ca.goudie.advisorinformationscraping.dto.EmployeeDto;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.EmployeeResult;
 
 import lombok.AllArgsConstructor;
@@ -43,6 +44,13 @@ public class EmployeeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	private Long id;
+
+	@Column(
+			insertable = false,
+			name = SqlConstants.FIRM_ID_COLUMN,
+			nullable = false,
+			updatable = false)
+	private Long firmId;
 
 	@Column(
 			name = SqlConstants.EMPLOYEE_NAME_COLUMN,
@@ -112,8 +120,11 @@ public class EmployeeEntity {
 		}
 	}
 
-	public EmployeeResult toDto() {
-		final EmployeeResult employee = new EmployeeResult();
+	public EmployeeDto toDto() {
+		final EmployeeDto employee = new EmployeeDto();
+
+		employee.setInternalEmployeeId(this.id);
+		employee.setInternalFirmId(this.firmId);
 
 		employee.setName(this.name);
 		employee.setSource(this.source);

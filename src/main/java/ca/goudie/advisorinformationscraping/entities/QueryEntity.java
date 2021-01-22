@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
+import ca.goudie.advisorinformationscraping.dto.QueryDto;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.QueryResult;
 
@@ -58,11 +59,17 @@ public class QueryEntity {
 		}
 	}
 
-	public QueryResult toDto() {
-		final QueryResult query = new QueryResult();
+	public QueryDto toDto() {
+		final QueryDto query = new QueryDto();
+
+		query.setSemarchyId(this.semarchyId);
+		query.setName(this.name);
+		query.setCity(this.city);
+		query.setRegion(this.region);
+		query.setIsUsa(this.isUsa);
 
 		for (final FirmEntity result : this.results) {
-			query.getFirms().add(result.toDto());
+			query.getResults().add(result.toDto());
 		}
 
 		return query;

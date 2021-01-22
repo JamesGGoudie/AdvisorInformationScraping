@@ -1,6 +1,7 @@
 package ca.goudie.advisorinformationscraping.entities;
 
 import ca.goudie.advisorinformationscraping.constants.SqlConstants;
+import ca.goudie.advisorinformationscraping.dto.FirmDto;
 import ca.goudie.advisorinformationscraping.services.scrapers.models.FirmResult;
 
 import lombok.AllArgsConstructor;
@@ -43,6 +44,13 @@ public class FirmEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	private Long id;
+
+	@Column(
+			insertable = false,
+			name = SqlConstants.QUERY_SEMARCHY_ID_COLUMN,
+			nullable = false,
+			updatable = false)
+	private String semarchyId;
 
 	@Column(
 			name = SqlConstants.FIRM_SOURCE_COLUMN,
@@ -122,8 +130,11 @@ public class FirmEntity {
 		}
 	}
 
-	public FirmResult toDto() {
-		final FirmResult firm = new FirmResult();
+	public FirmDto toDto() {
+		final FirmDto firm = new FirmDto();
+
+		firm.setInternalFirmId(this.id);
+		firm.setSemarchyId(this.semarchyId);
 
 		firm.setSource(this.source);
 		firm.setFirmUrl(this.url);
